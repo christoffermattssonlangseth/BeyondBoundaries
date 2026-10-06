@@ -4,7 +4,6 @@ usage: python scripts/01_extract_features.py [--config config.yaml] [--sections 
                                              [--workers N] [--max-windows N --out-suffix _bench] [--overwrite]
 """
 import argparse
-import fnmatch
 import sys
 import time
 from pathlib import Path
@@ -15,15 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from beyondboundaries.extract import extract_section  # noqa: E402
 from beyondboundaries.features import FeatureParams  # noqa: E402
-from beyondboundaries.io import section_id  # noqa: E402
-
-
-def in_scope_bundles(cfg):
-    for run_dir in cfg["runs"].values():
-        for b in sorted(Path(run_dir).glob("output-*")):
-            region = b.name.split("__")[2]
-            if not any(fnmatch.fnmatch(region, pat) for pat in cfg["exclude_regions"]):
-                yield b
+from beyondboundaries.io import find_bundles  # noqa: E402
 
 
 def main():
@@ -38,11 +29,11 @@ def main():
     cfg = yaml.safe_load(open(a.config))
     out_dir = ROOT / cfg["features_dir"]
     tl = cfg["tiling"]
-    bundles = [b for b in in_scope_bundles(cfg) if not a.sections or section_id(b) in a.sections]
+    bundles = {s: b for s, b in find_bundles(cfg).items() if not a.sections or s in a.sections}
     print(f"{len(bundles)} sections in scope", flush=True)
     t0 = time.time()
-    for b in bundles:
-        out = out_dir / f"{section_id(b)}{a.out_suffix}.parquet"
+    for sid, b in bundles.items():
+        out = out_dir / f"{sid}{a.out_suffix}.parquet"
         if out.exists() and not a.overwrite:
             print(f"skip {out.name} (exists)", flush=True)
             continue

@@ -39,6 +39,17 @@ def section_id(bundle: Path) -> str:
     return f"{run}_{region}_{slide}"
 
 
+def find_bundles(cfg: dict) -> dict[str, Path]:
+    """In-scope bundles from config: {section_id: bundle path}, excluding cfg['exclude_regions'] globs."""
+    import fnmatch
+    out = {}
+    for run_dir in cfg["runs"].values():
+        for b in sorted(Path(run_dir).glob("output-*")):
+            if not any(fnmatch.fnmatch(b.name.split("__")[2], pat) for pat in cfg["exclude_regions"]):
+                out[section_id(b)] = b
+    return out
+
+
 class TiledPlane:
     """Random-access window reads from one tiled TIFF plane without zarr (tifffile>=2025 needs zarr 3)."""
 

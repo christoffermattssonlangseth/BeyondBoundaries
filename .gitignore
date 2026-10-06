@@ -8,3 +8,4 @@ __pycache__/
 *.zarr.zip
 *.ome.tif
 data/
+# executed notebooks are committed; their percent-script twins are the source
