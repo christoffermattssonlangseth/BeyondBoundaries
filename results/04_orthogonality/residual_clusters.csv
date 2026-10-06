@@ -1,0 +1,20 @@
+cell_type,cluster,n,frac,lesion_minus_phys,p,lesion_dist_median,type_lesion_dist_median,top_features,q
+Oligodendrocyte,0,30000,1.0,0.0,,0.0,0.0,"smavim_glcm_entropy -0.04, bnd_rim_mean +0.04, bnd_cyto_mean +0.04, smavim_glcm_asm +0.04",1.0
+Myeloid,0,30000,1.0,0.0,,0.0,0.0,"bnd_glcm_asm -0.06, smavim_rim_over_ring +0.05, smavim_cyto_p90 -0.05, smavim_rim_p90 -0.05",1.0
+Neuron,0,30000,1.0,0.0,,27.387649790213572,27.387649790213572,"bnd_glcm_contrast -0.09, bnd_glcm_correlation +0.09, bnd_rim_mean +0.07, bnd_cyto_mean +0.07",1.0
+Fibroblast,0,13434,0.4478,-0.03112615121483625,0.04844093322753906,0.0,0.0,"bnd_ring_mean -0.52, smavim_ring_mean -0.52, bnd_terr_mean -0.51, smavim_terr_mean -0.51",0.4601888656616211
+Fibroblast,1,16566,0.5522,0.03112615121483628,0.04844093322753906,0.0,0.0,"bnd_ring_mean +0.50, smavim_ring_mean +0.49, bnd_terr_mean +0.48, smavim_terr_mean +0.48",0.4601888656616211
+Astrocyte,0,30000,1.0,0.0,,0.0,0.0,"bnd_glcm_correlation +0.05, bnd_glcm_contrast -0.04, morph_nuc_cell_ratio -0.02, bnd_nuc_p90 -0.02",1.0
+Endothelial,0,19411,0.6470333333333333,-0.04005697573591177,0.4060330390930176,0.0,0.0,"smavim_radial_b4 -0.34, smavim_radial_b2 +0.31, smavim_glcm_homogeneity -0.30, smavim_glcm_entropy +0.29",1.0
+Endothelial,1,10589,0.35296666666666665,0.040056975735911715,0.4060330390930176,0.0,0.0,"smavim_radial_b4 +0.60, smavim_radial_b2 -0.54, smavim_radial_b1 -0.53, r18s_radial_b4 +0.44",1.0
+Schwann cell,0,7230,0.3495117470753166,0.025154523139148732,0.7011814117431641,26.30701908735911,20.416856522053394,"bnd_terr_mean -0.66, bnd_nuc_p90 -0.65, bnd_ring_mean -0.63, bnd_terr_p90 -0.62",1.0
+Schwann cell,1,13456,0.6504882529246834,-0.025154523139148732,0.7011814117431641,18.413562931881074,20.416856522053394,"bnd_terr_mean +0.35, bnd_ring_mean +0.35, bnd_rim_mean +0.35, bnd_nuc_p90 +0.35",1.0
+DC,0,8558,0.5074113601328116,-0.10035603026257234,1.0,0.0,0.0,"smavim_nuc_mean +0.52, bnd_nuc_p90 +0.47, bnd_nuc_mean +0.45, bnd_glcm_asm -0.45",1.0
+DC,1,8308,0.4925886398671884,0.10035603026257223,1.0,0.0,0.0,"smavim_nuc_p90 -0.45, smavim_glcm_asm +0.44, smavim_glcm_homogeneity +0.43, bnd_radial_b1 -0.42",1.0
+T cell,0,15921,1.0,0.0,1.0,0.0,0.0,"smavim_nuc_mean +0.13, bnd_rim_mean +0.12, bnd_nuc_mean +0.11, bnd_cyto_mean +0.10",1.0
+OPC,0,14242,1.0,0.0,,0.0,0.0,"bnd_glcm_correlation +0.05, bnd_glcm_contrast -0.05, bnd_nuc_mean -0.04, bnd_nuc_p90 -0.03",1.0
+VSMC,0,9328,1.0,0.0,,0.0,0.0,"bnd_glcm_contrast -0.06, bnd_glcm_homogeneity +0.06, bnd_glcm_correlation +0.05, bnd_glcm_entropy -0.05",1.0
+B cell,0,4548,1.0,,,0.0,0.0,"smavim_nuc_mean +0.09, dapi_radial_b4 +0.09, dapi_radial_b2 -0.08, bnd_nuc_mean +0.07",1.0
+Ependymal cell,0,2490,0.8280678417026938,-0.013056835637480835,,65.09486277575508,63.70791924798202,"smavim_glcm_entropy +0.24, smavim_glcm_homogeneity -0.23, smavim_glcm_asm -0.22, smavim_radial_b4 -0.22",1.0
+Ependymal cell,1,517,0.1719321582973063,0.01305683563748078,,57.65035583069078,63.70791924798202,"smavim_radial_b2 -1.02, smavim_radial_b4 +1.02, smavim_radial_b1 -0.94, bnd_radial_b2 -0.94",1.0
+NK/DC,0,2046,1.0,,,0.0,0.0,"bnd_glcm_correlation +0.24, bnd_glcm_contrast -0.21, dapi_radial_b4 +0.09, bnd_glcm_asm -0.08",1.0

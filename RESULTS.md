@@ -93,3 +93,36 @@ Expectation tests, AUROC (all cells / 18S-seg / boundary-seg / nucleus-exp; anim
   after removing offsets: 18S 0.998, boundary 0.63, nucleus-exp 0.30 (r with all-cells pattern).
   → Phase 4 main analysis on 18S-segmented cells (96 %), all-cells as sensitivity; 18S distribution features flagged
   as partly by construction.
+
+## 2026-10-06 — Phase 4: orthogonality (`notebooks/04_orthogonality.ipynb`, src `orthogonality.py`)
+
+Setup: 18S-segmented cells, 14 types (≥ 500 cells, ≥ 5 animals; ≤ 30k cells/type), 118 image features (rank-INT within
+type), ridge, 5-fold GroupKFold by animal; covariates = section, spinal level, log transcripts, log area, log edge dist;
+transcriptome = 50 PCs of log-normalised counts fitted in-fold. ~2.3 h on the shared Mac (load 40–60).
+Bug caught mid-run: reverse-direction covariate models scored R² < 0 under animal-grouped CV (cell-state composition
+differs between animals) → inflated "image gain". Fixed: consistent PCA targets, pooled OOF R², gains clipped at 0.
+
+- **The transcriptome explains little of the image**: median R²(covariates + transcriptome) per feature 0.11–0.18 across
+  types (transcriptome-unique ΔR² 0.06–0.10) → 82–89 % of image-feature variance is not linearly explained.
+  Best explained: morphology (0.39; nucleus:cell ratio ΔR² 0.40–0.47 in every type), rim/cyto/nuclear intensities
+  (0.23–0.36); least: polarity (0.06), radial profile (0.09), territory intensity (0.09).
+- **The unexplained intensity signal is spatially structured**: a cell's residual vs its 10 nearest same-type
+  neighbours r ≈ 0.44–0.49 (rim/cyto/nuc intensity), 0.29–0.31 (ring/territory); polarity 0.08, radial 0.13
+  (≈ noise). Not yet separated into technical field vs tissue biology → next check.
+- **Reverse — images predict transcriptional state**: e.g. neuron PC1 R² 0.75 (image gain 0.36; neurofilament genes
+  *Nefm/Nefh/Nefl*), astrocyte PC1 0.59 (gain 0.41; *C3*, *A2m*, *Gfap*, *Mt2*, *Slc6a11*, *Fgfr3*, *Aldoc*, *Gjb6*),
+  oligodendrocyte PC1 0.43 (gain 0.35; *Klk6*, *Ermn*, *Ptgds* and neighbour-spillover genes *Snap25*, *Eno2*, *Sncb*).
+  αSMA/Vim intensity/texture in astrocytes is well transcriptome-explained (ΔR² 0.23–0.27) → the vimentin stain largely
+  re-measures transcriptional reactivity.
+- **Lesion information beyond the transcriptome is small**: residual lesion-vs-physiological shift (per animal) in
+  32/1114 type×feature tests (q < 0.05), 0.1–0.26 SD; clearest = lower ATP1A1 ring/territory around myeloid, endothelial,
+  VSMC in lesions (neuropil loss around the cell). Lesion-niche classification: image alone AUROC 0.47–0.82, but
+  image adds ≤ 0.015 to the transcriptome (0.79–0.96) — partly by construction (niches are transcriptome-defined).
+- Residual clustering (Leiden, res 0.3): no discrete hidden states; 1 cluster in most types, 2 continuous-gradient
+  splits elsewhere (mostly ring/territory intensity); none lesion-associated (all q ≥ 0.46).
+
+### Open questions (updated)
+- Is the spatially coherent residual a technical field (stain/focus) or tissue biology? Decompose into a smooth
+  all-cell-type field + cell-specific part; test both against lesion distance / piece disease.
+- Lesion labels are transcriptome-derived; an image-independent outcome (clinical score / stage per animal) is the
+  fairer test of added value.
