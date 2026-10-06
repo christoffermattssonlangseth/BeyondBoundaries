@@ -80,20 +80,26 @@ def pixels_by_region(maps: dict, cell_xy_um: np.ndarray, cell_region: np.ndarray
     return df
 
 
-def normalise(feats: pd.DataFrame, channels, ref_mask: np.ndarray, bg: str = "local") -> pd.DataFrame:
+def normalise(feats: pd.DataFrame, channels, ref_mask: np.ndarray, bg: str = "local",
+              scale_q: float = 90, group: str = "section_id") -> pd.DataFrame:
     """Background-subtract compartment intensities and scale per section.
 
-    x_norm = (x - bg) / s_section, s_section = median(cell_mean - bg) over reference cells
-    (ref_mask, e.g. physiological-niche cells) of that section. Sums: (sum - bg * npx) / s.
+    x_norm = (x - bg) / s_group, s_group = scale_q-th percentile of raw cell_mean over reference cells
+    (ref_mask, e.g. physiological-niche cells) of that group (section, or tissue piece = `meta_sample_id`). Sums: (sum - bg * npx) / s.
+    (The scale is taken on raw, not background-subtracted, values: for ATP1A1 most cells are dimmer than
+    the surrounding neuropil and αSMA/Vim is ~0 in most cells, so a subtracted median is <= 0; and the plain
+    median of αSMA/Vim is noise-level, hence a high percentile that tracks the stained population.)
     Ratio-type features (radial, polarity, texture, morphology) are left unchanged.
     """
     out = feats.copy()
+    num = [c for c in out if c.split("_")[0] in channels and out[c].dtype == np.float32]
+    out[num] = out[num].astype(np.float64)
     for ch in channels:
         b = feats[f"{ch}_bg_{bg}"]
-        for sec, idx in feats.groupby("section_id").groups.items():
+        for _, idx in feats.groupby(group, observed=True).groups.items():
             m = feats.index.isin(idx)
             ref = m & ref_mask
-            s = np.nanmedian((feats.loc[ref, f"{ch}_cell_mean"] - b[ref]).values) if ref.any() else np.nan
+            s = np.nanpercentile(feats.loc[ref, f"{ch}_cell_mean"].values, scale_q) if ref.any() else np.nan
             for comp in ("cell", "nuc", "cyto", "rim", "ring", "terr"):
                 for st in INTENSITY_STATS:
                     c = f"{ch}_{comp}_{st}"

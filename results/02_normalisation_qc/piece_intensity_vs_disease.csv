@@ -1,0 +1,7 @@
+,rho,rho,p,p
+covariate,lesion_frac,score,lesion_frac,score
+channel,,,,
+bnd,-0.2,-0.22,0.15,0.12
+dapi,0.27,0.35,0.052,0.012
+r18s,-0.42,-0.29,0.0023,0.037
+smavim,0.45,0.43,0.00084,0.0016

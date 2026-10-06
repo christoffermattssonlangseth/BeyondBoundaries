@@ -34,3 +34,41 @@ Scripts: `scripts/00_inspection/` (run on the analysis Mac, env `sc_py312`). Out
 - Controls are thin in run5/6 → condition contrast is mostly between EAE stages/niches, not EAE vs control.
 - ATP1A1 is pan-neuropil in CNS → ch1 "membrane rim" will be dominated by neighbouring neuropil; needs a local-background (ring outside cell) feature.
 - Include optic-nerve / D_SC bundles? (need their annotation).
+
+## 2026-10-06 — Phase 1: per-cell features (`scripts/01_extract_features.py`, `notebooks/01_feature_overview.ipynb`)
+
+- Package `src/beyondboundaries` (io / features / extract), env `environment.yml` (`bb` on analysis Mac), 8 unit tests pass
+  (synthetic known values + **exact tiling invariance**; the test caught an image-border bug, fixed).
+- 2048² windows + 256 px halo, 6 workers: **66 min for 18 sections**, 537,716 cells × 201 columns, **0 truncated cells**.
+  Output `data/features/<section>.parquet` (remote, 671 MB). 500,379 cells (93.1 %) are in the annotation; non-annotated
+  cells are QC-poor (median 629 vs 973 transcripts).
+- Concordance: mask areas = Xenium `cell_area` exactly; centroids ≤ 0.28 µm. Structural NaNs only (no nucleus 0.55 %,
+  of which boundary-segmented cells 31 %; no outer ring 2.2 % — fully enclosed cells).
+- Where stains live (compartment ÷ cell mean, median): DAPI nucleus 1.83; **ATP1A1 is higher outside cells (ring 1.29)**
+  = neuropil; 18S cell-confined (ring 0.22, partly by construction: 18S drew ~95 % of masks); αSMA/Vim cytoplasmic.
+- Raw biology already visible (heatmap): ependymal αSMA/Vim↑, neurons 18S↑ + large, fibroblasts αSMA/Vim↑, Schwann 18S↓.
+  **Leukocytes are boundary-channel-dim**, not CD45-bright: the channel is dominated by neuropil ATP1A1 → test CD45 as
+  rim/ring enrichment (Phase 3).
+
+## 2026-10-06 — Phase 2: background, AF, normalisation (`notebooks/02_normalisation_qc.ipynb`)
+
+- Level-3 (1.7 µm) maps per section: tissue mask, cell-free tissue (> 5 µm from cells), AF proxy = cell-free ∩ lowest-25 %
+  transcript density; local background = σ 25 µm normalised convolution of cell-free pixels. Cached in `data/qc/`.
+- **Autofluorescence WM vs GM** (AF-proxy pixels, median over sections): DAPI 1.0 vs 1.0; 18S 11.9 vs 11.5 (WM/GM 0.97);
+  ATP1A1 55 vs 15 (per-section median ratio 1.5); αSMA/Vim 1.0 vs 0.2 (tiny absolute). No broadband myelin AF (18S flat);
+  the WM boundary-channel excess is more likely axolemmal ATP1A1. Local background subtraction handles both.
+- Local background ≈ 1.3× the cell mean for ATP1A1 in GM (cells dimmer than neuropil); ~0.2 for 18S.
+- 2.2 % of cells within 20 µm of the tissue edge; `edge_um` kept as covariate.
+- **Normalisation**, after two failed variants (recorded so they're not retried):
+  1. scale = median background-subtracted reference cell mean → ≤ 0 for ATP1A1 and ~0 for αSMA/Vim (unusable);
+  2. scale = median raw reference mean → αSMA/Vim noise-level (most cells ≈ 0);
+  3. **final: (x − local bg) / p90 of raw cell means of physiological-niche cells, per section** (= slide region, the
+     technical unit). Between-section CV (stain-positive reference type): DAPI 0.077→0.052, 18S 0.099→0.065.
+     Per-piece scaling was tried and rejected because piece-level intensity tracks disease (next bullet).
+- **Finding: within a section, pieces from sicker animals have brighter αSMA/Vim (ρ = 0.45 vs lesion fraction,
+  p = 8e-4; ρ = 0.43 vs score, p = 0.002) and dimmer 18S (ρ = −0.42, p = 0.002) in their physiological-niche cells**
+  (51 pieces). Caveat: not yet controlled for cell-type composition / spinal level → Phase 4.
+- Output `data/features_norm.parquet` (500,379 annotated cells × 232 columns).
+
+### Open questions (updated)
+- Piece-level αSMA/Vim↑ / 18S↓ with disease: composition or level-driven, or cell-intrinsic? (Phase 4 within type.)

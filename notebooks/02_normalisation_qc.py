@@ -18,9 +18,13 @@
 #   DAPI-negative, transcript-poor pixels; split by the anatomical region of the nearest annotated cell (WM vs GM)
 # - **local background** per channel: Gaussian-weighted (σ 25 µm) mean of cell-free pixels, sampled at each cell
 #
-# Normalisation (intensity features only): `(x − local background) / s_section`, where `s_section` is the median
-# background-subtracted cell mean of **physiological-niche** cells in that section (`Curated_niche_state`), so
-# lesion-rich sections are not scaled towards their lesion content. Ratio-type features (radial, polarity,
+# Normalisation (intensity features only): `(x − local background) / s_section`, where `s_section` is the 90th
+# percentile of raw cell means of **physiological-niche** cells in that **section** (one slide region, stained
+# and imaged together = the technical unit). Pieces within a section also differ, but piece-level intensity
+# tracks disease (see below), so pieces are not scaled away — tissue piece enters Phase 4 models as a covariate (`Curated_niche_state`), so lesion-rich sections
+# are not scaled towards their lesion content. (Scaling on background-subtracted values fails: most cells are
+# dimmer than the ATP1A1 neuropil and αSMA/Vim ≈ 0 in most cells, giving ≤ 0 scales; a raw median is noise-level
+# for αSMA/Vim — earlier runs, see RESULTS.md.) Ratio-type features (radial, polarity,
 # texture, morphology) are left as they are.
 
 # %%
@@ -173,9 +177,48 @@ print("cells within 20 µm of edge:", (f.edge_um < 20).mean().round(3), "| outsi
 ref = (f.Curated_niche_state == "Physiological").values
 print("reference (physiological-niche) cells per section:")
 print(f[ref].groupby("section_id").size().describe().round(0).to_dict())
-fn = bgm.normalise(f, CH, ref, bg="local")
-scales = fn.groupby("section_id")[[f"{ch}_scale" for ch in CH]].first().round(1)
-scales
+fn = bgm.normalise(f, CH, ref, bg="local", group="section_id")
+scales = fn.groupby("section_id")[[f"{ch}_scale" for ch in CH]].first()
+scales.round(1)
+
+# %% [markdown]
+# ### Piece-level intensity vs disease
+# Within each section, the same reference statistic per tissue piece ÷ the section's scale (1 = like the rest of
+# its section). Spearman ρ with clinical score at sacrifice and with the piece's lesion-niche fraction. A positive
+# ρ for a channel means that stain is brighter, in *physiological-niche* cells, in sicker animals — biology that a
+# per-piece normalisation would remove.
+
+# %%
+from scipy.stats import spearmanr
+
+pc = {}
+for ch in CH:
+    p90 = f[ref].groupby("meta_sample_id", observed=True)[f"{ch}_cell_mean"].quantile(0.9)
+    pc[f"{ch}_rel"] = p90 / fn[ref].groupby("meta_sample_id", observed=True)[f"{ch}_scale"].first()
+piece = pd.DataFrame(pc).join(f.groupby("meta_sample_id", observed=True).agg(
+    score=("score_sacrifice", "first"), n=("section_id", "size"),
+    lesion_frac=("Curated_niche_state", lambda s: s.astype(str).str.startswith("Lesion").mean())))
+piece = piece[piece.n >= 1000]
+rows = []
+for ch in CH:
+    for cov_ in ("score", "lesion_frac"):
+        r, pval = spearmanr(piece[f"{ch}_rel"], piece[cov_], nan_policy="omit")
+        rows.append(dict(channel=ch, covariate=cov_, rho=round(r, 2), p=float(f"{pval:.2g}")))
+piece_tests = pd.DataFrame(rows).pivot(index="channel", columns="covariate", values=["rho", "p"])
+piece_tests.to_csv(OUT / "piece_intensity_vs_disease.csv")
+print(len(piece), "pieces with >= 1000 cells")
+piece_tests
+
+# %%
+fig, axs = plt.subplots(1, 4, figsize=(12, 3), sharey=False)
+for ax, ch in zip(axs, CH):
+    ax.scatter(piece.lesion_frac, piece[f"{ch}_rel"], s=14, color=plotting.CHANNEL_COLORS[ch])
+    ax.axhline(1, color="#888888", lw=0.8, ls="--")
+    ax.set(xlabel="lesion-niche fraction of piece", title=f"{plotting.CHANNEL_LABELS[ch]}\n"
+           f"ρ={piece_tests.loc[ch, ('rho', 'lesion_frac')]}")
+axs[0].set_ylabel("piece / section reference intensity")
+fig.tight_layout()
+plotting.save_fig(fig, "piece_intensity_vs_lesion", OUT, SRC)
 
 # %%
 oli = (f.Anno_L1_curated == "Oligodendrocyte") & ref
@@ -197,11 +240,16 @@ fig.tight_layout()
 plotting.save_fig(fig, "normalisation_oligos", OUT, SRC)
 
 # %%
-def cv_between_sections(frame):
-    med = frame[oli].groupby(f.section_id[oli])[[f"{ch}_cell_mean" for ch in CH]].median()
-    return (med.std() / med.mean().abs()).round(3)
-
-pd.DataFrame({"raw": cv_between_sections(f), "normalised": cv_between_sections(fn)})
+# between-section CV of the median normalised cell mean, judged on physiological-niche cells that carry the stain
+# (DAPI/18S only: for ATP1A1 and αSMA/Vim most cells sit at background after subtraction, so a CV is meaningless)
+POS = {"dapi": ["Oligodendrocyte"], "r18s": ["Neuron"]}
+rows = {}
+for ch, types in POS.items():
+    m = ref & f.Anno_L1_curated.isin(types).values
+    for lab, frame in (("raw", f), ("normalised", fn)):
+        med = frame.loc[m, f"{ch}_cell_mean"].groupby(f.section_id[m]).median()
+        rows.setdefault(f"{ch} ({types[0]})", {})[lab] = round(med.std() / abs(med.mean()), 3)
+pd.DataFrame(rows).T
 
 # %% [markdown]
 # ## QC after normalisation: by segmentation method

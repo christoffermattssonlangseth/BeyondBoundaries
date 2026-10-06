@@ -10,7 +10,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 CHANNELS = ["dapi", "bnd", "r18s", "smavim"]
-OBS_COLS = ["sample_id", "sample_name", "meta_sample_id", "condition", "model", "stage", "region", "sex",
+OBS_COLS = ["sample_id", "sample_name", "meta_sample_id", "condition", "model", "stage", "score_sacrifice", "region", "sex",
             "Anno_L1_curated", "Anno_L2", "Anno_L3", "Curated_niche_state", "Global_niche_group",
             "Global_anatomical_region", "Physiological_niche"]
 
