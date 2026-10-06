@@ -17,11 +17,12 @@ INTENSITY_STATS = ("mean", "p50", "p90", "p99")
 
 def section_background(b: XeniumBundle, level: int = 3, cell_margin_um: float = 5.0,
                        smooth_um: float = 25.0, tissue_smooth_um: float = 10.0,
-                       min_tissue_um2: float = 2e4) -> dict:
+                       min_tissue_um2: float = 2e4, af_tx_quantile: float = 0.25) -> dict:
     """Low-res maps for one section.
 
     tissue   : smoothed DAPI+18S > Otsu (log), holes filled, small specks removed
     cellfree : tissue pixels further than cell_margin_um from any segmented cell
+    af       : cell-free AND low transcript density (< af_tx_quantile of tissue) -> autofluorescence proxy
     bg_<ch>  : local background = Gaussian-weighted mean of cell-free pixels (normalised convolution)
     edge_um  : distance to tissue edge
     """
@@ -36,8 +37,10 @@ def section_background(b: XeniumBundle, level: int = 3, cell_margin_um: float = 
     cells = b.cell_mask_lowres(f)[:shape[0], :shape[1]]
     near_cell = ndi.binary_dilation(cells, iterations=max(1, int(round(cell_margin_um / px))))
     cellfree = tissue & ~near_cell
+    tx = ndi.gaussian_filter(b.transcript_density(f)[:shape[0], :shape[1]].astype(np.float32), 5.0 / px)
+    af = cellfree & (tx < np.quantile(tx[tissue], af_tx_quantile))
     w = ndi.gaussian_filter(cellfree.astype(np.float32), smooth_um / px)
-    out = {"px_um": px, "tissue": tissue, "cellfree": cellfree, "cells": cells,
+    out = {"px_um": px, "tissue": tissue, "cellfree": cellfree, "af": af, "tx_density": tx, "cells": cells,
            "edge_um": ndi.distance_transform_edt(tissue) * px, "img": imgs}
     for ch, im in imgs.items():
         num = ndi.gaussian_filter(np.where(cellfree, im, 0), smooth_um / px)
@@ -61,14 +64,14 @@ def sample_at_cells(maps: dict, x_um: np.ndarray, y_um: np.ndarray, channels) ->
     return pd.DataFrame(d)
 
 
-def cellfree_by_region(maps: dict, cell_xy_um: np.ndarray, cell_region: np.ndarray, channels,
-                       max_dist_um: float = 50.0) -> pd.DataFrame:
-    """Cell-free pixel intensities labelled by the region of the nearest annotated cell
+def pixels_by_region(maps: dict, cell_xy_um: np.ndarray, cell_region: np.ndarray, channels,
+                     which: str = "af", max_dist_um: float = 50.0) -> pd.DataFrame:
+    """Background pixels (maps[which]) labelled by the region of the nearest annotated cell
     (e.g. Global_anatomical_region WM vs GM) -> long table for autofluorescence comparison."""
     from scipy.spatial import cKDTree
 
     px = maps["px_um"]
-    yy, xx = np.nonzero(maps["cellfree"])
+    yy, xx = np.nonzero(maps[which])
     dist, j = cKDTree(cell_xy_um).query(np.c_[xx * px, yy * px], distance_upper_bound=max_dist_um)
     ok = np.isfinite(dist)
     df = pd.DataFrame({"region": np.asarray(cell_region)[j[ok]]})

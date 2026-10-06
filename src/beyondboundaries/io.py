@@ -122,6 +122,22 @@ class XeniumBundle:
         with tifffile.TiffFile(self.channel_files[channel], is_ome=False) as t:
             return t.series[0].levels[level].asarray()
 
+    def transcript_density(self, factor: int, min_qv: float = 20) -> np.ndarray:
+        """Decoded gene transcripts (qv >= min_qv) counted per pixel of a 2**level grid (factor = 2**level)."""
+        import pyarrow.parquet as pq
+
+        H, W = self.shape
+        out = np.zeros((-(-H // factor), -(-W // factor)), np.int64)
+        f = pq.ParquetFile(self.path / "transcripts.parquet")
+        step = self.pixel_size * factor
+        for i in range(f.num_row_groups):
+            t = f.read_row_group(i, columns=["x_location", "y_location", "qv", "is_gene"])
+            ok = (t["qv"].to_numpy() >= min_qv) & t["is_gene"].to_numpy()
+            iy = np.clip((t["y_location"].to_numpy()[ok] / step).astype(int), 0, out.shape[0] - 1)
+            ix = np.clip((t["x_location"].to_numpy()[ok] / step).astype(int), 0, out.shape[1] - 1)
+            np.add.at(out, (iy, ix), 1)
+        return out
+
     def cell_mask_lowres(self, factor: int) -> np.ndarray:
         """Boolean 'any cell' mask downsampled by `factor` (max-pool), read in row strips."""
         cell_m, _, _ = self._open_seg()
