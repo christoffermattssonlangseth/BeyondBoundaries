@@ -4,9 +4,12 @@ Within one cell type, cross-validated by animal (GroupKFold on `sample_name`):
   cov   : technical covariates -> image feature
   full  : covariates + transcriptome PCs -> image feature
   tx    : transcriptome PCs only
-ΔR²(tx | cov) = R²_full − R²_cov is what the transcriptome adds; 1 − R²_full is image signal nothing here explains.
-Reverse: covariates (+ image features) -> transcriptome PCs and individual genes.
-Transcriptome PCA is fitted on the training folds only. Image features are rank-inverse-normal transformed within
+ΔR²(tx | cov) = max(R²_full, 0) − max(R²_cov, 0) is what the transcriptome adds (clipped: with animal-grouped CV
+the covariate model can score < 0 because cell-state composition differs between animals); 1 − R²_full is image
+signal nothing here explains.
+Reverse: covariates (+ image features) -> transcriptome PCs and individual genes. All R² are pooled out-of-fold.
+Transcriptome PCA used as a *predictor* is fitted on the training folds only; the PCs used as reverse *targets* are
+one PCA per cell type (unsupervised, so consistent targets across folds). Image features are rank-inverse-normal transformed within
 the cell type (monotone, label-free) so heavy tails don't dominate R².
 """
 from __future__ import annotations
@@ -53,6 +56,11 @@ def r2(y: np.ndarray, pred: np.ndarray) -> np.ndarray:
     return 1 - ((y - pred) ** 2).sum(0) / ((y - y.mean(0)) ** 2).sum(0)
 
 
+def _gain(full, cov):
+    """ΔR² with both terms floored at 0 (a model worse than the mean explains nothing, not negative variance)."""
+    return np.clip(full, 0, None) - np.clip(cov, 0, None)
+
+
 def _ridge(Xtr, Ytr, Xte):
     m = RidgeCV(alphas=ALPHAS, alpha_per_target=True).fit(Xtr, Ytr)
     return m.predict(Xte)
@@ -72,7 +80,9 @@ def run_celltype(df: pd.DataFrame, counts, feats: list[str], n_pcs: int = 50, n_
         G = (G - G.mean(0)) / np.maximum(G.std(0), 1e-6)
     n = len(df)
     oof = {k: np.zeros_like(Y) for k in ("cov", "full", "tx")}
-    rev = {k: [] for k in ("P", "cov", "full")}
+    T = PCA(n_rev_pcs, svd_solver="covariance_eigh", random_state=0).fit_transform(Xln)
+    T = T / T.std(0)
+    rev = {k: np.zeros_like(T) for k in ("cov", "full")}
     gen = {k: np.zeros((n, G.shape[1]), np.float32) for k in ("cov", "full")} if G is not None else None
     for tr, te in GroupKFold(n_folds).split(Y, groups=df[group].astype(str).values):
         pca = PCA(n_pcs, svd_solver="covariance_eigh", random_state=0).fit(Xln[tr])
@@ -85,11 +95,9 @@ def run_celltype(df: pd.DataFrame, counts, feats: list[str], n_pcs: int = 50, n_
             oof["cov"][np.ix_(te, cols)] = _ridge(C[tr], Y[tr][:, cols], C[te])
             oof["full"][np.ix_(te, cols)] = _ridge(np.c_[C[tr], Ptr], Y[tr][:, cols], np.c_[C[te], Pte])
             oof["tx"][np.ix_(te, cols)] = _ridge(Ptr, Y[tr][:, cols], Pte)
-        # reverse: image -> transcriptome PCs (targets = this fold's PCs)
-        k = n_rev_pcs
-        rev["P"].append(Pte[:, :k])
-        rev["cov"].append(_ridge(C_area[tr], Ptr[:, :k], C_area[te]))
-        rev["full"].append(_ridge(np.c_[C_area[tr], Y[tr]], Ptr[:, :k], np.c_[C_area[te], Y[te]]))
+        # reverse: image -> transcriptome PCs
+        rev["cov"][te] = _ridge(C_area[tr], T[tr], C_area[te])
+        rev["full"][te] = _ridge(np.c_[C_area[tr], Y[tr]], T[tr], np.c_[C_area[te], Y[te]])
         if G is not None:
             gen["cov"][te] = _ridge(C_area[tr], G[tr], C_area[te])
             gen["full"][te] = _ridge(np.c_[C_area[tr], Y[tr]], G[tr], np.c_[C_area[te], Y[te]])
@@ -97,16 +105,13 @@ def run_celltype(df: pd.DataFrame, counts, feats: list[str], n_pcs: int = 50, n_
         "r2": pd.DataFrame({k: r2(Y, v) for k, v in oof.items()}, index=feats),
         "residuals": pd.DataFrame(Y - oof["full"], index=df.index, columns=feats),
     }
-    out["r2"]["tx_unique"] = out["r2"]["full"] - out["r2"]["cov"]
-    # reverse R² pooled over folds, per PC (PCs differ slightly per fold; pooled per-fold R² is the fair summary)
-    rp = np.array([r2(p, f_) for p, f_ in zip(rev["P"], rev["full"])])
-    rc = np.array([r2(p, c_) for p, c_ in zip(rev["P"], rev["cov"])])
-    out["reverse_pcs"] = pd.DataFrame({"cov": rc.mean(0), "full": rp.mean(0)},
+    out["r2"]["tx_unique"] = _gain(out["r2"]["full"], out["r2"]["cov"])
+    out["reverse_pcs"] = pd.DataFrame({"cov": r2(T, rev["cov"]), "full": r2(T, rev["full"])},
                                       index=[f"PC{i + 1}" for i in range(n_rev_pcs)])
-    out["reverse_pcs"]["img_unique"] = out["reverse_pcs"].full - out["reverse_pcs"]["cov"]
+    out["reverse_pcs"]["img_unique"] = _gain(out["reverse_pcs"].full, out["reverse_pcs"]["cov"])
     if G is not None:
         out["reverse_genes"] = pd.DataFrame({"cov": r2(G, gen["cov"]), "full": r2(G, gen["full"])}, index=genes)
-        out["reverse_genes"]["img_unique"] = out["reverse_genes"].full - out["reverse_genes"]["cov"]
+        out["reverse_genes"]["img_unique"] = _gain(out["reverse_genes"].full, out["reverse_genes"]["cov"])
     return out
 
 
