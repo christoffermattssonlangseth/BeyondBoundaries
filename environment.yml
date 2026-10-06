@@ -1,0 +1,25 @@
+# Analysis env for BeyondBoundaries (created on the analysis Mac, osx-arm64).
+# Exact solved versions are frozen in environment.lock.yml.
+name: bb
+channels: [conda-forge]
+dependencies:
+  - python=3.12
+  - numpy=2.2
+  - scipy=1.15
+  - pandas=2.2
+  - pyarrow=21
+  - scikit-image=0.25
+  - tifffile=2025.10.16
+  - imagecodecs=2025.8.2   # JPEG2000 tiles in morphology_focus
+  - zarr=2.18              # cells.zarr.zip via zarr.ZipStore
+  - h5py
+  - anndata=0.12
+  - scanpy=1.11
+  - scikit-learn=1.7
+  - matplotlib=3.10
+  - seaborn=0.13
+  - pyyaml
+  - pytest
+  - ipykernel
+  - nbconvert
+  - jupytext

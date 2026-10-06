@@ -1,0 +1,29 @@
+# Paths are on the analysis Mac (ki-cljjykhfx7) unless noted.
+runs:
+  run5: /Volumes/moldiassd/20260506__111857__GoncaloTing_5kMouse_run5
+  run6: /Volumes/moldiassd/20260506__112634__GoncaloTing_5kMouse_run6
+exclude_regions: ["ON_*", "D_SC"]   # optic nerve (out of scope); D_SC not annotated
+
+# laptop: ~/Downloads/RRMAP2_xenium_all_samples.cellcharter.companion.ready.with_metadata.rerun.with_AnnoL1Curated_with_Region_Anno2to4Updated.h5ad
+annotation:
+  h5ad: data/RRMAP2_annotated.h5ad
+  cell_type: Anno_L1_curated
+  cell_type_fine: Anno_L2
+  animal: sample_name
+  piece: meta_sample_id
+  lesion: Curated_niche_state
+
+features_dir: data/features          # one parquet per section, keyed by cell_id
+
+features:
+  rim_um: 1.0
+  ring_um: 2.0
+  territory_um: 10.0
+  radial_bins: 5
+  glcm_levels: 16
+  glcm_distance_um: 0.5
+
+tiling:
+  tile_px: 2048
+  halo_px: 256                       # 54 um; largest cell ~30 um across
+  workers: 6                         # shared machine
