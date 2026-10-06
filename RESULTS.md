@@ -72,3 +72,24 @@ Scripts: `scripts/00_inspection/` (run on the analysis Mac, env `sc_py312`). Out
 
 ### Open questions (updated)
 - Piece-level αSMA/Vim↑ / 18S↓ with disease: composition or level-driven, or cell-intrinsic? (Phase 4 within type.)
+
+## 2026-10-06 — Phase 3: sanity atlas (`notebooks/03_sanity_atlas.ipynb`)
+
+Expectation tests, AUROC (all cells / 18S-seg / boundary-seg / nucleus-exp; animals with AUROC > 0.5):
+| | expectation | all | 18S | boundary | nuc-exp | animals |
+|---|---|---|---|---|---|---|
+| E1 | leukocyte CD45 at rim (bnd rim/ring) | **0.48 ✗** | 0.48 | 0.54 | 0.46 | 7/25 |
+| E2 | VSMC αSMA-bright | 0.66 ✓ | 0.66 | 0.60 | 0.64 | 25/25 |
+| E3 | leukocyte vimentin > neuron/oligo | 0.73 ✓ | 0.74 | 0.77 | 0.55 | 25/25 |
+| E4 | neuron/oligo low ch3 | 0.74 ✓ | 0.75 | 0.78 | 0.58 | 25/25 |
+| E5 | ependymal vimentin | 0.86 ✓ | 0.86 | 0.88 | 0.54 | 25/25 |
+| E6 | neuron 18S (cytoplasm) | 0.78 ✓ | 0.78 | 0.85 | 0.60 | 25/25 |
+
+- **CD45 is not detectable**: leukocytes are not boundary-bright overall (0.55) nor in low-ATP1A1 context (lowest local-bg
+  quartile per section: AUROC 0.41–0.49 for every leukocyte type). In this mouse spinal cord ch1 behaves as ATP1A1 only.
+  → ask 10x whether the kit's CD45 antibody is mouse-reactive.
+- **Segmentation-method main effects are large for shape/distribution features** (boundary-seg: bnd outer radial bin
+  +10 SD, solidity +6 SD — the stain drew the edge; nucleus-exp: solidity +6, 18S entropy −6). Between-type pattern
+  after removing offsets: 18S 0.998, boundary 0.63, nucleus-exp 0.30 (r with all-cells pattern).
+  → Phase 4 main analysis on 18S-segmented cells (96 %), all-cells as sensitivity; 18S distribution features flagged
+  as partly by construction.

@@ -1,0 +1,31 @@
+test,stratum,feature,auroc,nA,nB,verdict
+E1 leukocyte CD45 rim,all,bnd_rim_over_ring,0.4774948608949283,130618.0,368328.0,fails
+E1 leukocyte CD45 rim,seg: interior (18S),bnd_rim_over_ring,0.4784656217037799,125177.0,354642.0,fails
+E1 leukocyte CD45 rim,seg: boundary,bnd_rim_over_ring,0.5378098381940238,1425.0,5793.0,fails
+E1 leukocyte CD45 rim,seg: nucleus exp.,bnd_rim_over_ring,0.4634500806831723,4016.0,7893.0,fails
+E1 leukocyte CD45 rim,animals > 0.5: 7/25,bnd_rim_over_ring,0.47763327821343726,,,fails
+E2 VSMC αSMA,all,smavim_cell_mean,0.6556848659327953,9679.0,489267.0,holds
+E2 VSMC αSMA,seg: interior (18S),smavim_cell_mean,0.6568399405003903,9328.0,470491.0,holds
+E2 VSMC αSMA,seg: boundary,smavim_cell_mean,0.5951751100885078,139.0,7079.0,weak
+E2 VSMC αSMA,seg: nucleus exp.,smavim_cell_mean,0.6399536407496842,212.0,11697.0,weak
+E2 VSMC αSMA,animals > 0.5: 25/25,smavim_cell_mean,0.6708697748219682,,,holds
+E3 leukocyte vimentin vs neuron/oligo,all,smavim_cell_mean,0.734443126382836,130618.0,170119.0,holds
+E3 leukocyte vimentin vs neuron/oligo,seg: interior (18S),smavim_cell_mean,0.7393548598752699,125177.0,165519.0,holds
+E3 leukocyte vimentin vs neuron/oligo,seg: boundary,smavim_cell_mean,0.7676972586222042,1425.0,2197.0,holds
+E3 leukocyte vimentin vs neuron/oligo,seg: nucleus exp.,smavim_cell_mean,0.547548466143748,4016.0,2403.0,fails
+E3 leukocyte vimentin vs neuron/oligo,animals > 0.5: 25/25,smavim_cell_mean,0.661498104054354,,,holds
+E4 neuron/oligo low ch3,all,smavim_cell_mean,0.7426502111430923,328827.0,170119.0,holds
+E4 neuron/oligo low ch3,seg: interior (18S),smavim_cell_mean,0.7463448914378723,314300.0,165519.0,holds
+E4 neuron/oligo low ch3,seg: boundary,smavim_cell_mean,0.7802149497372755,5021.0,2197.0,holds
+E4 neuron/oligo low ch3,seg: nucleus exp.,smavim_cell_mean,0.5806410109251366,9506.0,2403.0,weak
+E4 neuron/oligo low ch3,animals > 0.5: 25/25,smavim_cell_mean,0.7183569880635294,,,holds
+E5 ependymal vimentin,all,smavim_cell_mean,0.8593180062317907,3194.0,495752.0,holds
+E5 ependymal vimentin,seg: interior (18S),smavim_cell_mean,0.8601026122613644,3007.0,476812.0,holds
+E5 ependymal vimentin,seg: boundary,smavim_cell_mean,0.8756125743881107,155.0,7063.0,holds
+E5 ependymal vimentin,seg: nucleus exp.,smavim_cell_mean,0.5392223415003788,32.0,11877.0,fails
+E5 ependymal vimentin,animals > 0.5: 25/25,smavim_cell_mean,0.8770464640542452,,,holds
+E6 neuron 18S,all,r18s_cyto_mean,0.780043445756019,74943.0,424003.0,holds
+E6 neuron 18S,seg: interior (18S),r18s_cyto_mean,0.7769483480698223,73114.0,406705.0,holds
+E6 neuron 18S,seg: boundary,r18s_cyto_mean,0.8451320274230708,1464.0,5754.0,holds
+E6 neuron 18S,seg: nucleus exp.,r18s_cyto_mean,0.5973604844268973,365.0,11544.0,weak
+E6 neuron 18S,animals > 0.5: 25/25,r18s_cyto_mean,0.7811911655862904,,,holds

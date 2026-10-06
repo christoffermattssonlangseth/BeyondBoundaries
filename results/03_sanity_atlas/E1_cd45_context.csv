@@ -1,0 +1,19 @@
+context,feature,auroc,n_leuko,n_other
+all,bnd_cell_mean,0.545,130618,368328
+all,bnd_cell_over_terr,0.478,130618,368328
+all,bnd_rim_over_ring,0.477,130618,368328
+all,bnd_cell_mean: Myeloid vs non-leuko,0.536,89946,368328
+all,bnd_cell_mean: T cell vs non-leuko,0.556,16371,368328
+all,bnd_cell_mean: B cell vs non-leuko,0.605,4635,368328
+all,bnd_cell_mean: DC vs non-leuko,0.572,17449,368328
+all,bnd_cell_mean: NK/DC vs non-leuko,0.524,2077,368328
+all,bnd_cell_mean: Neutrophil vs non-leuko,0.644,140,368328
+low-ATP1A1 context,bnd_cell_mean,0.464,37323,87417
+low-ATP1A1 context,bnd_cell_over_terr,0.411,37323,87417
+low-ATP1A1 context,bnd_rim_over_ring,0.433,37323,87417
+low-ATP1A1 context,bnd_cell_mean: Myeloid vs non-leuko,0.456,21187,87417
+low-ATP1A1 context,bnd_cell_mean: T cell vs non-leuko,0.467,6383,87417
+low-ATP1A1 context,bnd_cell_mean: B cell vs non-leuko,0.458,2813,87417
+low-ATP1A1 context,bnd_cell_mean: DC vs non-leuko,0.492,5978,87417
+low-ATP1A1 context,bnd_cell_mean: NK/DC vs non-leuko,0.462,860,87417
+low-ATP1A1 context,bnd_cell_mean: Neutrophil vs non-leuko,0.431,102,87417

@@ -119,6 +119,32 @@ fig.tight_layout()
 plotting.save_fig(fig, "expectation_tests", OUT, SRC)
 
 # %% [markdown]
+# ### E1 follow-up: CD45 where the neuropil does not drown it
+# The boundary channel pools ATP1A1 (neuropil, high in GM/WM) with CD45. Restrict to cells whose local background
+# is in the lowest quartile of their section (meninges, lesion cores, roots) and compare leukocytes with
+# non-leukocytes *in that context*: background-subtracted cell mean and cell ÷ territory contrast.
+
+# %%
+q25 = f.groupby("section_id").bnd_bg_local.transform(lambda s: s.quantile(0.25))
+low = f.bnd_bg_local <= q25
+f["bnd_cell_over_terr"] = (f.bnd_cell_mean + f.bnd_bg_local / f.bnd_scale) / \
+                          (f.bnd_terr_mean + f.bnd_bg_local / f.bnd_scale)
+isL = f.Anno_L1_curated.isin(LEUKO)
+rows = []
+for ctx, m in (("all", np.ones(len(f), bool)), ("low-ATP1A1 context", low.values)):
+    for feat in ("bnd_cell_mean", "bnd_cell_over_terr", "bnd_rim_over_ring"):
+        rows.append(dict(context=ctx, feature=feat, auroc=round(auroc(f.loc[isL & m, feat], f.loc[~isL & m, feat]), 3),
+                         n_leuko=int((isL & m).sum()), n_other=int((~isL & m).sum())))
+    for t in LEUKO:
+        mt = (f.Anno_L1_curated == t) & m
+        rows.append(dict(context=ctx, feature=f"bnd_cell_mean: {t} vs non-leuko",
+                         auroc=round(auroc(f.loc[mt, "bnd_cell_mean"], f.loc[~isL & m, "bnd_cell_mean"]), 3),
+                         n_leuko=int(mt.sum()), n_other=int((~isL & m).sum())))
+e1 = pd.DataFrame(rows)
+e1.to_csv(OUT / "E1_cd45_context.csv", index=False)
+e1
+
+# %% [markdown]
 # ## Atlas: cell type × feature (normalised medians, z-scored across types)
 
 # %%
@@ -147,21 +173,32 @@ med.to_csv(OUT / "atlas_celltype_medians.csv")
 # %%
 segs = ["interior (18S)", "boundary", "nucleus exp."]
 fig, axs = plt.subplots(1, 3, figsize=(16, 5), sharey=True)
-corr = {}
+corr, offset = {}, {}
 for ax, s in zip(axs, segs):
     sub = f[f.seg == s]
     cnt = sub.Anno_L1_curated.value_counts()
     keep = [t for t in TYPES if cnt.get(t, 0) >= 30]
     m_ = sub.groupby("Anno_L1_curated", observed=True)[FEAT].median().reindex(TYPES)
-    zs = (m_ - med.mean()) / med.std()
+    zs = (m_ - m_.loc[keep].mean()) / med.std()          # centred within stratum: between-type pattern only
+    offset[s] = ((m_.loc[keep].mean() - med.loc[keep].mean()) / med.std())
     ax.imshow(zs.values, cmap=plotting.DIV, vmin=-2.5, vmax=2.5, aspect="auto")
     ax.set_title(f"{s} (types with ≥30 cells: {len(keep)})")
     ax.set_xticks([])
-    corr[s] = np.corrcoef(zs.loc[keep].values.ravel(), z.loc[keep].values.ravel())[0, 1]
+    zk = z.loc[keep] - z.loc[keep].mean()
+    corr[s] = np.corrcoef(zs.loc[keep].values.ravel(), zk.values.ravel())[0, 1]
 axs[0].set_yticks(range(len(TYPES)), TYPES, fontsize=8)
 fig.tight_layout()
 plotting.save_fig(fig, "atlas_by_segmethod", OUT, SRC)
-print("correlation of each stratum's z-pattern with the all-cells pattern:", {k: round(v, 3) for k, v in corr.items()})
+print("between-type pattern correlation with all cells (each stratum centred on its own mean):",
+      {k: round(v, 3) for k, v in corr.items()})
+
+# %% [markdown]
+# The removed per-stratum offsets = the segmentation-method main effect on each feature (in SD units of the
+# between-type spread). Largest offsets:
+
+# %%
+off = pd.DataFrame(offset)
+off.reindex(off.abs().max(axis=1).sort_values(ascending=False).index).head(15).round(2)
 
 # %% [markdown]
 # ## Violins: key features by cell type, split by segmentation method
