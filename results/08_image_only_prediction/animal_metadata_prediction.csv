@@ -1,0 +1,25 @@
+task,input,animals,metric,value,p,chance
+clinical score (all),images,25,Spearman ρ (per animal),0.6228770440999741,0.0008821699853057079,
+clinical score (all),transcriptome,25,Spearman ρ (per animal),0.7936721861111476,2.2002311091840977e-06,
+clinical score (all),both,25,Spearman ρ (per animal),0.7621587316626168,9.535349434842523e-06,
+day of sacrifice (chronic),images,16,Spearman ρ (per animal),0.5192398593257311,0.03928779948362227,
+day of sacrifice (chronic),transcriptome,16,Spearman ρ (per animal),0.8402513962877929,4.6152621814130406e-05,
+day of sacrifice (chronic),both,16,Spearman ρ (per animal),0.7470544984600974,0.0008822014490548402,
+day of sacrifice (relapse-remitting),images,9,Spearman ρ (per animal),-0.5714487486348921,0.10797035347412806,
+day of sacrifice (relapse-remitting),transcriptome,9,Spearman ρ (per animal),0.025210974204480537,0.948667820369289,
+day of sacrifice (relapse-remitting),both,9,Spearman ρ (per animal),-0.3613572969308877,0.3393210245115939,
+phase (chronic: pre/onset · peak · chronic),images,16,accuracy (per animal),0.5625,,0.3333333333333333
+phase (chronic: pre/onset · peak · chronic),transcriptome,16,accuracy (per animal),1.0,,0.3333333333333333
+phase (chronic: pre/onset · peak · chronic),both,16,accuracy (per animal),0.9375,,0.3333333333333333
+phase (RR: peak · remission),images,9,accuracy (per animal),0.4444444444444444,,0.5
+phase (RR: peak · remission),transcriptome,9,accuracy (per animal),0.7777777777777778,,0.5
+phase (RR: peak · remission),both,9,accuracy (per animal),0.4444444444444444,,0.5
+sex (chronic),images,16,accuracy (per animal),0.25,,0.5
+sex (chronic),transcriptome,16,accuracy (per animal),0.375,,0.5
+sex (chronic),both,16,accuracy (per animal),0.25,,0.5
+run5 vs run6 (RR) — batch control,images,9,accuracy (per animal),1.0,,0.5
+run5 vs run6 (RR) — batch control,transcriptome,9,accuracy (per animal),0.4444444444444444,,0.5
+run5 vs run6 (RR) — batch control,both,9,accuracy (per animal),0.8888888888888888,,0.5
+model: chronic vs RR — confounded with slide/sex/level,images,25,accuracy (per animal),0.72,,0.5
+model: chronic vs RR — confounded with slide/sex/level,transcriptome,25,accuracy (per animal),0.96,,0.5
+model: chronic vs RR — confounded with slide/sex/level,both,25,accuracy (per animal),0.76,,0.5
