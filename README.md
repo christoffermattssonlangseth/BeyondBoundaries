@@ -3,6 +3,18 @@
 What do the Xenium Multimodal Cell Segmentation stains (DAPI, ATP1A1/CD45/E-Cadherin, 18S rRNA, αSMA/Vimentin) add to
 the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 5/6; 18 sections, 25 animals, 500k annotated cells).
 
+## The answer
+
+> **Beyond segmentation, the kit gives us per-cell protein for genes the panel lacks (vimentin, αSMA, ATP1A1) and
+> the tissue context around each cell, and the images alone can map lesions and cell types in a new run.
+> It reveals no hidden cell states and no CD45.**
+
+| ✅ What it adds | ❌ What it does not add |
+|---|---|
+| **Protein the panel can't measure:** *Vim*, *Acta2*, *Atp1a1* aren't on the 5K panel. Example: astrocyte reactive RNA comes *before* vimentin protein ("RNA-only" astrocytes 20 % at peak vs 3.5 % in CFA) | **CD45:** undetectable in mouse spinal cord; the boundary channel is ATP1A1 only |
+| **Tissue context:** white-matter lesions have 25 % less ATP1A1 neuropil around each cell (p = 8e-6); images add anatomy to the transcriptome (0.68 → 0.73) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
+| **Images alone, held-out animals:** cell type 46 % (14 types, chance 7 %); lesion maps AUROC 0.90, and **0.87–0.90 when trained on one run and tested on the other** | **Better lesion calls or severity than RNA:** images are informative but redundant (clinical score ρ 0.62 vs 0.79) |
+
 **Start here:** `report/BeyondBoundaries_conclusions.pdf` — the answer, conclusions and key figures (9 pages).
 Lab-meeting deck: `report/slides/BeyondBoundaries_labmeeting.html` (PDF alongside). All findings in detail:
 `notebooks/00_summary.ipynb` (also `report/BeyondBoundaries_summary.pdf`).
