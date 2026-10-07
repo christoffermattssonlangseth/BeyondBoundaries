@@ -63,7 +63,8 @@ def fig(path, width=900):
 # | Is the unexplained ~85 % hidden biology? | **Mostly not** — a local optical/staining field shared across cell types + cell-level variation unrelated to lesions | 05 |
 # | Do images add to the transcriptome for lesion identity? | **No** (≤ +0.015 AUROC; niches are transcriptome-defined) | 04 |
 # | …for clinical score per animal? | Images alone ρ = 0.46 (p = 0.04) vs transcriptome 0.86; combined not better | 05 |
-# | What *do* they add? | Measurements of genes **not on the panel** (*Vim*, *Acta2*, *Atp1a1*): vimentin reactivity timing, **WM neuropil loss (−25 %)**, **18S gain in activated lesion cells**, **T-cell 18S polarity towards vessels**, a candidate **18S-texture severity marker** (holds within section and after a crowding adjustment) | 05–07 |
+# | What can images predict *alone*? | Cell type 46 % (14 types, chance 7 %), subtypes (microglia 0.72, reactive astro 0.68), anatomy 63 % (10 regions), **lesion maps AUROC 0.90**, clinical score ρ 0.62 — always ≤ transcriptome, but images add to it for anatomy (0.68 → 0.73) | 08 |
+| What *do* they add? | Measurements of genes **not on the panel** (*Vim*, *Acta2*, *Atp1a1*): vimentin reactivity timing, **WM neuropil loss (−25 %)**, **18S gain in activated lesion cells**, **T-cell 18S polarity towards vessels**, a candidate **18S-texture severity marker** (holds within section and after a crowding adjustment) | 05–07 |
 
 # %% [markdown]
 # ## 1. Features look right (notebook 01)
@@ -186,6 +187,39 @@ fig("06_targeted_readouts/neuropil_index_map.png", 900)
 fig("06_targeted_readouts/neuropil_index_paired.png", 450)
 
 # %% [markdown]
+# ## 8. What the images can predict on their own (notebook 08)
+# Gradient-boosted trees on image features only, cross-validated by animal. Cell type at 46 % balanced accuracy
+# (14 types, chance 7 %), errors within lineages; no single stain carries identity; subtypes recoverable.
+
+# %%
+fig("08_image_only_prediction/L1_confusion.png", 750)
+fig("08_image_only_prediction/L1_feature_set_ablation.png", 600)
+fig("08_image_only_prediction/L2_within_type.png", 600)
+
+# %% [markdown]
+# Anatomy and lesion state — images add to the transcriptome for anatomy (0.68 → 0.73):
+
+# %%
+display(pd.read_csv(RES / "08_image_only_prediction/anatomy_lesion_prediction.csv")[["task", "inputs", "balanced acc.", "chance (balanced)"]].round(3))
+fig("08_image_only_prediction/anatomy_lesion_prediction.png", 800)
+
+# %% [markdown]
+# **Lesion maps from images alone** (held-out animals; AUROC 0.90, transcriptome composition 0.92, both 0.93):
+
+# %%
+fig("08_image_only_prediction/lesion_maps_images_vs_annotation.png", 900)
+fig("08_image_only_prediction/lesion_top_image_features.png", 550)
+
+# %% [markdown]
+# Animal metadata — images track score and chronic timepoint but stay below the transcriptome; they identify the
+# **imaging run** perfectly (strong batch signature — important for adding runs 1–3):
+
+# %%
+r5 = pd.read_csv(RES / "08_image_only_prediction/animal_metadata_prediction.csv")
+display(r5.pivot_table(index=["task", "metric"], columns="input", values="value", sort=False)[["images", "transcriptome", "both"]].round(2))
+fig("08_image_only_prediction/animal_metadata_prediction.png", 800)
+
+# %% [markdown]
 # ## Caveats
 # - CD45 component undetectable → no immune-membrane readout from ch1.
 # - αSMA and vimentin share a channel; 18S drew ~95 % of masks (18S distribution features partly by construction).
@@ -197,3 +231,4 @@ fig("06_targeted_readouts/neuropil_index_paired.png", 450)
 # 2. Disentangle vimentin vs αSMA in "protein-only" astrocytes (VSMC proximity, notebook 07; ideally separate channels).
 # 3. Perivascular T-cell 18S polarity: relate to cuff position / migration state.
 # 4. Use the neuropil-loss index and 18S per cell as covariates in the RRMAP2 lesion analyses.
+# 5. Runs 1–3: image features carry a strong run signature — compare within run / batch-correct before pooling.

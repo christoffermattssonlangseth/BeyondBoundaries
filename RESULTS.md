@@ -212,3 +212,13 @@ closest pieces 326 µm apart (typically 650–930 µm). Spatial neighbourhoods c
 (k = 15/30: 0 cells; k = 50: 0.01 %); lesion distance always from the same piece → earlier results unaffected.
 Hardening: `lesion_distance` / `nearest_of` now group by piece by default; check + figure added to notebook 02.
 Statistical unit throughout = animal (`sample_name`); normalisation per image (shared staining/imaging).
+- **Lesion state (7 classes):** images 0.54 (chance 0.14), transcriptome composition 0.65, both 0.67.
+- **Lesion maps (lesion vs physiological, held-out animals):** AUROC images 0.90 (cell only 0.84), transcriptome
+  composition 0.92, both 0.93; maps reproduce lesion extent incl. a fully lesioned piece. Top signals: vimentin-channel
+  texture/intensity in surrounding tissue (AUROC 0.76–0.78).
+- **Animal metadata (per held-out animal):** clinical score ρ images 0.62 / transcriptome 0.79 / both 0.76; day of
+  sacrifice (chronic) 0.52 / 0.84 / 0.75; chronic phase accuracy 0.56 / 1.00 / 0.94; RR timing and peak-vs-remission not
+  predictable (9 animals); sex 0.25 (no signal, control). **Run5 vs run6: images 1.00, transcriptome 0.44 → strong
+  technical run signature in the images** → runs 1–3 must be compared within run / batch-corrected.
+- Process notes: a cache-key collision (RR tasks reused chronic results) was caught and fixed before any RR result was
+  reported; the machine was swapping (concurrent c2l job, since stopped) → float32 features + freeing AnnData.

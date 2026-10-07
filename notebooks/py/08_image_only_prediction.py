@@ -155,6 +155,12 @@ plotting.save_fig(fig, "L1_recall_per_type", OUT, SRC)
 rec.round(3)
 
 # %% [markdown]
+# > **Finding — images alone recover cell type at 46 % balanced accuracy across 14 types (chance 7 %)** in animals the
+# > model never saw (44 % from the cell alone). Ependymal 0.86, neurons 0.81, Schwann 0.76 are easy; immune cells are hard
+# > (myeloid 0.16, NK/DC 0.17, DC 0.25, T 0.26 — no CD45 signal). Errors stay within lineages: immune ↔ immune,
+# > endothelium ↔ VSMC ↔ fibroblast, OPC ↔ oligodendrocyte.
+
+# %% [markdown]
 # ## 2. Which stain carries cell identity?
 # Same task, restricted feature sets (cell features only, no neighbourhood; ≤ 3,000 cells per class for the
 # restricted sets — the full-feature rows are the 6,000-per-class models from section 1).
@@ -187,6 +193,10 @@ ax.set_xlabel(f"balanced accuracy, {len(TYPES)} cell types (chance {1 / len(TYPE
 fig.tight_layout()
 plotting.save_fig(fig, "L1_feature_set_ablation", OUT, SRC)
 abl.round(3)
+
+# %% [markdown]
+# > **Finding — no single stain carries identity:** 18S 0.27, αSMA/Vim 0.25, DAPI 0.24, ATP1A1 0.21, morphology 0.17;
+# > combined 0.44. Without 18S (the stain that drew the masks) 0.40 — identity is not an artefact of segmentation.
 
 # %% [markdown]
 # ### Where are the images right and wrong? (one section)
@@ -241,6 +251,11 @@ ax.set_yticks(y, [f"{p} ({len(s.split(','))} subtypes)" for p, s in zip(l2.index
 ax.set_xlabel("balanced accuracy (subtypes within type)"); ax.set_xlim(0, 1); ax.legend(fontsize=7)
 fig.tight_layout()
 plotting.save_fig(fig, "L2_within_type", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — subtypes are recoverable:** neurons 0.64 (chance 0.33; cholinergic/motor 0.72), astrocytes 0.60 (0.25;
+# > reactive 0.68), myeloid 0.53 (0.25; microglia 0.72, MDM 0.53, CAM 0.61), oligodendrocyte lineage 0.47 (0.25; MOL
+# > 0.65, OPC/COP 0.17).
 
 # %% [markdown]
 # Microglia vs monocyte-derived macrophages is the immunologically most relevant split — confusion:
@@ -310,6 +325,12 @@ for name in TASKS:
     fig.colorbar(im, ax=ax, shrink=0.7)
     fig.tight_layout()
     plotting.save_fig(fig, f"confusion_{name.replace(' ', '_')}", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — anatomy from images, and images add to the transcriptome here:** 10 anatomical regions at 0.63 balanced
+# > accuracy (chance 0.10; central canal 0.88, dorsal horn 0.80, DRG 0.79, GM 0.75, WM 0.45). Transcriptome cell-type
+# > composition of the 15 nearest cells 0.68; **both 0.73**. Lesion state (7 classes): images 0.54, transcriptome
+# > composition 0.65, both 0.67 — images see lesion vs not well, the three main lesion subtypes less so.
 
 # %% [markdown]
 # ## 5. Animal metadata: model, timepoint, score, sex — images vs transcriptome
@@ -435,6 +456,15 @@ fig.tight_layout()
 plotting.save_fig(fig, "animal_metadata_scatter", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — animal-level metadata.** Images alone track clinical score (ρ 0.62, 25 animals) and day of sacrifice in
+# > the chronic model (ρ 0.52; phase pre/onset · peak · chronic 56 % vs chance 33 %), but always below the transcriptome
+# > (0.79, 0.84, 100 %), and adding images does not help. Relapse-remitting timing is not predictable from either (9
+# > animals, cycling course). Sex: no signal (negative control). **Batch: images identify the run (run5 vs run6) with
+# > 100 % accuracy, the transcriptome cannot (44 %)** — the stain images carry a strong technical run signature, so
+# > cross-run work (runs 1–3) must compare within run or batch-correct. *Model* (chronic vs RR) is confounded with
+# > slide, sex and spinal level and is not interpretable.
+
+# %% [markdown]
 # ## 6. Lesion maps from images alone
 # Lesion niche (any `Lesion_*` state) vs physiological niche, per cell. Inputs: image features of the cell, its 15
 # nearest cells, and a wider 50-cell image neighbourhood (lesions are tissue-scale). Trained by animal (5-fold
@@ -541,3 +571,11 @@ ax.set_xlabel("univariate AUROC (> 0.5: higher in lesions)"); ax.tick_params(axi
 fig.tight_layout()
 plotting.save_fig(fig, "lesion_top_image_features", OUT, SRC)
 fe_t.round(3)
+
+# %% [markdown]
+# > **Finding — lesions can be mapped from the images alone.** Lesion vs physiological niche, held-out animals: AUROC
+# > **0.90** from images (cell + 15 + 50 nearest cells; 0.84 from the cell alone), vs 0.92 from transcriptome cell-type
+# > composition — on the transcriptome's home ground, since niches are transcriptome-defined — and 0.93 combined. The maps
+# > reproduce lesion extent, white-matter rims and a fully lesioned piece. Strongest single signals: αSMA/Vim (vimentin
+# > channel) texture and intensity in the surrounding tissue (AUROC 0.76–0.78) → reactive vimentin⁺ tissue.
+
