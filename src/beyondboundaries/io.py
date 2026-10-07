@@ -93,7 +93,8 @@ class XeniumBundle:
     # ---- images -------------------------------------------------------------------------
     def _channel_files(self) -> dict[str, Path]:
         focus = self.path / "morphology_focus"
-        files = sorted(focus.glob("*.ome.tif"))
+        # skip macOS AppleDouble companions ('._*') that copies onto non-HFS volumes leave next to each file
+        files = sorted(f for f in focus.glob("*.ome.tif") if not f.name.startswith("._"))
         if not files:
             raise FileNotFoundError(f"no morphology_focus images in {self.path}")
         with tifffile.TiffFile(files[0]) as t:

@@ -2,6 +2,10 @@
 runs:
   run5: /Volumes/moldiassd/20260506__111857__GoncaloTing_5kMouse_run5
   run6: /Volumes/moldiassd/20260506__112634__GoncaloTing_5kMouse_run6
+  # runs 1-3: same segmentation kit, XOA 3.2; only images + masks copied from the KI share (no transcripts.parquet)
+  run1: /Volumes/moldiassd/20250X0X__132701__GoncaloCharles_5kMouse_run1
+  run2: /Volumes/moldiassd/20250605__132701__GoncaloTing_5kMouse_run2
+  run3: /Volumes/moldiassd/20250605__134456__GoncaloTing_5kMouse_run3
 exclude_regions: ["ON_*", "D_SC"]   # optic nerve (out of scope); D_SC not annotated
 
 # laptop: ~/Downloads/RRMAP2_xenium_all_samples.cellcharter.companion.ready.with_metadata.rerun.with_AnnoL1Curated_with_Region_Anno2to4Updated.h5ad
