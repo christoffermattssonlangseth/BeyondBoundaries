@@ -152,7 +152,8 @@ rec.round(3)
 
 # %% [markdown]
 # ## 2. Which stain carries cell identity?
-# Same task, restricted feature sets (cell features only, no neighbourhood).
+# Same task, restricted feature sets (cell features only, no neighbourhood; ≤ 3,000 cells per class for the
+# restricted sets — the full-feature rows are the 6,000-per-class models from section 1).
 
 # %%
 SETS = {"morphology only": MORPH,
@@ -160,9 +161,15 @@ SETS = {"morphology only": MORPH,
         "all channels, no morphology": [c for c in CELL if c.split("_")[0] in CH],
         "all except 18S": [c for c in CELL if not c.startswith("r18s_")],
         "all image (cell)": CELL, "all image + neighbourhood": CELL + NBH}
+# ablation models use ≤ 3,000 cells per class (relative comparison); the two full sets reuse the models above
 abl = {}
 for name, feats in SETS.items():
-    r = cv_predict(ct, ct.Anno_L1_curated, feats, "L1_" + name.replace(" ", "_").replace("/", "-"))
+    if name == "all image (cell)":
+        r = r_cell
+    elif name == "all image + neighbourhood":
+        r = r_all
+    else:
+        r = cv_predict(ct, ct.Anno_L1_curated, feats, "L1_" + name.replace(" ", "_").replace("/", "-"), max_per_class=3000)
     abl[name] = scores(r)
 abl = pd.DataFrame(abl).T
 abl.to_csv(OUT / "L1_feature_set_ablation.csv")
@@ -417,3 +424,111 @@ for ax, name in zip(axs, ["clinical score (all)", "day of sacrifice (chronic)", 
 axs[0].legend(fontsize=7)
 fig.tight_layout()
 plotting.save_fig(fig, "animal_metadata_scatter", OUT, SRC)
+
+# %% [markdown]
+# ## 6. Lesion maps from images alone
+# Lesion niche (any `Lesion_*` state) vs physiological niche, per cell. Inputs: image features of the cell, its 15
+# nearest cells, and a wider 50-cell image neighbourhood (lesions are tissue-scale). Trained by animal (5-fold
+# GroupKFold; ≤ 20,000 cells per class from the training animals), then **every cell of the held-out animals** is
+# predicted, so whole sections can be drawn. Baseline: transcriptome cell-type composition of the 15 nearest cells.
+
+# %%
+K2 = 50
+nb50 = np.full((len(fa), len(NB_BASE)), np.nan, np.float32)
+for _, idx in fa.groupby("section_id", observed=True).indices.items():
+    xy = fa[["x_centroid", "y_centroid"]].values[idx]
+    _, nn = cKDTree(xy).query(xy, k=min(K2 + 1, len(idx)))
+    nb50[idx] = np.nanmean(vals[idx][nn[:, 1:]], axis=1)
+NBH50 = [f"nbhd50_{c}" for c in NB_BASE]
+fa[NBH50] = nb50
+les = fa[fa.Curated_niche_state.astype(str).str.startswith("Lesion") | (fa.Curated_niche_state == "Physiological")].copy()
+les["y_lesion"] = les.Curated_niche_state.astype(str).str.startswith("Lesion").astype(int)
+print(f"{len(les):,} cells; lesion fraction {les.y_lesion.mean():.2f}; {les.sample_name.nunique()} animals")
+
+
+def lesion_cv(feats, key, per_class=20000):
+    cache = CACHE / f"lesionmap_{key}.parquet"
+    if cache.exists():
+        return pd.read_parquet(cache).p
+    p = pd.Series(np.nan, index=les.index)
+    g = les.sample_name.astype(str).values
+    for tr, te in GroupKFold(5).split(les, groups=g):
+        trd = les.iloc[tr]
+        sub = np.concatenate([rng.choice(gg.index.values, min(len(gg), per_class), replace=False)
+                              for _, gg in trd.groupby("y_lesion")])
+        m = HistGradientBoostingClassifier(max_iter=300, early_stopping=True, random_state=0).fit(
+            les.loc[sub, feats].values.astype(np.float32), les.loc[sub, "y_lesion"].values)
+        p.iloc[te] = m.predict_proba(les.iloc[te][feats].values.astype(np.float32))[:, 1]
+    p.to_frame("p").to_parquet(cache)
+    return p
+
+
+LES_INPUTS = {"images (cell + 15 + 50 neighbours)": CELL + NBH + NBH50,
+              "images (cell only)": CELL,
+              "transcriptome cell-type composition (15 NN)": COMP,
+              "both": CELL + NBH + NBH50 + COMP}
+lp, rows = {}, []
+for name, feats in LES_INPUTS.items():
+    p = lesion_cv(feats, name.split(" (")[0].replace(" ", "_") + ("_cellonly" if "cell only" in name else ""))
+    lp[name] = p
+    per_an = [roc_auc_score(g.y_lesion, p[g.index]) for _, g in les.groupby("sample_name", observed=True)
+              if 0 < g.y_lesion.mean() < 1 and min(g.y_lesion.sum(), (1 - g.y_lesion).sum()) >= 50]
+    rows.append(dict(inputs=name, AUROC=roc_auc_score(les.y_lesion, p), median_AUROC_per_animal=np.median(per_an),
+                     animals=len(per_an)))
+lt8 = pd.DataFrame(rows).set_index("inputs")
+lt8.to_csv(OUT / "lesion_map_auroc.csv")
+lt8.round(3)
+
+# %%
+fig, ax = plt.subplots(figsize=(7, 2.8))
+ax.barh(lt8.index, lt8.AUROC, color=[plotting.CATEGORICAL[k] for k in (0, 3, 6, 2)], height=0.55)
+for i, v in enumerate(lt8.AUROC):
+    ax.text(v + 0.005, i, f"{v:.3f}", va="center", fontsize=7)
+ax.axvline(0.5, color="#888888", lw=0.8, ls="--")
+ax.set_xlim(0.4, 1); ax.set_xlabel("AUROC, lesion vs physiological niche (held-out animals)"); ax.invert_yaxis()
+fig.tight_layout()
+plotting.save_fig(fig, "lesion_map_auroc", OUT, SRC)
+
+# %% [markdown]
+# ### Maps: transcriptome-defined lesions vs lesion probability from images alone
+# Three sections with mixed lesion/physiological tissue; image probability smoothed over each cell's 15 nearest cells
+# for display. Every cell shown was in a held-out fold (its animal was not used to train the model that scored it).
+
+# %%
+p_img = lp["images (cell + 15 + 50 neighbours)"]
+mix = les.groupby("section_id", observed=True).y_lesion.mean()
+SECS = mix[(mix > 0.25) & (mix < 0.75)].sort_values().index[[0, len(mix[(mix > 0.25) & (mix < 0.75)]) // 2, -1]]
+fig, axs = plt.subplots(len(SECS), 2, figsize=(14, 4.2 * len(SECS)))
+for r_, sec in enumerate(SECS):
+    d = les[les.section_id == sec]
+    xy = d[["x_centroid", "y_centroid"]].values
+    _, nn = cKDTree(xy).query(xy, k=16)
+    ps = p_img[d.index].values[nn].mean(1)
+    auc = roc_auc_score(d.y_lesion, p_img[d.index])
+    axs[r_, 0].scatter(d.x_centroid, -d.y_centroid, s=0.6, c=np.where(d.y_lesion, plotting.CATEGORICAL[1], "#c9c9c9"),
+                       rasterized=True)
+    axs[r_, 0].set_title(f"{sec}: lesion niches (orange) — transcriptome annotation", fontsize=9)
+    sc_ = axs[r_, 1].scatter(d.x_centroid, -d.y_centroid, s=0.6, c=ps, cmap=plotting.SEQ, vmin=0, vmax=1, rasterized=True)
+    axs[r_, 1].set_title(f"lesion probability from images only (AUROC {auc:.2f})", fontsize=9)
+    fig.colorbar(sc_, ax=axs[r_, 1], shrink=0.6)
+    for a in axs[r_]:
+        a.set_aspect("equal"); a.axis("off")
+fig.tight_layout()
+plotting.save_fig(fig, "lesion_maps_images_vs_annotation", OUT, SRC)
+
+# %% [markdown]
+# Which image features drive lesion calls? Univariate AUROC of each feature (lesion vs physiological), top 20 — note
+# neighbourhood features (`nbhd*`) summarise tissue around the cell.
+
+# %%
+fe = pd.Series({c: roc_auc_score(les.y_lesion, les[c].fillna(les[c].median())) for c in CELL + NBH + NBH50})
+fe = (fe - 0.5).abs().sort_values(ascending=False).head(20).index
+fe_t = pd.DataFrame({"AUROC": [roc_auc_score(les.y_lesion, les[c].fillna(les[c].median())) for c in fe]}, index=fe)
+fe_t.to_csv(OUT / "lesion_top_image_features.csv")
+fig, ax = plt.subplots(figsize=(6.5, 5))
+ax.barh(fe_t.index, fe_t.AUROC - 0.5, left=0.5, color=[plotting.CATEGORICAL[1] if v > 0.5 else plotting.CATEGORICAL[0] for v in fe_t.AUROC])
+ax.axvline(0.5, color="#888888", lw=0.8); ax.invert_yaxis()
+ax.set_xlabel("univariate AUROC (> 0.5: higher in lesions)"); ax.tick_params(axis="y", labelsize=7)
+fig.tight_layout()
+plotting.save_fig(fig, "lesion_top_image_features", OUT, SRC)
+fe_t.round(3)
