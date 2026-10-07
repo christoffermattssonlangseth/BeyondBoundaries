@@ -301,13 +301,11 @@ prof["share of lesion cells"] = pd.Series(lab).value_counts(normalize=True).sort
 prof.round(2)
 
 # %%
-def name_state(r):
-    """Name each state after its dominant axes (data-driven labels, checked against the profile table)."""
-    top = r.drop("share of lesion cells").sort_values(ascending=False)
-    return " + ".join(top.index[:2])
-
-
-names = {k: f"S{k}: {name_state(prof.loc[k])}" for k in prof.index}
+# Every lesion state is far above control on the myeloid / MHC-II axes, so naming by the largest axis repeats itself.
+# Name each state by the two axes that most distinguish it from the other states (profile z-scored across states).
+rel = np.arcsinh(prof.drop(columns="share of lesion cells"))
+rel = (rel - rel.mean()) / rel.std()
+names = {k: f"S{k}: " + " + ".join(rel.loc[k].sort_values(ascending=False).index[:2]) for k in prof.index}
 obs["lesion_state"] = "no lesion"
 obs.loc[LES, "lesion_state"] = pd.Series(lab, index=obs.index[LES]).map(names)
 obs.loc[obs.region_class == "other", "lesion_state"] = "not scored"
@@ -359,7 +357,8 @@ ax_.to_parquet(CACHE / "lesion_axes.parquet")
 # ## D. Image pilot (runs 5/6): the same lesion state at peak vs in recovery
 #
 # Image readouts per cell (normalised features from notebook 02, 18S-segmented cells):
-# - **neuropil index** — ATP1A1 in the 10 µm territory ÷ the median of the same piece × WM/GM (notebook 06),
+# - **neuropil index** — ATP1A1 in the 10 µm territory ÷ the median of the same piece's *non-lesion* WM or GM
+#   (pieces with ≥ 100 non-lesion cells of that class),
 # - **tissue vimentin/αSMA** — channel mean in the territory, robust z within image,
 # - **astrocyte vimentin** — channel cell mean in astrocytes, robust z within image,
 # - **18S texture** — Haralick correlation in myeloid cells, robust z within image.
@@ -383,7 +382,11 @@ def image_z(s, by):
 fa["bnd_terr_raw"] = fa.bnd_terr_mean * fa.bnd_scale + fa.bnd_bg_local
 wmgm = fa.rc10.isin(["WM", "GM"])
 key = fa.meta_sample_id.astype(str) + "|" + fa.rc10
-fa["neuropil index"] = np.where(wmgm, fa.bnd_terr_raw / fa.bnd_terr_raw.groupby(key).transform("median"), np.nan)
+# reference = the piece's own non-lesion tissue of the same class (WM / GM): in a mostly lesioned piece the piece
+# median is itself lesion and would hide the loss (notebook 06 used the piece median over all cells)
+ref = fa.bnd_terr_raw.where(fa.lesion_state == "no lesion").groupby(key).agg(["median", "count"])
+ref = ref[ref["count"] >= 100]["median"]
+fa["neuropil index"] = np.where(wmgm, fa.bnd_terr_raw / key.map(ref), np.nan)
 fa["tissue vimentin (z)"] = image_z(fa.smavim_terr_mean, fa.section_id)
 fa["astro vimentin (z)"] = np.where(fa.Anno_L1_curated == "Astrocyte",
                                     image_z(fa.smavim_cell_mean.where(fa.Anno_L1_curated == "Astrocyte"), fa.section_id),
