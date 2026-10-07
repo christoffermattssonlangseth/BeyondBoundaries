@@ -49,6 +49,8 @@ rng = np.random.default_rng(0)
 
 fa = pd.read_parquet(ROOT / "data" / "features_norm.parquet")
 fa = fa[fa.segmentation_method == "Segmented by interior stain (18S)"].copy()
+_f64 = fa.select_dtypes("float64").columns
+fa[_f64] = fa[_f64].astype(np.float32)            # halves memory on the shared machine
 for ch in CH:
     fa[f"{ch}_rim_over_ring"] = (fa[f"{ch}_rim_mean"] + fa[f"{ch}_bg_local"] / fa[f"{ch}_scale"]) / \
                                 (fa[f"{ch}_ring_mean"] + fa[f"{ch}_bg_local"] / fa[f"{ch}_scale"])
@@ -337,6 +339,8 @@ L = lum.loc[cells].copy()
 P = PCA(50, svd_solver="covariance_eigh", random_state=0).fit_transform(orth.lognorm(adata[L.index].X))
 TX = [f"txPC{i + 1}" for i in range(50)]
 L[TX] = P
+del adata, P                                       # counts no longer needed; free memory before the long loops
+import gc; gc.collect()
 INPUTS = {"images": CELL + NBH, "transcriptome": TX, "both": CELL + NBH + TX}
 L["phase"] = L.stage.astype(str).map(lambda s: "pre/onset" if s in ("CFA", "NONSYMPTOM", "OS1") else
                                      "peak" if s.startswith("PEAK") else "remission" if s.startswith("REMISSION") else "chronic")
