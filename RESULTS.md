@@ -190,3 +190,16 @@ differs between animals) → inflated "image gain". Fixed: consistent PCA target
   adjusted vs 0.53–0.86 raw).
 - All findings written into the notebooks as **Finding** cells; `00_summary` collects them with figures;
   `report/BeyondBoundaries_summary.pdf` = rendered summary.
+
+## 2026-10-07 — Image-only prediction (`notebooks/08_image_only_prediction.ipynb`, in progress)
+
+Gradient-boosted trees on image features only (no transcript counts), 5-fold CV grouped by animal, 18S-segmented cells.
+- **Cell type (14 L1 types):** balanced accuracy 0.46 with cell + image-neighbourhood features (0.44 cell only; chance
+  0.07). Ependymal 0.86, neuron 0.81, Schwann 0.76; immune poor (myeloid 0.16, NK/DC 0.17, DC 0.25, T 0.26 — no CD45).
+  Errors stay within lineage (immune↔immune, endothelium↔VSMC↔fibroblast, OPC↔oligo).
+- **Per stain:** 18S 0.27, αSMA/Vim 0.25, DAPI 0.24, ATP1A1 0.21, morphology 0.17; all except 18S 0.40 → identity is
+  spread across stains, not an artefact of the 18S masks.
+- **Subtypes:** neurons 0.64 (chance 0.33; cholinergic 0.72), astrocytes 0.60 (0.25; reactive 0.68), myeloid 0.53
+  (0.25; microglia 0.72, MDM 0.53), oligodendrocyte lineage 0.47 (0.25).
+- **Anatomical region (10 classes):** images 0.63 (chance 0.10; central canal 0.88, dorsal horn 0.80, DRG 0.79, GM 0.75,
+  WM 0.45) vs transcriptome cell-type composition of 15 NN 0.68; **both 0.73 → images add anatomical information**.
