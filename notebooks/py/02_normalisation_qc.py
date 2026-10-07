@@ -338,3 +338,63 @@ for ch in CH:
 # %%
 fn.drop(columns=["in_tissue"]).to_parquet(ROOT / "data" / "features_norm.parquet")
 print(fn.shape)
+
+# %% [markdown]
+# ## Images, tissue pieces and animals
+# Each Xenium image (`sample_id` / `section_id`) holds 2–3 separate tissue pieces (`meta_sample_id`), usually from
+# different animals (`sample_name`). Checks: one animal per piece; gaps between pieces; whether any spatial
+# neighbourhood used downstream (k nearest cells within an image) reaches into another piece.
+
+# %%
+from scipy.spatial import cKDTree
+
+pa = fn.groupby("meta_sample_id", observed=True).agg(section=("section_id", "first"), n_sections=("section_id", "nunique"),
+                                                     animals=("sample_name", "nunique"), animal=("sample_name", "first"),
+                                                     cells=("section_id", "size"))
+print(f"{len(pa)} pieces in {pa.section.nunique()} images; pieces with >1 animal: {(pa.animals > 1).sum()}; "
+      f"pieces in >1 image: {(pa.n_sections > 1).sum()}")
+print("pieces per image:", pa.groupby("section").size().value_counts().to_dict(),
+      "| animals per image:", fn.groupby("section_id").sample_name.nunique().value_counts().to_dict())
+gaps = []
+for sec, g in fn.groupby("section_id"):
+    ps = g.meta_sample_id.astype(str).unique()
+    for i, a in enumerate(ps):
+        A = g.loc[g.meta_sample_id == a, ["x_centroid", "y_centroid"]].values
+        for b in ps[i + 1:]:
+            B = g.loc[g.meta_sample_id == b, ["x_centroid", "y_centroid"]].values
+            gaps.append(dict(section=sec, a=a, b=b, min_gap_um=cKDTree(B).query(A)[0].min()))
+gaps = pd.DataFrame(gaps)
+piece = fn.meta_sample_id.astype(str).values
+cross = {}
+for k in (15, 30, 50):
+    c = []
+    for _, idx in fn.groupby("section_id").indices.items():
+        _, nn = cKDTree(fn[["x_centroid", "y_centroid"]].values[idx]).query(fn[["x_centroid", "y_centroid"]].values[idx], k=k + 1)
+        c.append((piece[idx][nn[:, 1:]] != piece[idx][:, None]).any(1))
+    cross[k] = np.concatenate(c).mean()
+print("fraction of cells whose k nearest cells include another piece:", {k: round(v, 5) for k, v in cross.items()})
+pa.to_csv(OUT / "pieces_animals.csv")
+gaps.to_csv(OUT / "piece_gaps.csv", index=False)
+
+# %%
+fig, axs = plt.subplots(1, 2, figsize=(11, 3.2), gridspec_kw={"width_ratios": [1, 1.4]})
+axs[0].hist(gaps.min_gap_um, bins=25, color=plotting.CATEGORICAL[0])
+axs[0].axvline(gaps.min_gap_um.min(), color=plotting.CATEGORICAL[1], lw=1)
+axs[0].set(xlabel="closest distance between two pieces in an image (µm)", ylabel="piece pairs",
+           title=f"min {gaps.min_gap_um.min():.0f} µm")
+ex = fn[fn.section_id == fn.section_id.value_counts().index[0]]
+for k_, (pc, g) in enumerate(ex.groupby("meta_sample_id", observed=True)):
+    axs[1].scatter(g.x_centroid, -g.y_centroid, s=0.3, color=plotting.CATEGORICAL[k_], rasterized=True,
+                   label=f"{pc} — {g.sample_name.iloc[0]} ({g.stage.iloc[0]})")
+axs[1].set_aspect("equal"); axs[1].axis("off"); axs[1].legend(markerscale=12, fontsize=7, loc="lower center",
+                                                              bbox_to_anchor=(0.5, -0.25), ncol=1)
+axs[1].set_title(f"{ex.section_id.iloc[0]}: one image, {ex.meta_sample_id.nunique()} pieces / animals")
+fig.tight_layout()
+plotting.save_fig(fig, "pieces_and_animals", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — pieces are separate animals and spatially well separated.** 51 pieces in 18 images (15 images × 3
+# > pieces, 3 × 2); every piece is one animal and images usually hold 2–3 different animals. The closest two pieces are
+# > 326 µm apart (typically 650–930 µm), so neighbourhoods never cross pieces (k = 15/30: 0 cells; k = 50: 0.01 %) and
+# > lesion distances are always taken within the same piece. Statistics use the animal (`sample_name`) as the unit;
+# > spatial helpers group by piece (`meta_sample_id`); normalisation is per image (shared staining/imaging).

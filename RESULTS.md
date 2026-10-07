@@ -203,3 +203,12 @@ Gradient-boosted trees on image features only (no transcript counts), 5-fold CV 
   (0.25; microglia 0.72, MDM 0.53), oligodendrocyte lineage 0.47 (0.25).
 - **Anatomical region (10 classes):** images 0.63 (chance 0.10; central canal 0.88, dorsal horn 0.80, DRG 0.79, GM 0.75,
   WM 0.45) vs transcriptome cell-type composition of 15 NN 0.68; **both 0.73 → images add anatomical information**.
+
+## 2026-10-07 — Images vs tissue pieces vs animals (check requested)
+
+Each Xenium image (`sample_id`) holds 2–3 tissue pieces (`meta_sample_id`) from (usually) different animals
+(`sample_name`). Checked: 51 pieces in 18 images (15 × 3, 3 × 2); every piece = one animal; no piece spans images;
+closest pieces 326 µm apart (typically 650–930 µm). Spatial neighbourhoods computed within an image never cross pieces
+(k = 15/30: 0 cells; k = 50: 0.01 %); lesion distance always from the same piece → earlier results unaffected.
+Hardening: `lesion_distance` / `nearest_of` now group by piece by default; check + figure added to notebook 02.
+Statistical unit throughout = animal (`sample_name`); normalisation per image (shared staining/imaging).

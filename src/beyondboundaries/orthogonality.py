@@ -116,8 +116,9 @@ def run_celltype(df: pd.DataFrame, counts, feats: list[str], n_pcs: int = 50, n_
 
 
 def lesion_distance(df: pd.DataFrame, lesion: np.ndarray, x: str = "x_centroid", y: str = "y_centroid",
-                    by: str = "section_id") -> np.ndarray:
-    """Distance (µm) from each cell to the nearest lesion-niche cell in the same section (0 inside lesions)."""
+                    by: str = "meta_sample_id") -> np.ndarray:
+    """Distance (µm) from each cell to the nearest lesion-niche cell in the same tissue piece (0 inside lesions).
+    Grouped by piece (`meta_sample_id`): a Xenium image holds 2–3 pieces from different animals."""
     from scipy.spatial import cKDTree
 
     d = np.full(len(df), np.nan)
@@ -131,8 +132,8 @@ def lesion_distance(df: pd.DataFrame, lesion: np.ndarray, x: str = "x_centroid",
 
 
 def nearest_of(df: pd.DataFrame, target: np.ndarray, x: str = "x_centroid", y: str = "y_centroid",
-               by: str = "section_id") -> pd.DataFrame:
-    """Per cell: distance (µm) and vector (dx, dy) to the nearest `target` cell in the same section (self excluded)."""
+               by: str = "meta_sample_id") -> pd.DataFrame:
+    """Per cell: distance (µm) and vector (dx, dy) to the nearest `target` cell in the same tissue piece (self excluded)."""
     from scipy.spatial import cKDTree
 
     out = np.full((len(df), 3), np.nan)
