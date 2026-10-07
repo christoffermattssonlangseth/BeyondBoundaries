@@ -16,8 +16,10 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `05_field_vs_cell_and_animal_level` | is the unexplained signal technical or biological; clinical-score prediction per animal; 18S texture |
 | `06_targeted_readouts` | astrocyte vimentin vs RNA reactivity, leukocyte polarity vs vessels, 18S lesion vs physiological, neuropil loss |
 | `07_visual_checks` | images behind the findings: perivascular T cells, protein-only astrocytes vs VSMC, 18S texture, crowding test |
+| `08_image_only_prediction` | what images alone predict: cell type, subtypes, anatomy, lesion state + lesion maps, animal metadata (vs transcriptome) |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.
-Notebooks are authored as jupytext percent scripts (`notebooks/*.py`) and executed on the analysis Mac (kernel `bb`).
+Notebooks (`notebooks/*.ipynb`, executed, with outputs) are paired with jupytext percent scripts in `notebooks/py/`
+(edit either; `jupytext --sync notebooks/NN_name.ipynb` keeps them in step). Executed on the analysis Mac (kernel `bb`).
 Running log of what was run and key numbers: `RESULTS.md`. Figures (PDF + PNG): `results/<notebook>/`.

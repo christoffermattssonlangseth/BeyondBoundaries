@@ -1,7 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: ipynb,py:percent
+#     formats: ipynb,py//py:percent
 #   kernelspec:
 #     display_name: Python (bb)
 #     language: python
