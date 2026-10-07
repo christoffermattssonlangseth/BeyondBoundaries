@@ -294,3 +294,26 @@ uni["feature"] = [feat_img[int(b.split("|img")[1])] for b in uni.block]
 uni["q"] = bh(uni.p)
 uni.to_csv(OUT / "animal_image_feature_vs_score.csv", index=False)
 uni.sort_values("p").head(25)[["cell_type", "feature", "rho", "p", "q"]].round(4)
+
+# %% [markdown]
+# ### Is the 18S-texture ↔ score link a section-level (focus/staining) effect?
+# Per animal × section (lumbar, ≥ 30 cells), median 18S texture correlation; compare animals only with other animals
+# in the *same section* (both centred on the section mean). DAPI texture is the negative control (same optics).
+
+# %%
+rows = []
+for t in ["Myeloid", "Astrocyte", "Endothelial", "Fibroblast", "Oligodendrocyte", "Neuron"]:
+    d = lum[lum.Anno_L1_curated == t]
+    a = d.groupby(["section_id", "sample_name"], observed=True).agg(
+        v=("r18s_glcm_correlation", "median"), dv=("dapi_glcm_correlation", "median"),
+        score=("score_sacrifice", "first"), n=("section_id", "size")).reset_index()
+    a = a[a.n >= 30]
+    a["v_w"] = a.v - a.groupby("section_id").v.transform("mean")
+    a["s_w"] = a.score - a.groupby("section_id").score.transform("mean")
+    b = a[(a.groupby("section_id").sample_name.transform("nunique") > 1) & (a.groupby("section_id").score.transform("std") > 0)]
+    rows.append(dict(cell_type=t, rho_all=spearmanr(a.v, a.score).statistic,
+                     rho_within_section=spearmanr(b.v_w, b.s_w).statistic, n_within=len(b),
+                     rho_dapi_texture=spearmanr(a.dv, a.score).statistic))
+tex = pd.DataFrame(rows).set_index("cell_type")
+tex.to_csv(OUT / "r18s_texture_within_section.csv")
+tex.round(2)

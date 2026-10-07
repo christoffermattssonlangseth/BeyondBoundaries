@@ -100,8 +100,12 @@ ast["rna_reactive"] = gene_z(REACTIVE)
 ast["rna_homeostatic"] = gene_z(HOMEO)
 ast["rna_score"] = section_z(pd.Series(ast.rna_reactive - ast.rna_homeostatic, index=ast.index), ast.section_id)
 # protein score: vimentin-channel intensity (cell mean, cytoplasmic p90) up, ATP1A1 rim down (spec)
-ast["prot_score"] = (section_z(ast.smavim_cell_mean, ast.section_id) + section_z(ast.smavim_cyto_p90, ast.section_id)
-                     - section_z(ast.bnd_rim_mean, ast.section_id)) / 3
+ast["z_vim"] = section_z(ast.smavim_cell_mean, ast.section_id)
+ast["z_vim90"] = section_z(ast.smavim_cyto_p90, ast.section_id)
+ast["z_bndrim"] = section_z(ast.bnd_rim_mean, ast.section_id)
+ast["prot_score"] = (ast.z_vim + ast.z_vim90 - ast.z_bndrim) / 3
+print("protein score components vs RNA score (Spearman):",
+      {c: round(spearmanr(ast[c], ast.rna_score, nan_policy="omit").statistic, 3) for c in ("z_vim", "z_vim90", "z_bndrim")})
 r_all = spearmanr(ast.prot_score, ast.rna_score, nan_policy="omit").statistic
 per_sec = ast.groupby("section_id").apply(lambda g: spearmanr(g.prot_score, g.rna_score, nan_policy="omit").statistic,
                                           include_groups=False)
@@ -112,6 +116,9 @@ gene_rho = pd.Series({g: spearmanr(Xln[:, gi[g]].toarray().ravel(), ast.prot_sco
 gene_rho.round(3)
 
 # %% [markdown]
+# The protein score follows the spec (vimentin channel up, ATP1A1 rim down); the table below shows its components
+# per quadrant so it is clear which drives a cell into "protein-only".
+#
 # Quadrants (top/bottom 25 % within section of each score): concordant reactive, concordant quiet,
 # **protein-only** (vimentin-high, RNA-quiet) and **RNA-only**. Where are they, and in which disease stages?
 
@@ -125,7 +132,9 @@ QUADS = ["both high", "protein-only", "RNA-only", "both low"]
 qt = ast[ast.quadrant != "middle"].groupby("quadrant").agg(
     n=("section_id", "size"), lesion_frac=("lesion", "mean"), WM_frac=("region_class", lambda s: (s == "WM").mean()),
     lesion_dist_median=("lesion_dist_um", "median"), edge_um_median=("edge_um", "median"),
-    area_median=("morph_cell_area_um2", "median"), transcripts_median=("transcript_counts", "median")).loc[QUADS]
+    area_median=("morph_cell_area_um2", "median"), transcripts_median=("transcript_counts", "median"),
+    vim_channel_z=("z_vim", "median"), vim_cyto_p90_z=("z_vim90", "median"), atp1a1_rim_z=("z_bndrim", "median"),
+    rna_reactive_median=("rna_reactive", "median"), rna_homeostatic_median=("rna_homeostatic", "median")).loc[QUADS]
 qt.to_csv(OUT / "astro_quadrants.csv")
 qt.round(3)
 
@@ -233,6 +242,28 @@ pol.to_csv(OUT / "leukocyte_polarity.csv", index=False)
 pol.round(4)
 
 # %% [markdown]
+# ### Control: is vessel-directed polarity specific to leukocytes, or neighbour bleed?
+# Same cosine test for non-immune cells next to vessels (< 15 µm). A channel that "points at the vessel" in
+# neurons and oligodendrocytes too is optical bleed from the vessel/neighbouring nuclei, not cell polarity.
+
+# %%
+ctrl = {**LEUK, "Fibroblast": fa.Anno_L1_curated == "Fibroblast", "Astrocyte": fa.Anno_L1_curated == "Astrocyte",
+        "Oligodendrocyte": fa.Anno_L1_curated == "Oligodendrocyte", "Neuron": fa.Anno_L1_curated == "Neuron"}
+rows = []
+for name, m in ctrl.items():
+    d = fa[m & (fa.vessel_dist_um > 0) & (fa.vessel_dist_um < 15)]
+    for ch in CH:
+        c = (d[f"{ch}_polarity_dx_um"] * d.vx + d[f"{ch}_polarity_dy_um"] * d.vy) / (
+            np.hypot(d[f"{ch}_polarity_dx_um"], d[f"{ch}_polarity_dy_um"]) * np.hypot(d.vx, d.vy))
+        an = d.assign(c=c).groupby("sample_name", observed=True).c.agg(["mean", "size"])
+        an = an[an["size"] >= 20]["mean"]
+        rows.append(dict(cells=name, channel=ch, cos=an.median() if len(an) else np.nan,
+                         p=wilcoxon(an).pvalue if len(an) >= 5 else np.nan))
+pc = pd.DataFrame(rows)
+pc.to_csv(OUT / "polarity_vessel_direction_control.csv", index=False)
+pc.pivot(index="cells", columns="channel", values="cos").round(3)
+
+# %% [markdown]
 # ## 3. 18S per cell type: lesion vs physiological niche
 # Per animal, median normalised cytoplasmic 18S in lesion vs physiological cells of the same `Anno_L2` type.
 # Adjusted version: 18S residual after regressing on log transcript density (transcripts / µm²) within type — if the
@@ -276,39 +307,48 @@ fig.tight_layout()
 plotting.save_fig(fig, "r18s_lesion_by_type", OUT, SRC)
 
 # %% [markdown]
-# ## 4. Neuropil-loss index
-# Raw ATP1A1-channel intensity in each cell's 10 µm extracellular territory ÷ the median of physiological-niche
-# cells of the same section and region class (WM / GM). 1 = like healthy tissue of that class; < 1 = less neuropil
-# ATP1A1 (loss of neuronal/axonal membrane, oedema, infiltrate).
+# ## 4. Neuropil-loss index (within tissue piece)
+# Raw ATP1A1-channel intensity in each cell's 10 µm extracellular territory ÷ the median of all cells in the **same
+# tissue piece** and region class (WM / GM). Pieces differ in overall ATP1A1 intensity even within a section
+# (notebook 02), so only within-piece contrasts are interpretable: < 1 = less neuropil ATP1A1 than the rest of the
+# same piece's WM/GM (loss of neuronal/axonal membrane, oedema, infiltrate).
 
 # %%
 fa["bnd_terr_raw"] = fa.bnd_terr_mean * fa.bnd_scale + fa.bnd_bg_local
-key = fa.section_id.astype(str) + "|" + fa.region_class
-ref = fa[fa.phys & fa.region_class.isin(["WM", "GM"])].groupby(key[fa.phys & fa.region_class.isin(["WM", "GM"])]).bnd_terr_raw.median()
-fa["neuropil_index"] = fa.bnd_terr_raw / key.map(ref)
-ni = fa[fa.region_class.isin(["WM", "GM"])]
+ni = fa[fa.region_class.isin(["WM", "GM"])].copy()
+key = ni.meta_sample_id.astype(str) + "|" + ni.region_class
+ni["neuropil_index"] = ni.bnd_terr_raw / ni.bnd_terr_raw.groupby(key).transform("median")
 by_niche = ni.groupby(["region_class", "Curated_niche_state"], observed=True).neuropil_index.agg(["median", "size"])
 by_niche.round(3)
 
+# %% [markdown]
+# Paired within piece: median index of lesion-niche vs physiological-niche cells (pieces with ≥ 100 of each, per
+# class); Wilcoxon across pieces.
+
 # %%
-pa_n = ni[ni.lesion].groupby("sample_name", observed=True).agg(neuropil=("neuropil_index", "median"),
-                                                              score=("score_sacrifice", "first"), n=("section_id", "size"))
-pa_n = pa_n[pa_n.n >= 200]
-rho, p = spearmanr(pa_n.neuropil, pa_n.score)
-print(f"per animal: median neuropil index in lesion niches vs clinical score ρ = {rho:.2f}, p = {p:.3g} (n = {len(pa_n)})")
-pa_n.to_csv(OUT / "neuropil_index_per_animal.csv")
-# does the transcriptome of the cell explain it? (cell type + niche only)
+rows = []
+for (pc, cl), g in ni.groupby(["meta_sample_id", "region_class"], observed=True):
+    L, P = g[g.lesion], g[g.phys]
+    if len(L) >= 100 and len(P) >= 100:
+        rows.append(dict(piece=pc, region_class=cl, lesion=L.neuropil_index.median(), phys=P.neuropil_index.median(),
+                         score=g.score_sacrifice.iloc[0]))
+pp = pd.DataFrame(rows)
+pp["diff"] = pp.lesion - pp.phys
+pp.to_csv(OUT / "neuropil_index_within_piece.csv", index=False)
+for cl, g in pp.groupby("region_class"):
+    print(f"{cl}: lesion − physiological median {g['diff'].median():+.3f} over {len(g)} pieces, "
+          f"Wilcoxon p = {wilcoxon(g['diff']).pvalue:.2g}; ρ(diff, score) = {spearmanr(g['diff'], g.score).statistic:+.2f}")
 gl = ni.groupby("Global_niche_group", observed=True).neuropil_index.agg(["median", "size"]).sort_values("median")
 gl[gl["size"] >= 500].round(3)
 
 # %%
 EX = fa[fa.lesion].section_id.value_counts().index[0]
-d = fa[fa.section_id == EX]
+d = ni[ni.section_id == EX]
 fig, axs = plt.subplots(1, 2, figsize=(14, 4.5))
-sc_ = axs[0].scatter(d.x_centroid, -d.y_centroid, c=d.neuropil_index.clip(0, 1.5), s=0.5, cmap=plotting.DIV.reversed(),
+sc_ = axs[0].scatter(d.x_centroid, -d.y_centroid, c=d.neuropil_index.clip(0, 2), s=0.5, cmap=plotting.DIV.reversed(),
                      vmin=0, vmax=2, rasterized=True)
-axs[0].set_title(f"neuropil index, {EX}"); axs[0].set_aspect("equal"); axs[0].axis("off")
-fig.colorbar(sc_, ax=axs[0], shrink=0.6, label="territory ATP1A1 ÷ healthy same-class")
+axs[0].set_title(f"neuropil index (within piece × WM/GM), {EX}"); axs[0].set_aspect("equal"); axs[0].axis("off")
+fig.colorbar(sc_, ax=axs[0], shrink=0.6, label="territory ATP1A1 ÷ piece median (same class)")
 cats = d.Curated_niche_state.astype(str)
 for k, c in enumerate(sorted(cats.unique())):
     m = cats == c
@@ -319,9 +359,12 @@ fig.tight_layout()
 plotting.save_fig(fig, "neuropil_index_map", OUT, SRC)
 
 # %%
-fig, ax = plt.subplots(figsize=(4.5, 3.5))
-ax.scatter(pa_n.score, pa_n.neuropil, s=20, color=plotting.CATEGORICAL[1])
-ax.set(xlabel="clinical score at sacrifice", ylabel="median neuropil index\nin lesion niches",
-       title=f"per animal, ρ = {rho:.2f} (p = {p:.2g})")
+fig, ax = plt.subplots(figsize=(5, 3.5))
+for k, (cl, g) in enumerate(pp.groupby("region_class")):
+    ax.scatter(g.phys, g.lesion, s=20, color=plotting.CATEGORICAL[k], label=cl)
+ax.plot([0.5, 1.5], [0.5, 1.5], color="#888888", lw=0.8, ls="--")
+ax.set(xlabel="physiological-niche cells (median index)", ylabel="lesion-niche cells (median index)",
+       title="neuropil index, paired within piece")
+ax.legend()
 fig.tight_layout()
-plotting.save_fig(fig, "neuropil_index_vs_score", OUT, SRC)
+plotting.save_fig(fig, "neuropil_index_paired", OUT, SRC)

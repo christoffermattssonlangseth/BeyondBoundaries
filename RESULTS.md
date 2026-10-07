@@ -126,3 +126,53 @@ differs between animals) → inflated "image gain". Fixed: consistent PCA target
   all-cell-type field + cell-specific part; test both against lesion distance / piece disease.
 - Lesion labels are transcriptome-derived; an image-independent outcome (clinical score / stage per animal) is the
   fairer test of added value.
+
+## 2026-10-07 — Unexplained signal: field vs cell; animal level (`notebooks/05_field_vs_cell_and_animal_level.ipynb`)
+
+- **Residual = cross-type field + cell-specific part.** Field = mean residual of the 30 nearest *other-type* cells.
+  r(residual, field) for rim/cyto/nuc intensity 0.37–0.39 (ATP1A1 0.39, αSMA/Vim 0.17, DAPI 0.16, 18S 0.13) → a
+  large share of the "unexplained" intensity signal is shared by all cells in a neighbourhood.
+- The field does **not** track lesion distance (within-section ρ ≈ 0 for every channel/family) but follows local
+  background where optics predict it (ATP1A1 nuclear intensity vs local bg ρ = −0.55: neuropil glow into nuclei).
+  The cell-specific remainder doesn't track lesion distance either (ρ ≈ 0); per-animal lesion shifts 19/924 (q < 0.05),
+  ~0.1 SD. → The ~85 % unexplained is mostly a local optical/staining field + cell-level variation unrelated to lesions.
+- **Animal level** (25 animals, lumbar only, LOO ridge, clinical score): transcriptome ρ = 0.86 (R² 0.75, perm p 0.005);
+  image ρ = 0.46 (R² 0.28, perm p 0.04); transcriptome + image ρ = 0.74 (adding ~670 noisy features to n = 25 hurts);
+  section-membership baseline uninformative (no batch confound).
+- **Candidate image biomarker: 18S texture.** 18S Haralick correlation (smoother, less punctate 18S) rises with clinical
+  score in 6 cell types (ρ 0.37–0.76) and **holds within section** (animals vs same-section animals: ρ 0.53–0.86,
+  12 animal-sections); DAPI texture (same optics) does not (ρ −0.18…0.39). Tissue-wide → biology (ribosome
+  redistribution / RNA degradation in inflamed tissue) or animal-level tissue handling; needs another run to confirm.
+
+## 2026-10-07 — Phase 5 targeted readouts (`notebooks/06_targeted_readouts.ipynb`)
+
+*Vim*, *Acta2*, *Atp1a1* are **not on the 5K panel** → for 3 of 4 stain targets the image is the only per-cell readout.
+
+1. **Astrocyte reactivity, protein vs RNA** (47,062 astrocytes). Protein score (spec: vimentin-channel cell mean +
+   cyto p90 − ATP1A1 rim, within-section z) vs RNA (reactive C3/Gfap/Serpina3n/Cd44/Osmr/Timp1/Socs3/Serping1/H2-D1/
+   Psmb8/Gbp2 − homeostatic Slc1a3/Kcnj10/Slc6a11/Fgfr3/Gjb6/Aldoc/Aldh1l1): ρ = 0.48 (per section 0.17–0.58); driven
+   by the vimentin channel (components ρ 0.44 / 0.62; ATP1A1 rim 0.14). Strongest single genes: *C3* 0.50, *Serping1*
+   0.39, *Gfap* 0.38; homeostatic *Slc6a11* −0.44, *Aldoc* −0.37.
+   - **RNA-only** (reactive transcription, vimentin-quiet): 95 % in lesions, share peaks in active disease (PEAK1 20 %,
+     PEAK2 17 % vs CFA 3.5 %), lower in remission → **reactive transcription precedes vimentin protein**
+     (protein-only − RNA-only per animal: active −0.08, remission −0.03, pre/none +0.04; remission vs active p = 0.019).
+   - **Protein-only** (vimentin-channel-high, homeostatic RNA; n = 401): mostly GM, outside lesions, deep tissue;
+     most frequent in CFA/pre-symptomatic animals. Caveat: channel pools αSMA → arteriole-associated astrocytes possible.
+2. **Leukocyte polarity.** Magnitude perivascular (< 15 µm to vessel) vs parenchymal (> 50 µm): no meaningful
+   difference. Direction: **18S polarity points towards the nearest vessel in T cells (cos 0.14), fibroblasts (0.17),
+   MDM (0.06), microglia (0.05) but not neurons (0.00) or oligodendrocytes (−0.01)** → cell-type-specific, not blur.
+   DAPI and αSMA/Vim "towards vessel" also appear in neurons/oligos/astrocytes → optical bleed (artefact).
+3. **18S per cell type, lesion vs physiological** (per animal, within-section z): up in lesion Schwann (+0.73),
+   fibroblasts (+0.57), endothelium (+0.54), DAO (+0.44), CD4 T (+0.44), astrocytes (+0.26–0.34), microglia (+0.21);
+   down in OPC/COP (−0.18) and MOL (−0.14). 18S tracks transcript density (ρ 0.6–0.75 within type); after adjusting,
+   increases persist (e.g. endothelium +0.39, Schwann +0.83, homeostatic astro +0.39) while the oligodendrocyte drop
+   ~vanishes (MOL +0.04) → lesion 18S gain beyond RNA content in activated cells; oligo loss = RNA-content loss.
+4. **Neuropil-loss index** (territory ATP1A1 ÷ median of same piece × WM/GM; first version referenced per section and
+   was confounded by piece-level intensity — replaced). **WM lesion cells have 25 % less surrounding ATP1A1 than
+   physiological WM of the same piece (38 pieces, p = 8e-6); GM no difference (45 pieces, p = 0.62);** not related to
+   clinical score. Highest in ventral/dorsal rim OL niches (1.3–1.4).
+
+### Open questions (updated)
+- 18S texture biomarker: validate on runs 1–3 (raw images on P drive) or a new run; visual check of high vs low animals.
+- Protein-only astrocytes: vimentin or αSMA from arterioles? (distance to VSMC; channel can't separate.)
+- T-cell 18S polarity towards vessels: uropod / migration orientation? Check perivascular-cuff T cells by eye.
