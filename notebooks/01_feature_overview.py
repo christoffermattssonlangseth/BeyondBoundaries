@@ -68,10 +68,19 @@ cov.to_csv(OUT / "coverage.csv")
 cov
 
 # %% [markdown]
+# > **Finding — coverage.** 537,716 cells in 18 sections got features; 500,379 (93.1 %) are in the annotated object.
+# > Three sections lost 25–40 % of cells to upstream QC (C2_G2_Bot, C2_G2_Top, C2_G3_Bot). No cell was truncated by
+# > the tiling.
+
+# %% [markdown]
 # Cells not in the annotation: are they different (low transcript QC failures)?
 
 # %%
 f.groupby("annotated")[["transcript_counts", "n_genes", "morph_cell_area_um2"]].median()
+
+# %% [markdown]
+# > **Finding — the cells left out are QC-poor**: median 629 vs 973 transcripts and 401 vs 558 genes in annotated cells,
+# > and they are smaller. The analysis uses annotated cells only.
 
 # %% [markdown]
 # ## Technical concordance with Xenium's own tables
@@ -93,6 +102,10 @@ print("max centroid diff µm:", err.max().round(3), "| area ratio range:",
       (f.morph_cell_area_um2 / f.cell_area).agg(["min", "max"]).round(4).tolist())
 
 # %% [markdown]
+# > **Finding — extraction matches Xenium exactly.** Mask areas equal Xenium `cell_area` (ratio 1.000 for every cell);
+# > nucleus areas match for single-nucleus cells; centroids agree within 0.28 µm.
+
+# %% [markdown]
 # ## Feature catalogue and missingness
 # NaNs are structural: no nucleus → nuclear features NaN; cells fully surrounded by other cells → no ring.
 
@@ -105,6 +118,10 @@ cat.groupby("family").agg(n_features=("nan_frac", "size"), max_nan_frac=("nan_fr
 print("cells without nucleus:", (f.nucleus_count == 0).mean().round(4),
       "| by segmentation method:", f.groupby("seg").nucleus_count.apply(lambda s: (s == 0).mean()).round(3).to_dict())
 print("cells without outer ring:", f.ring_npx.eq(0).mean().round(4))
+
+# %% [markdown]
+# > **Finding — missing values are structural, not errors.** 0.55 % of cells have no nucleus (31 % of
+# > boundary-segmented cells); 2.2 % have no outer ring because they are completely surrounded by other cells.
 
 # %% [markdown]
 # ## Where does each stain live?
@@ -124,6 +141,11 @@ axs[0].set_ylabel("compartment / cell mean (median)")
 fig.tight_layout()
 plotting.save_fig(fig, "compartment_profile", OUT, SRC)
 rel.round(2)
+
+# %% [markdown]
+# > **Finding — each stain has its own compartment.** DAPI is nuclear (1.83× the cell mean). **ATP1A1/CD45/E-Cad is
+# > *higher outside* cells (ring 1.29×)** — it labels neuropil, not cell membranes. 18S is confined to cells (ring
+# > 0.22×; partly by construction, since 18S drew ~95 % of the masks). αSMA/Vim is cytoplasmic (1.27×).
 
 # %% [markdown]
 # ## Raw intensity per section and segmentation method
@@ -147,6 +169,10 @@ fig.tight_layout()
 plotting.save_fig(fig, "raw_intensity_by_section_segmethod", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — raw intensities differ strongly between sections** for the ATP1A1 and αSMA/Vim channels (and, less, by
+# > segmentation method). This is what notebook 02 normalises.
+
+# %% [markdown]
 # ## First look at biology (raw, unnormalised): channel means by cell type
 # z-scored across cell types per feature; a teaser for the Phase 3 sanity atlas.
 
@@ -165,6 +191,12 @@ ax.set_yticks(range(len(z)), [f"{i} (n={n[i]:,})" for i in z.index], fontsize=8)
 fig.colorbar(im, ax=ax, label="z across cell types", shrink=0.6)
 fig.tight_layout()
 plotting.save_fig(fig, "celltype_raw_heatmap", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — known biology is already visible in raw data:** ependymal cells are the brightest in αSMA/Vim
+# > (vimentin⁺ ependyma), neurons have the most 18S (ribosome-rich, Nissl-like) and are the largest, fibroblasts are
+# > αSMA/Vim-high, Schwann cells are 18S-low. **Leukocytes are *dim* in the boundary channel**, not CD45-bright — tested
+# > properly in notebook 03.
 
 # %% [markdown]
 # ## Cell gallery

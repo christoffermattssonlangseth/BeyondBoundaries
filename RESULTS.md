@@ -176,3 +176,17 @@ differs between animals) → inflated "image gain". Fixed: consistent PCA target
 - 18S texture biomarker: validate on runs 1–3 (raw images on P drive) or a new run; visual check of high vs low animals.
 - Protein-only astrocytes: vimentin or αSMA from arterioles? (distance to VSMC; channel can't separate.)
 - T-cell 18S polarity towards vessels: uropod / migration orientation? Check perivascular-cuff T cells by eye.
+
+## 2026-10-07 — Visual checks (`notebooks/07_visual_checks.ipynb`) and summary (`notebooks/00_summary.ipynb`)
+
+- Perivascular T cells: cos(18S polarity, to vessel) mean 0.13 (n = 4,163), 0.20 in the most polarised quarter; 9/12
+  random strongly polarised cells point vessel-wards in the gallery.
+- "Protein-only" astrocytes vs VSMC: median nearest-VSMC distance 58 µm, same as quiet astrocytes (p = 0.4); αSMA/Vim
+  not shifted towards the VSMC (cos 0.01); 7 % within 10 µm of a VSMC (vs 1.5 %) → mostly vimentin, a minority may be
+  arteriole αSMA.
+- 18S texture, same section (run5_C2_G3_Top): C_P1_6 (score 3.25) vs C_CFA_6 — smoother 18S inside cells (median r 0.73
+  vs 0.67 myeloid, 0.73 vs 0.69 astrocytes) and more bright 18S around cells. **Crowding test:** neighbouring 18S, local
+  density and area explain 17–33 % of per-cell texture, but the within-section score link largely remains (ρ 0.41–0.81
+  adjusted vs 0.53–0.86 raw).
+- All findings written into the notebooks as **Finding** cells; `00_summary` collects them with figures;
+  `report/BeyondBoundaries_summary.pdf` = rendered summary.

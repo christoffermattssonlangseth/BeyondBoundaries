@@ -128,3 +128,23 @@ def lesion_distance(df: pd.DataFrame, lesion: np.ndarray, x: str = "x_centroid",
         tree = cKDTree(df[[x, y]].values[les])
         d[idx] = tree.query(df[[x, y]].values[idx])[0]
     return d
+
+
+def nearest_of(df: pd.DataFrame, target: np.ndarray, x: str = "x_centroid", y: str = "y_centroid",
+               by: str = "section_id") -> pd.DataFrame:
+    """Per cell: distance (µm) and vector (dx, dy) to the nearest `target` cell in the same section (self excluded)."""
+    from scipy.spatial import cKDTree
+
+    out = np.full((len(df), 3), np.nan)
+    xy_all = df[[x, y]].values
+    for _, idx in df.groupby(by, observed=True).indices.items():
+        ti = idx[target[idx]]
+        if len(ti) < 2:
+            continue
+        d, j = cKDTree(xy_all[ti]).query(xy_all[idx], k=2)
+        self_hit = ti[j[:, 0]] == idx
+        jj = np.where(self_hit, j[:, 1], j[:, 0])
+        dd = np.where(self_hit, d[:, 1], d[:, 0])
+        out[idx, 0] = dd
+        out[idx, 1:] = xy_all[ti[jj]] - xy_all[idx]
+    return pd.DataFrame(out, index=df.index, columns=["dist_um", "dx_um", "dy_um"])

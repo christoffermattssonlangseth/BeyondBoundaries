@@ -1,0 +1,13 @@
+cell_type,version,rho_all,rho_within_section
+Myeloid,raw texture,0.7551557417851654,0.8435969626135144
+Myeloid,adjusted for neighbours/density,0.6757885231740507,0.6854225321234804
+Astrocyte,raw texture,0.7174174074455668,0.8400819752692913
+Astrocyte,adjusted for neighbours/density,0.5446769904684347,0.7697822283848319
+Endothelial,raw texture,0.6971865477995962,0.8154770638597305
+Endothelial,adjusted for neighbours/density,0.4411883622794321,0.8084470891712846
+Fibroblast,raw texture,0.693295997867679,0.6678475954023656
+Fibroblast,adjusted for neighbours/density,0.5116073160471368,0.748692304319494
+Oligodendrocyte,raw texture,0.49876850127180944,0.5307630889776694
+Oligodendrocyte,adjusted for neighbours/density,0.3797176733551373,0.44991838006054097
+Neuron,raw texture,0.3715475184981108,0.6713625827465884
+Neuron,adjusted for neighbours/density,0.4509147371092255,0.41125351927408826

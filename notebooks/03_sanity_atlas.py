@@ -119,6 +119,12 @@ fig.tight_layout()
 plotting.save_fig(fig, "expectation_tests", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — five of six expectations hold in every animal**: VSMC αSMA-bright (AUROC 0.66), leukocyte vimentin >
+# > neuron/oligo (0.73), neuron/oligo low in ch3 (0.74), ependymal vimentin (0.86), neuron 18S (0.78); 25/25 animals
+# > each, and they hold in *boundary*-segmented cells too (not an 18S-mask artefact). Nucleus-expansion cells lose most
+# > signal (their mask is a 5 µm guess). **E1 (CD45 at the leukocyte rim) fails: 0.48.**
+
+# %% [markdown]
 # ### E1 follow-up: CD45 where the neuropil does not drown it
 # The boundary channel pools ATP1A1 (neuropil, high in GM/WM) with CD45. Restrict to cells whose local background
 # is in the lowest quartile of their section (meninges, lesion cores, roots) and compare leukocytes with
@@ -142,7 +148,26 @@ for ctx, m in (("all", np.ones(len(f), bool)), ("low-ATP1A1 context", low.values
                          n_leuko=int(mt.sum()), n_other=int((~isL & m).sum())))
 e1 = pd.DataFrame(rows)
 e1.to_csv(OUT / "E1_cd45_context.csv", index=False)
+d = e1[e1.feature.str.startswith("bnd_cell_mean:")].copy()
+d["type"] = d.feature.str.replace("bnd_cell_mean: ", "").str.replace(" vs non-leuko", "")
+pv = d.pivot(index="type", columns="context", values="auroc")
+fig, ax = plt.subplots(figsize=(6, 3.2))
+y = np.arange(len(pv))
+for k, ctx in enumerate(pv.columns):
+    ax.barh(y + (k - 0.5) * 0.38, pv[ctx], height=0.36, color=plotting.CATEGORICAL[k], label=ctx)
+ax.axvline(0.5, color="#888888", lw=0.8, ls="--")
+ax.set_yticks(y, pv.index); ax.set_xlim(0.3, 0.8)
+ax.set_xlabel("AUROC, boundary channel (ATP1A1/CD45/E-Cad) cell mean\nleukocyte type vs non-leukocytes (0.5 = none)")
+ax.legend(fontsize=7, loc="lower right")
+fig.tight_layout()
+plotting.save_fig(fig, "E1_cd45_context", OUT, SRC)
 e1
+
+# %% [markdown]
+# > **Finding — CD45 is not detectable.** Even where neuropil ATP1A1 is lowest (bottom quartile of local background per
+# > section — meninges, lesion cores, roots), every leukocyte type is *as dim or dimmer* than non-leukocytes (AUROC
+# > 0.41–0.49). In this mouse spinal cord the boundary channel behaves as ATP1A1 only. Worth asking 10x whether the kit's
+# > CD45 antibody is mouse-reactive. (*Ptprc* is on the panel, so CD45 RNA is available anyway.)
 
 # %% [markdown]
 # ## Atlas: cell type × feature (normalised medians, z-scored across types)
@@ -201,6 +226,13 @@ off = pd.DataFrame(offset)
 off.reindex(off.abs().max(axis=1).sort_values(ascending=False).index).head(15).round(2)
 
 # %% [markdown]
+# > **Finding — segmentation method shifts shape/distribution features for all cell types alike** (boundary-segmented:
+# > boundary stain at the outer radial bin +10 SD, solidity +6 SD — the stain drew that edge). After removing these
+# > offsets the cell-type pattern holds for boundary cells (r = 0.63) but only weakly for nucleus-expansion cells
+# > (r = 0.30). → Downstream analyses use 18S-segmented cells (96 %); 18S *distribution* features are partly by
+# > construction.
+
+# %% [markdown]
 # ## Violins: key features by cell type, split by segmentation method
 
 # %%
@@ -225,6 +257,11 @@ axs[0].legend([plt.Rectangle((0, 0), 1, 1, fc=plotting.CATEGORICAL[k]) for k in 
               ["interior (18S)", "boundary"], ncol=2, loc="upper right")
 fig.tight_layout()
 plotting.save_fig(fig, "violins_key_features", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — the violins show the key contrasts per cell type and that boundary-segmented cells follow the same
+# > ordering as 18S-segmented ones** for vimentin, 18S and nucleus:cell ratio; the boundary-channel rim/ring ratio is flat
+# > across types (no CD45 rim).
 
 # %% [markdown]
 # ## Cell type × lesion state
@@ -252,3 +289,9 @@ fig.colorbar(im, ax=ax, label="log2 FC lesion / physiological", shrink=0.6)
 fig.tight_layout()
 plotting.save_fig(fig, "lesion_vs_physiological_fc", OUT, SRC)
 fc.to_csv(OUT / "lesion_vs_physiological_log2fc.csv")
+
+# %% [markdown]
+# > **Finding — lesion vs physiological, per cell type:** astrocyte αSMA/Vim cytoplasm is **~2× higher in lesions**
+# > (log2 FC 1.07) — vimentin up in reactive astrocytes, as expected. Large changes in DC and B cells rest on tiny
+# > physiological groups (437 and 66 cells) and ependymal lesion cells are few (211) — treat those as unreliable.
+

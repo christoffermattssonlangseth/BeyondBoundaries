@@ -116,6 +116,12 @@ gene_rho = pd.Series({g: spearmanr(Xln[:, gi[g]].toarray().ravel(), ast.prot_sco
 gene_rho.round(3)
 
 # %% [markdown]
+# > **Finding — vimentin-channel protein agrees moderately with RNA reactivity** (ρ = 0.48; per section 0.17–0.58). Best
+# > single genes: *C3* (0.50), *Serping1* (0.39), *Gfap* (0.38); homeostatic genes anti-correlate (*Slc6a11* −0.44,
+# > *Aldoc* −0.37). The agreement comes from the vimentin channel (components ρ 0.44 / 0.62), not the ATP1A1 rim (0.14).
+# > Note *Vim* itself is not on the 5K panel — the image is the only vimentin measurement.
+
+# %% [markdown]
 # The protein score follows the spec (vimentin channel up, ATP1A1 rim down); the table below shows its components
 # per quadrant so it is clear which drives a cell into "protein-only".
 #
@@ -136,6 +142,20 @@ qt = ast[ast.quadrant != "middle"].groupby("quadrant").agg(
     vim_channel_z=("z_vim", "median"), vim_cyto_p90_z=("z_vim90", "median"), atp1a1_rim_z=("z_bndrim", "median"),
     rna_reactive_median=("rna_reactive", "median"), rna_homeostatic_median=("rna_homeostatic", "median")).loc[QUADS]
 qt.to_csv(OUT / "astro_quadrants.csv")
+fig, axs = plt.subplots(1, 2, figsize=(11, 3.2))
+comp = qt[["vim_channel_z", "vim_cyto_p90_z", "atp1a1_rim_z"]]
+for k, c in enumerate(comp.columns):
+    axs[0].bar(np.arange(len(QUADS)) + (k - 1) * 0.27, comp[c], width=0.25, color=plotting.CATEGORICAL[[3, 4, 1][k]], label=c)
+axs[0].set_xticks(range(len(QUADS)), QUADS); axs[0].axhline(0, color="#888888", lw=0.8)
+axs[0].set_ylabel("median within-section z"); axs[0].legend(fontsize=7); axs[0].set_title("protein-score components")
+for k, c in enumerate(["rna_reactive_median", "rna_homeostatic_median"]):
+    axs[1].bar(np.arange(len(QUADS)) + (k - 0.5) * 0.38, qt[c], width=0.36, color=plotting.CATEGORICAL[[7, 0][k]],
+               label=c.replace("_median", ""))
+axs[1].set_xticks(range(len(QUADS)), QUADS); axs[1].axhline(0, color="#888888", lw=0.8)
+axs[1].legend(fontsize=7); axs[1].set_title("RNA gene-set scores")
+fig.tight_layout()
+plotting.save_fig(fig, "astro_quadrant_components", OUT, SRC)
+ast[["quadrant", "prot_score", "rna_score", "z_vim", "z_vim90", "z_bndrim"]].to_parquet(ROOT / "data" / "astro_quadrants.parquet")
 qt.round(3)
 
 # %%
@@ -156,6 +176,12 @@ plotting.save_fig(fig, "astro_protein_vs_rna", OUT, SRC)
 st.round(3)
 
 # %% [markdown]
+# > **Finding — RNA comes before protein.** "RNA-only" astrocytes (reactive transcription, low vimentin) are 95 % in
+# > lesions and peak in active disease (PEAK1 20 %, PEAK2 17 % of extreme astrocytes vs 3.5 % in CFA), falling in
+# > remission. "Protein-only" astrocytes (vimentin-high, homeostatic RNA; n = 401) are genuinely vimentin-channel-high
+# > (z ≈ 3.7–4.4), sit mostly in grey matter outside lesions and are most frequent in CFA / pre-symptomatic animals.
+
+# %% [markdown]
 # Per animal: protein-only share (of extreme-quadrant astrocytes) vs RNA-only share, by disease phase.
 # Hypothesis: vimentin protein outlasts the reactive transcriptional programme → protein-only enriched in remission.
 
@@ -173,6 +199,11 @@ from scipy.stats import mannwhitneyu
 a_, r_ = pa.loc[pa.phase == "active", "protein_only_minus_rna_only"], pa.loc[pa.phase == "remission", "protein_only_minus_rna_only"]
 print(f"remission vs active (protein-only − RNA-only): MWU p = {mannwhitneyu(r_, a_).pvalue:.3g} (n={len(r_)} vs {len(a_)})")
 pa.to_csv(OUT / "astro_quadrants_per_animal.csv")
+
+# %% [markdown]
+# > **Finding — per animal:** protein-only − RNA-only share is negative in active disease (−0.08), smaller in remission
+# > (−0.03), positive before disease (+0.04); remission vs active p = 0.019 → reactive transcription leads, vimentin
+# > protein follows/persists.
 
 # %% [markdown]
 # Gallery: protein-only vs RNA-only astrocytes (one section), same contrast.
@@ -242,6 +273,11 @@ pol.to_csv(OUT / "leukocyte_polarity.csv", index=False)
 pol.round(4)
 
 # %% [markdown]
+# > **Finding — polarity magnitude does not differ** between perivascular (< 15 µm to a vessel cell) and parenchymal
+# > (> 50 µm) leukocytes in a biologically meaningful way. **Direction does:** in leukocytes next to vessels, the 18S
+# > signal is shifted *towards* the vessel (cos 0.05–0.15, p ≤ 0.002 in MDM, microglia, T cells, DC, B cells).
+
+# %% [markdown]
 # ### Control: is vessel-directed polarity specific to leukocytes, or neighbour bleed?
 # Same cosine test for non-immune cells next to vessels (< 15 µm). A channel that "points at the vessel" in
 # neurons and oligodendrocytes too is optical bleed from the vessel/neighbouring nuclei, not cell polarity.
@@ -261,7 +297,30 @@ for name, m in ctrl.items():
                          p=wilcoxon(an).pvalue if len(an) >= 5 else np.nan))
 pc = pd.DataFrame(rows)
 pc.to_csv(OUT / "polarity_vessel_direction_control.csv", index=False)
-pc.pivot(index="cells", columns="channel", values="cos").round(3)
+pv = pc.pivot(index="cells", columns="channel", values="cos")[CH]
+pp_ = pc.pivot(index="cells", columns="channel", values="p")[CH]
+order = ["T cell", "DC", "B cell", "MDM", "Microglia", "Fibroblast", "Astrocyte", "Oligodendrocyte", "Neuron"]
+pv, pp_ = pv.reindex(order), pp_.reindex(order)
+fig, ax = plt.subplots(figsize=(5.5, 4.2))
+im = ax.imshow(pv.values, cmap=plotting.DIV, vmin=-0.2, vmax=0.2, aspect="auto")
+for i in range(pv.shape[0]):
+    for j in range(pv.shape[1]):
+        star = "*" if pp_.values[i, j] < 0.01 else ""
+        ax.text(j, i, f"{pv.values[i, j]:+.2f}{star}", ha="center", va="center", fontsize=7)
+ax.set_xticks(range(len(CH)), [plotting.CHANNEL_LABELS[c] for c in CH], rotation=20, ha="right")
+ax.set_yticks(range(len(order)), order)
+ax.axhline(4.5, color="black", lw=0.8)
+fig.colorbar(im, ax=ax, label="mean cos(polarity, to vessel); * p<0.01", shrink=0.8)
+ax.set_title("Vessel-directed polarity: leukocytes (top) vs controls", fontsize=9)
+fig.tight_layout()
+plotting.save_fig(fig, "polarity_vessel_direction", OUT, SRC)
+pv.round(3)
+
+# %% [markdown]
+# > **Finding — DAPI and αSMA/Vim "polarity towards vessels" is an artefact** (neurons, oligodendrocytes and astrocytes
+# > show it too: optical bleed from the vessel wall and neighbouring nuclei). **18S towards vessels is cell-type
+# > specific:** T cells cos 0.14, fibroblasts 0.17 (wrap vessels — partly geometry), MDM 0.06, microglia 0.05, but
+# > neurons 0.00 and oligodendrocytes −0.01. Images of these T cells in notebook 07.
 
 # %% [markdown]
 # ## 3. 18S per cell type: lesion vs physiological niche
@@ -307,6 +366,13 @@ fig.tight_layout()
 plotting.save_fig(fig, "r18s_lesion_by_type", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — 18S rises in activated cells in lesions** (per animal, within-section z): Schwann +0.73, fibroblasts +0.57,
+# > endothelium +0.54, DAO +0.44, CD4 T +0.44, astrocytes +0.26–0.34, microglia +0.21; it falls in OPC/COP (−0.18) and
+# > MOL (−0.14). 18S tracks transcript density (ρ 0.6–0.75 within type), but **after adjusting for it the lesion gains
+# > remain** (endothelium +0.39, Schwann +0.83, astrocytes +0.39) while the oligodendrocyte drop vanishes (MOL +0.04) →
+# > more ribosomal RNA in activated cells; the oligo loss is RNA-content loss.
+
+# %% [markdown]
 # ## 4. Neuropil-loss index (within tissue piece)
 # Raw ATP1A1-channel intensity in each cell's 10 µm extracellular territory ÷ the median of all cells in the **same
 # tissue piece** and region class (WM / GM). Pieces differ in overall ATP1A1 intensity even within a section
@@ -320,6 +386,11 @@ key = ni.meta_sample_id.astype(str) + "|" + ni.region_class
 ni["neuropil_index"] = ni.bnd_terr_raw / ni.bnd_terr_raw.groupby(key).transform("median")
 by_niche = ni.groupby(["region_class", "Curated_niche_state"], observed=True).neuropil_index.agg(["median", "size"])
 by_niche.round(3)
+
+# %% [markdown]
+# > **Finding — by niche:** with a within-piece reference, white-matter lesion niches sit below physiological WM (active
+# > 0.98, mix 0.92 vs physiological 1.15); GM lesions ≈ GM. (A first version referenced per section and was confounded by
+# > piece-level intensity — replaced.)
 
 # %% [markdown]
 # Paired within piece: median index of lesion-niche vs physiological-niche cells (pieces with ≥ 100 of each, per
@@ -368,3 +439,10 @@ ax.set(xlabel="physiological-niche cells (median index)", ylabel="lesion-niche c
 ax.legend()
 fig.tight_layout()
 plotting.save_fig(fig, "neuropil_index_paired", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — neuropil loss in white-matter lesions.** Lesion-niche cells in WM have **25 % less surrounding ATP1A1**
+# > than physiological WM of the same tissue piece (38 pieces, Wilcoxon p = 8e-6); in GM there is no difference (45
+# > pieces, p = 0.62). The loss does not scale with clinical score. ATP1A1 (*Atp1a1* is not on the panel) gives a
+# > tissue-damage readout the transcriptome cannot.
+

@@ -102,6 +102,10 @@ fig.tight_layout()
 plotting.save_fig(fig, "masks_example", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — masks.** Tissue ≈ 29 % of the image area in the example section; cell-free tissue 13.5 %; the
+# > autofluorescence (AF) proxy (cell-free *and* transcript-poor) 6.7 %.
+
+# %% [markdown]
 # ## Autofluorescence: white vs grey matter
 # Median intensity of AF-proxy pixels (cell-free, DAPI-negative, transcript-poor), per section and region.
 # If myelin autofluorescence matters, WM should be brighter than GM in the channels that are *not* expected
@@ -140,6 +144,12 @@ fig.tight_layout()
 plotting.save_fig(fig, "af_wm_vs_gm", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — no broadband myelin autofluorescence.** In cell-free, transcript-poor pixels, white matter is *not*
+# > brighter than grey matter in 18S (WM/GM 0.97) or DAPI (1.0). The boundary channel is ~1.5× higher in WM (55 vs 15
+# > raw) — more likely ATP1A1 on axon membranes than AF; αSMA/Vim WM/GM 6.3 but at near-zero absolute level. Local
+# > background subtraction handles both.
+
+# %% [markdown]
 # How large is background relative to cell signal? Ratio of local background to the cell's own mean
 # (median over cells), by region of the cell. Values near 1 mean the feature is mostly background.
 
@@ -153,6 +163,10 @@ f["region_class"] = np.select([f.Global_anatomical_region.isin(WM), f.Global_ana
 bg_rel = pd.DataFrame({ch: (f[f"{ch}_bg_local"] / f[f"{ch}_cell_mean"]).groupby(f.region_class).median()
                        for ch in CH}).round(2)
 bg_rel
+
+# %% [markdown]
+# > **Finding — ATP1A1 background is larger than most cells' own signal**: local background ≈ 1.3× the cell mean in GM
+# > (cells are dimmer than the neuropil around them); for 18S it is ≈ 0.2×.
 
 # %% [markdown]
 # ## Distance to tissue edge
@@ -171,6 +185,10 @@ plotting.save_fig(fig, "edge_distance", OUT, SRC)
 print("cells within 20 µm of edge:", (f.edge_um < 20).mean().round(3), "| outside tissue mask:", (~f.in_tissue.astype(bool)).mean().round(4))
 
 # %% [markdown]
+# > **Finding — edge.** 2.2 % of cells lie within 20 µm of the tissue edge; meningeal/root-associated types (fibroblasts,
+# > Schwann cells) are closest. `edge_um` is kept as a covariate.
+
+# %% [markdown]
 # ## Normalisation
 
 # %%
@@ -180,6 +198,12 @@ print(f[ref].groupby("section_id").size().describe().round(0).to_dict())
 fn = bgm.normalise(f, CH, ref, bg="local", group="section_id")
 scales = fn.groupby("section_id")[[f"{ch}_scale" for ch in CH]].first()
 scales.round(1)
+
+# %% [markdown]
+# > **Finding — normalisation design.** Two variants failed and are kept out: scaling by the median of
+# > background-subtracted values gives ≤ 0 for ATP1A1 (cells dimmer than neuropil) and ~0 for αSMA/Vim; scaling by the
+# > raw median is noise for αSMA/Vim (most cells ≈ 0). Final: `(x − local bg) / p90 of physiological-niche cells`, per
+# > **section** (the staining/imaging unit).
 
 # %% [markdown]
 # ### Piece-level intensity vs disease
@@ -252,6 +276,14 @@ for ch, types in POS.items():
 pd.DataFrame(rows).T
 
 # %% [markdown]
+# > **Finding — stain intensity tracks disease at the animal level.** Within a section, pieces from sicker animals have
+# > **brighter αSMA/Vim** (ρ = 0.45 vs lesion fraction, p = 8e-4; ρ = 0.43 vs clinical score, p = 0.002) and **dimmer
+# > 18S** (ρ = −0.42, p = 0.002) *in their physiological-niche cells*. That is why pieces are not normalised away.
+# >
+# > **Finding — normalisation works where it can be judged:** between-section CV of the median in stain-positive
+# > reference cells drops from 0.077 → 0.052 (DAPI, oligodendrocytes) and 0.099 → 0.065 (18S, neurons).
+
+# %% [markdown]
 # ## QC after normalisation: by segmentation method
 # Interior (18S)-segmented cells dominate; boundary and nucleus-expansion cells are few but must be checked
 # separately because the stains defined the masks.
@@ -272,6 +304,10 @@ plotting.save_fig(fig, "normalised_by_segmethod", OUT, SRC)
 pd.crosstab(fn.Anno_L1_curated, fn.seg, normalize="index").round(3)
 
 # %% [markdown]
+# > **Finding — segmentation method.** 96 % of every cell type is 18S-segmented; boundary and nucleus-expansion cells are
+# > few and differ systematically (see notebook 03).
+
+# %% [markdown]
 # ## Spatial heatmaps of each channel (level 5, 6.8 µm/px)
 # Same contrast per channel across sections (1st–99.5th percentile of tissue pixels pooled over sections).
 
@@ -289,6 +325,10 @@ for ch in CH:
     fig.tight_layout()
     plotting.save_fig(fig, f"spatial_{ch}", OUT, SRC)
     plt.show()
+
+# %% [markdown]
+# > **Finding — ATP1A1 is brightest in grey matter** (neuronal Na⁺/K⁺-ATPase) and its intensity differs between tissue
+# > *pieces* within one section — the reason the neuropil index in notebook 06 is referenced within piece.
 
 # %% [markdown]
 # ## Save the normalised table

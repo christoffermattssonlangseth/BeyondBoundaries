@@ -163,12 +163,23 @@ fig.tight_layout()
 plotting.save_fig(fig, "r2_cov_vs_full", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — the transcriptome explains little of the image.** Per feature, covariates + 50 transcriptome PCs explain a
+# > median **11–18 %** of variance across the 14 cell types; the transcriptome's own share is 6–10 %. So ~85 % of image
+# > variation is not (linearly) predictable from expression. Best explained: morphology (R² 0.39) and rim / cytoplasm /
+# > nuclear intensities (0.23–0.36); least: polarity (0.06), radial profiles (0.09).
+
+# %% [markdown]
 # Features the transcriptome explains *most* (largest ΔR²), per cell type — these are the image readouts that
 # largely re-measure transcriptional state:
 
 # %%
 top_tx = r2.sort_values("tx_unique", ascending=False).groupby("cell_type").head(5)
 top_tx[["cell_type", "feature", "cov", "full", "tx_unique"]].round(3).set_index("cell_type").loc[TYPES]
+
+# %% [markdown]
+# > **Finding — what the transcriptome *does* explain:** nucleus:cell ratio (ΔR² 0.40–0.47 in every type), nuclear and
+# > cytoplasmic 18S in neurons (0.3–0.4; ribosome-rich large neurons), αSMA/Vim intensity and texture in astrocytes and
+# > myeloid cells (0.23–0.36; vimentin tracks the reactive programme).
 
 # %% [markdown]
 # ## 2. Reverse: how much of the transcriptome do the images predict?
@@ -189,6 +200,13 @@ genes_tab = pd.concat({t: r["reverse_genes"] for t, r in results.items()}, names
 genes_tab.to_csv(OUT / "r2_genes_from_image.csv", index=False)
 top_g = genes_tab.sort_values("img_unique", ascending=False).groupby("cell_type").head(8)
 top_g.round(3).set_index("cell_type").loc[TYPES]
+
+# %% [markdown]
+# > **Finding — images predict transcriptional state.** The main within-type expression axis (PC1) is predicted from
+# > image features at R² 0.75 in neurons (neurofilament genes *Nefm/Nefh/Nefl* — large projection neurons), 0.59 in
+# > astrocytes (*C3*, *A2m*, *Gfap*, *Mt2* vs homeostatic *Slc6a11*, *Fgfr3*, *Aldoc*, *Gjb6*) and 0.43 in
+# > oligodendrocytes (*Klk6*, *Ermn*, *Ptgds*, plus neuronal spill-over genes *Snap25*, *Eno2*, *Sncb* — the image
+# > tells you a cell sits in grey matter and will pick up neighbours' transcripts).
 
 # %% [markdown]
 # ## 3. Is the unexplained image signal structured or noise?
@@ -219,6 +237,12 @@ ax.set_yticks(range(len(coh_f)), coh_f.index, fontsize=6); ax.set_xticks(range(l
 fig.colorbar(im, ax=ax, label="residual vs neighbour-residual r", shrink=0.6)
 fig.tight_layout()
 plotting.save_fig(fig, "residual_spatial_coherence", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — the unexplained part is spatially structured, not noise, for intensities:** a cell's residual correlates
+# > r ≈ 0.44–0.49 with its 10 nearest same-type neighbours (rim/cyto/nucleus), 0.29–0.31 (ring/territory). Polarity
+# > (0.08) and radial profiles (0.13) are close to noise. Notebook 05 asks whether this structure is technical or
+# > biological.
 
 # %% [markdown]
 # ## 4a. Does the unexplained image signal differ between lesion and physiological niches?
@@ -261,6 +285,12 @@ fig.tight_layout()
 plotting.save_fig(fig, "residual_lesion_shift_top40", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — little lesion information hides in the residual:** 32 of 1,114 type × feature tests shift between lesion
+# > and physiological niches (q < 0.05), by 0.1–0.26 SD. The clearest: lower ATP1A1 in the ring/territory of myeloid,
+# > endothelial and VSMC cells in lesions — loss of neuropil *around* the cell, which its own transcriptome cannot
+# > carry.
+
+# %% [markdown]
 # ## 4b. Does adding image features improve lesion-niche classification beyond the transcriptome?
 # Within each type, lesion vs physiological cells; L2 logistic regression; GroupKFold by animal; inputs
 # (i) covariates + 50 transcriptome PCs, (ii) + image features. Note lesion niches were defined from transcriptomic
@@ -292,6 +322,11 @@ cls = pd.DataFrame(cls).set_index("cell_type")
 cls["ΔAUROC (img | tx)"] = cls["AUROC tx+img"] - cls["AUROC tx"]
 cls.to_csv(OUT / "lesion_classification.csv")
 cls.round(3)
+
+# %% [markdown]
+# > **Finding — images are redundant with the transcriptome for lesion-niche identity.** Images alone classify lesion vs
+# > physiological cells at AUROC 0.47–0.82 (best OPC, ependymal 0.82), but add ≤ 0.015 on top of the transcriptome
+# > (0.79–0.96). Partly by construction: the niches were defined from transcriptomic neighbourhoods.
 
 # %% [markdown]
 # ## 4c. Residual clusters
@@ -350,3 +385,8 @@ for _, row in ct[ct.q < 0.05].sort_values("q").head(12).iterrows():
     gg = g[g.group == row.cluster].head(6)
     print(f"{row.cell_type} c{row.cluster} (n={row.n}, lesion−phys {row.lesion_minus_phys:+.3f}): "
           + ", ".join(f"{a} ({b:.1f})" for a, b in zip(gg.names, gg.logfoldchanges)))
+
+# %% [markdown]
+# > **Finding — no hidden discrete states.** Leiden on residuals gives one cluster in most types and continuous
+# > two-way splits elsewhere (mostly ring/territory intensity); none is associated with lesions (all q ≥ 0.46).
+

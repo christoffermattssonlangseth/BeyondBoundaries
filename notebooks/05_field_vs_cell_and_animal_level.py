@@ -133,6 +133,11 @@ fig.tight_layout()
 plotting.save_fig(fig, "field_share_heatmap", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — a large share of the unexplained signal is shared with neighbouring cells of *other* types**
+# > (r ≈ 0.37–0.39 for rim/cyto/nucleus intensity; by channel ATP1A1 0.39, αSMA/Vim 0.17, DAPI 0.16, 18S 0.13): a
+# > local field acting on all cells in a neighbourhood.
+
+# %% [markdown]
 # ### What does the field track — technical proxies or lesion biology?
 # Within each section, Spearman ρ of the field with local background of the same channel, log edge distance, and
 # log(1 + distance to lesion); median over sections. A field that follows lesion distance but not background is
@@ -177,6 +182,11 @@ fig.tight_layout()
 plotting.save_fig(fig, "field_lesion_vs_technical", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — the field is not lesion biology.** Its within-section correlation with distance to lesion is ≈ 0 for
+# > every channel and feature family; where it follows anything it is local background (ATP1A1 nuclear intensity vs
+# > background ρ = −0.55: neuropil glow into the nucleus). → optical / staining field.
+
+# %% [markdown]
 # ### Does the *cell-specific* part (field removed) still shift with lesion state?
 # Per animal: mean cell-specific residual in lesion − physiological niche cells (≥ 20 each); Wilcoxon across animals,
 # BH over type × feature. Compare with the same test on the full residual (notebook 04) and on the field.
@@ -214,6 +224,11 @@ ls.groupby("part").apply(lambda d: pd.Series({"tests": len(d), "q<0.05": (d.q < 
 # %%
 sig = ls[(ls.part == "cell-specific") & (ls.q < 0.05)].sort_values("median_diff", key=abs, ascending=False)
 sig.head(25).round(3)
+
+# %% [markdown]
+# > **Finding — the cell-specific remainder hardly tracks lesions either:** 19 of 924 tests (q < 0.05), median |shift|
+# > ≈ 0.1 SD. So the ~85 % "unexplained" image signal is mostly a local optical/staining field plus cell-level variation
+# > unrelated to lesion state.
 
 # %% [markdown]
 # ## B. Animal level: does the image add to the transcriptome for clinical score?
@@ -283,6 +298,11 @@ fig.tight_layout()
 plotting.save_fig(fig, "animal_score_prediction", OUT, SRC)
 
 # %% [markdown]
+# > **Finding — per animal, images carry real but weaker disease information** (25 animals, lumbar cells, leave-one-out):
+# > transcriptome ρ = 0.86 with clinical score (perm p 0.005), **image alone ρ = 0.46 (perm p 0.04)**, both together
+# > ρ = 0.74 (adding ~670 noisy features to n = 25 hurts). Section membership (staining batch) carries no score signal.
+
+# %% [markdown]
 # Which image features carry the animal-level signal? Univariate Spearman ρ of each (type, feature) animal mean with
 # score, BH-corrected; top hits.
 
@@ -294,6 +314,11 @@ uni["feature"] = [feat_img[int(b.split("|img")[1])] for b in uni.block]
 uni["q"] = bh(uni.p)
 uni.to_csv(OUT / "animal_image_feature_vs_score.csv", index=False)
 uni.sort_values("p").head(25)[["cell_type", "feature", "rho", "p", "q"]].round(4)
+
+# %% [markdown]
+# > **Finding — one image feature stands out across cell types: 18S texture correlation** (smoother, less punctate 18S)
+# > rises with clinical score in myeloid cells (ρ 0.74), astrocytes (0.69), endothelium (0.69), fibroblasts (0.64)
+# > (q < 0.05).
 
 # %% [markdown]
 # ### Is the 18S-texture ↔ score link a section-level (focus/staining) effect?
@@ -316,4 +341,23 @@ for t in ["Myeloid", "Astrocyte", "Endothelial", "Fibroblast", "Oligodendrocyte"
                      rho_dapi_texture=spearmanr(a.dv, a.score).statistic))
 tex = pd.DataFrame(rows).set_index("cell_type")
 tex.to_csv(OUT / "r18s_texture_within_section.csv")
+fig, ax = plt.subplots(figsize=(7, 3.2))
+y = np.arange(len(tex))
+for k, (col, lab) in enumerate([("rho_all", "18S texture, all animals"),
+                                ("rho_within_section", "18S texture, within section"),
+                                ("rho_dapi_texture", "DAPI texture (control)")]):
+    ax.barh(y + (k - 1) * 0.27, tex[col], height=0.25, color=plotting.CATEGORICAL[[0, 2, 7][k]], label=lab)
+ax.axvline(0, color="#888888", lw=0.8)
+ax.set_yticks(y, tex.index); ax.set_xlabel("Spearman ρ with clinical score (per animal × section)")
+ax.legend(fontsize=7, loc="lower right")
+fig.tight_layout()
+plotting.save_fig(fig, "r18s_texture_within_section", OUT, SRC)
 tex.round(2)
+
+# %% [markdown]
+# > **Finding — candidate image biomarker of severity.** The 18S-texture ↔ score link **holds within sections**
+# > (animals compared only with animals in the same section: ρ 0.53–0.86 in six cell types, incl. neurons and
+# > oligodendrocytes), while DAPI texture under the same optics does not (ρ −0.18…0.39). Tissue-wide → either biology
+# > (ribosome redistribution / RNA degradation in inflamed tissue) or animal-level tissue handling. Needs another run
+# > (runs 1–3) to confirm. Images in notebook 07.
+
