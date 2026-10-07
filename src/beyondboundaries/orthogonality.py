@@ -149,3 +149,19 @@ def nearest_of(df: pd.DataFrame, target: np.ndarray, x: str = "x_centroid", y: s
         out[idx, 0] = dd
         out[idx, 1:] = xy_all[ti[jj]] - xy_all[idx]
     return pd.DataFrame(out, index=df.index, columns=["dist_um", "dx_um", "dy_um"])
+
+
+def neighbourhood_mean(df: pd.DataFrame, cols: list[str], k: int, by: str = "meta_sample_id",
+                       x: str = "x_centroid", y: str = "y_centroid") -> np.ndarray:
+    """Mean of `cols` over each cell's k nearest cells in the same tissue piece (self excluded)."""
+    from scipy.spatial import cKDTree
+
+    out = np.full((len(df), len(cols)), np.nan, np.float32)
+    vals = df[cols].values.astype(np.float32)
+    xy_all = df[[x, y]].values
+    for _, idx in df.groupby(by, observed=True).indices.items():
+        if len(idx) < 2:
+            continue
+        _, nn = cKDTree(xy_all[idx]).query(xy_all[idx], k=min(k + 1, len(idx)))
+        out[idx] = np.nanmean(vals[idx][nn[:, 1:]], axis=1)
+    return out
