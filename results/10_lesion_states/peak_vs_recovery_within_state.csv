@@ -1,0 +1,25 @@
+state,readout,peak,recovery,n_peak,n_rec,p
+S0: astro reactivity + oligo disease state,neuropil index,0.9989130623190833,1.0692170911007886,7,5,0.5303030303030304
+S0: astro reactivity + oligo disease state,tissue vimentin (z),-0.056043893009732657,-0.005517961682169693,7,5,0.26767676767676774
+S0: astro reactivity + oligo disease state,astro vimentin (z),0.13420342849815947,0.9042469831809996,7,5,0.148989898989899
+S0: astro reactivity + oligo disease state,myeloid 18S texture (z),-0.05348297586290806,-0.07938497903648628,7,5,0.5303030303030304
+S1: monocyte-derived myeloid + microglia homeostasis loss,neuropil index,0.7859943412278084,0.9452890503329031,7,5,0.5303030303030304
+S1: monocyte-derived myeloid + microglia homeostasis loss,tissue vimentin (z),1.7715980605028236,3.1899756776820922,7,5,0.5303030303030304
+S1: monocyte-derived myeloid + microglia homeostasis loss,astro vimentin (z),2.614156453166472,3.367302708064794,7,5,0.7550505050505051
+S1: monocyte-derived myeloid + microglia homeostasis loss,myeloid 18S texture (z),0.17104762298931903,0.1521859318610252,7,5,0.7550505050505051
+S2: fibrosis + myelinating oligo loss,neuropil index,1.0558308137571024,1.2348476963781563,7,5,0.20202020202020204
+S2: fibrosis + myelinating oligo loss,tissue vimentin (z),1.1549616068774942,1.455919763608839,7,5,0.8762626262626263
+S2: fibrosis + myelinating oligo loss,astro vimentin (z),3.0324083654560043,2.3915956173158843,7,5,1.0
+S2: fibrosis + myelinating oligo loss,myeloid 18S texture (z),-0.06643573151716473,0.05084474651643649,7,5,0.7550505050505051
+S3: astro reactivity + MHC-II / IFN,neuropil index,0.9343624696943948,1.0467712326617833,7,5,0.010101010101010102
+S3: astro reactivity + MHC-II / IFN,tissue vimentin (z),-0.1445984661891572,-0.0038781873549049977,7,5,0.10606060606060606
+S3: astro reactivity + MHC-II / IFN,astro vimentin (z),-0.16919088382019604,-0.2252198661066058,7,5,0.5303030303030304
+S3: astro reactivity + MHC-II / IFN,myeloid 18S texture (z),0.1424599178531566,-0.1755566040381686,7,5,0.20202020202020204
+S4: monocyte-derived myeloid + oligo disease state,neuropil index,1.0523426410159884,0.9519488686802666,7,5,0.7550505050505051
+S4: monocyte-derived myeloid + oligo disease state,tissue vimentin (z),0.0762931467065829,0.4915167076475429,7,5,0.3434343434343435
+S4: monocyte-derived myeloid + oligo disease state,astro vimentin (z),1.3546358423010407,1.435684899814024,7,5,0.8762626262626263
+S4: monocyte-derived myeloid + oligo disease state,myeloid 18S texture (z),-0.06498671756074913,0.011458841185197789,7,5,0.8762626262626263
+S5: infiltration + microglia homeostasis loss,neuropil index,0.815011531697548,0.93907828285442,6,5,0.24675324675324672
+S5: infiltration + microglia homeostasis loss,tissue vimentin (z),0.47777646058983697,-0.011891583156990338,7,5,0.3434343434343435
+S5: infiltration + microglia homeostasis loss,astro vimentin (z),1.6491968741386271,1.18803679085219,7,5,0.5303030303030304
+S5: infiltration + microglia homeostasis loss,myeloid 18S texture (z),0.04126838577973536,0.07059343435520893,7,5,1.0

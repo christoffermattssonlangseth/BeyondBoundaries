@@ -232,3 +232,28 @@ Same image features / model as notebook 08, trained on all animals of one run, t
 - → The run signature (images identify run at 100 %) does not carry the lesion or cell-type models; per-image
   normalisation (notebook 02) suffices for transfer between these two runs. Raw feature values still differ by run.
 - One-figure summary `results/09_conclusions/conclusions_figure.{pdf,png}`; conclusions + "how to use the stains" table.
+
+## 2026-10-07 — Lesions redefined; lesion states across both disease courses (`notebooks/10_lesion_states.ipynb`)
+
+All five runs for RNA (1.38 M cells, 67 animals; full object `data/RRMAP2_all_runs.h5ad` on the analysis Mac); images
+runs 5/6 only (runs 1–3 copying). Daily clinical scores/weights: `data/clinical/` (per-animal metrics in
+`animal_course_metrics.csv`).
+- **Curated niches overcall lesions:** never-immunised controls 4–20 % "lesion" (almost all Lesion_mix).
+- **Control-referenced lesions** (30-NN neighbourhood: 23 cell types/states, 7 programs, cellularity; Mahalanobis vs
+  control neighbourhoods of the same region class; threshold = 99th pct of leave-one-control-animal-out): controls
+  0.3–2.4 % (MOG-CFA and PLP-CFA alike → pooled reference OK); 72 % of Lesion_mix cells are not lesion.
+- **Lesions resolve** (median share, RR): PEAK1 0.93 → REMISSION1 0.53 → MONOPHASIC 0.35 → REMISSION2 0.30 →
+  REMISSION2_LONG 0.14. Chronic: PEAK1 0.87, SEVERE16 0.52 vs MILD16 0.28.
+- **Six lesion states** (k-means on 10 axes; named by the axes that distinguish them): S1 monocyte-derived myeloid
+  (active; ~35 % of tissue at PEAK1/PEAK2, ~0.5 % in REMISSION2_LONG), S4 monocyte-derived + oligo disease state
+  (peak), S2 fibrosis + myelinating-oligo loss (late: SEVERE30 20 %, MILD30 13 %, REMISSION2 12 %), S0 astro reactivity
+  + DAO (persists after peak), S3 astro reactivity + MHC-II, S5 lymphocytic infiltration. Course: active infiltrate →
+  fibrotic/demyelinated + glial-reactive.
+- REMISSION1 vs MONOPHASIC state mix is similar (S1 7.6 % vs 5.3 %; S2 6.0 % vs 8.0 %) — an earlier impression that
+  monophasic animals lack active tissue does not hold up in the medians.
+- **Clinical scores:** chronic severity is set at the first attack (SEVERE all peak 3.5, never below 2.25; MILD peak
+  2.0–2.5); relapse is not predictable from the first attack (monophasic vs relapsing peaks/nadirs overlap).
+- **Image pilot (runs 5/6, 7 peak vs 5 recovery animals, uncorrected):** neuropil index (vs the piece's own
+  non-lesion tissue) lower at peak than in recovery within the same state (S1 0.79 vs 0.95; S5 0.82 vs 0.94; S3 0.93
+  vs 1.05, p = 0.01); vimentin trends the other way (tissue vimentin in S1 1.8 vs 3.2 z; astro vimentin in S0 0.13 vs
+  0.90). Suggests neuropil recovers while a vimentin scar builds — needs runs 1–3 (13 more recovery animals).
