@@ -222,3 +222,13 @@ Statistical unit throughout = animal (`sample_name`); normalisation per image (s
   technical run signature in the images** → runs 1–3 must be compared within run / batch-corrected.
 - Process notes: a cache-key collision (RR tasks reused chronic results) was caught and fixed before any RR result was
   reported; the machine was swapping (concurrent c2l job, since stopped) → float32 features + freeing AnnData.
+
+## 2026-10-07 — Conclusions + cross-run transfer (`notebooks/09_conclusions.ipynb`)
+
+Same image features / model as notebook 08, trained on all animals of one run, tested on the other.
+- **Lesion vs physiological:** run5 → run6 AUROC 0.90 (median per animal 0.91, 6 animals), run6 → run5 0.87 (19
+  animals); within-run CV 0.90. Rank-within-image features: 0.87 / 0.86 (no gain).
+- **Cell type (14):** balanced accuracy 0.45 / 0.42 (rank 0.45 / 0.43) vs 0.46 within run; chance 0.07.
+- → The run signature (images identify run at 100 %) does not carry the lesion or cell-type models; per-image
+  normalisation (notebook 02) suffices for transfer between these two runs. Raw feature values still differ by run.
+- One-figure summary `results/09_conclusions/conclusions_figure.{pdf,png}`; conclusions + "how to use the stains" table.

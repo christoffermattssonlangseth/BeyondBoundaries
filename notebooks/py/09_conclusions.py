@@ -148,6 +148,14 @@ fig.tight_layout()
 plotting.save_fig(fig, "transfer_across_runs", OUT, SRC)
 
 # %% [markdown]
+# **Finding: the image models transfer across imaging runs.** A lesion model trained only on run5 animals maps lesions
+# in run6 at AUROC 0.90 (median per animal 0.91), and run6 → run5 at 0.87 — the same as within-run cross-validation
+# (0.90). Cell type transfers too (balanced accuracy 0.42–0.45 vs 0.46 within run; chance 0.07). Ranking features
+# within each image does not help (0.86–0.87 lesion), so the simple per-image normalisation of notebook 02 is enough.
+# The run signature that lets images identify their run perfectly sits in features the lesion and cell-type models
+# do not depend on. Caveat: two runs only, from the same lab and the same week; run6 has 6 animals.
+
+# %% [markdown]
 # ## B. One figure
 
 # %%
@@ -300,8 +308,9 @@ plotting.save_fig(fig, "conclusions_figure", OUT, SRC)
 # - **Candidate severity marker:** smoother 18S texture in sicker animals, in six cell types, within sections and after
 #   a crowding adjustment (ρ 0.41–0.81) — needs replication.
 #
-# **5. Caveats that shape how to use them.** Images identify the imaging run perfectly (transcriptome cannot): compare
-# within run or harmonise (see panel I / section A for transfer). 18S drew ~95 % of masks (18S distribution features
+# **5. Caveats that shape how to use them.** Images identify the imaging run perfectly (transcriptome cannot), so raw
+# feature values should be compared within run — yet the lesion and cell-type models transfer between runs at
+# within-run accuracy (lesion AUROC 0.87–0.90, section A / panel I). 18S drew ~95 % of masks (18S distribution features
 # partly by construction); αSMA and vimentin share a channel; lesion niches are transcriptome-defined; 25 animals and
 # only two CFA pieces.
 #

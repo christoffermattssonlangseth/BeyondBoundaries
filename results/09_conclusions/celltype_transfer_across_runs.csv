@@ -1,0 +1,5 @@
+direction,features,balanced_acc,chance
+train run5 → test run6,as normalised,0.44784345246932433,0.07142857142857142
+train run5 → test run6,rank within image,0.4536777359571116,0.07142857142857142
+train run6 → test run5,as normalised,0.41955225303741156,0.07142857142857142
+train run6 → test run5,rank within image,0.4294373960170277,0.07142857142857142

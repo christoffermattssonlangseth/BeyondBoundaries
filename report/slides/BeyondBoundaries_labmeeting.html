@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beyond Boundaries — what the Xenium segmentation stains add</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME — Notebook Tabs
+   Cream paper page on a dark desk, coloured section tabs on the right edge.
+   Change the palette here; everything else reads these variables.
+   =========================================== */
+:root {
+    --bg-outer: #2d2d2d;
+    --bg-page: #f8f6f1;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5b5852;
+    --rule: #d9d4c7;
+    --tab-1: #98d4bb; /* mint     — question */
+    --tab-2: #c7b8ea; /* lavender — answer */
+    --tab-3: #f4b8c5; /* pink     — checks */
+    --tab-4: #a8d8ea; /* sky      — images alone */
+    --tab-5: #ffe6a7; /* cream    — biology */
+    --tab-6: #f2c5a0; /* apricot  — use it */
+    --ink-accent: #b4462f; /* single editorial accent for numbers */
+
+    --font-display: 'Bodoni Moda', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    --title-size: clamp(1.5rem, 4.2vw, 3.6rem);
+    --h2-size: clamp(1.15rem, 2.8vw, 2.3rem);
+    --h3-size: clamp(0.9rem, 1.6vw, 1.3rem);
+    --body-size: clamp(0.72rem, 1.25vw, 1.08rem);
+    --small-size: clamp(0.6rem, 0.95vw, 0.82rem);
+
+    --slide-padding: clamp(0.6rem, 2vw, 2rem);
+    --page-pad: clamp(1rem, 3.2vw, 3.2rem);
+    --content-gap: clamp(0.5rem, 1.6vw, 1.6rem);
+    --element-gap: clamp(0.25rem, 0.8vw, 0.8rem);
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-normal: 0.6s;
+}
+
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   Each slide is exactly one viewport; nothing scrolls inside a slide.
+   =========================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--bg-outer); color: var(--text-primary); }
+
+.slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: var(--slide-padding);
+    padding-right: calc(var(--slide-padding) + clamp(1.6rem, 2.6vw, 2.6rem)); /* room for tabs */
+}
+
+/* The paper page */
+.page {
+    flex: 1;
+    position: relative;
+    background: var(--bg-page);
+    border-radius: 6px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05), 0 18px 40px rgba(0,0,0,0.45);
+    padding: var(--page-pad);
+    padding-left: calc(var(--page-pad) + clamp(1rem, 2vw, 2rem)); /* room for binder holes */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 100%;
+}
+
+/* Binder holes down the left edge */
+.page::before {
+    content: "";
+    position: absolute;
+    left: clamp(0.5rem, 1vw, 1rem);
+    top: 20%;
+    width: clamp(0.5rem, 0.9vw, 0.85rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--bg-outer);
+    box-shadow: 0 25vh 0 var(--bg-outer), 0 50vh 0 var(--bg-outer);
+    opacity: 0.9;
+}
+
+.slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--content-gap);
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+/* ===========================================
+   SECTION TABS (right edge)
+   Every slide carries the full tab strip; the tab of its own section sticks out.
+   =========================================== */
+.tabs {
+    position: absolute;
+    right: var(--slide-padding);
+    top: 10%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.2rem, 0.6vh, 0.45rem);
+    width: clamp(1.6rem, 2.6vw, 2.6rem);
+}
+.tab {
+    writing-mode: vertical-rl;
+    font-size: clamp(0.5rem, 1vh, 0.7rem);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2a2a2a;
+    padding: clamp(0.4rem, 1.2vh, 0.9rem) 0;
+    text-align: center;
+    border-radius: 0 6px 6px 0;
+    opacity: 0.55;
+    transform: translateX(-30%);
+    transition: transform 0.4s var(--ease-out-expo), opacity 0.4s;
+    cursor: pointer;
+}
+.tab.active { opacity: 1; transform: translateX(0); }
+.tab[data-sec="1"] { background: var(--tab-1); }
+.tab[data-sec="2"] { background: var(--tab-2); }
+.tab[data-sec="3"] { background: var(--tab-3); }
+.tab[data-sec="4"] { background: var(--tab-4); }
+.tab[data-sec="5"] { background: var(--tab-5); }
+.tab[data-sec="6"] { background: var(--tab-6); }
+
+/* ===========================================
+   TYPOGRAPHY
+   =========================================== */
+.kicker {
+    font-size: var(--small-size);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    display: flex; align-items: center; gap: 0.6em;
+}
+.kicker .chip { width: 0.9em; height: 0.9em; border-radius: 2px; display: inline-block; }
+h1 { font-family: var(--font-display); font-size: var(--title-size); font-weight: 400; line-height: 1.05; letter-spacing: -0.01em; }
+h1 em, h2 em { font-style: italic; color: var(--ink-accent); }
+h2 { font-family: var(--font-display); font-size: var(--h2-size); font-weight: 400; line-height: 1.12; }
+h3 { font-family: var(--font-body); font-size: var(--h3-size); font-weight: 700; }
+p, li { font-size: var(--body-size); line-height: 1.45; }
+.muted { color: var(--text-secondary); }
+.small { font-size: var(--small-size); }
+.num { font-family: var(--font-display); color: var(--ink-accent); font-weight: 700; }
+.source { position: absolute; right: var(--page-pad); bottom: clamp(0.4rem, 1.2vh, 0.9rem); font-size: clamp(0.5rem, 0.8vw, 0.68rem); color: #9a958a; }
+.slide-no { position: absolute; left: calc(var(--page-pad) + clamp(1rem, 2vw, 2rem)); bottom: clamp(0.4rem, 1.2vh, 0.9rem); font-size: clamp(0.5rem, 0.8vw, 0.68rem); color: #9a958a; letter-spacing: 0.1em; }
+
+.bullet-list { list-style: none; display: flex; flex-direction: column; gap: clamp(0.35rem, 1vh, 0.9rem); }
+.bullet-list li { padding-left: 1.2em; position: relative; }
+.bullet-list li::before { content: "—"; position: absolute; left: 0; color: var(--ink-accent); }
+
+/* ===========================================
+   LAYOUT HELPERS
+   =========================================== */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--content-gap); align-items: center; min-height: 0; }
+.split.wide-left { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+.split > * { min-width: 0; min-height: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: clamp(0.5rem, 1.4vw, 1.1rem); }
+.card {
+    background: #fffdf8;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: clamp(0.6rem, 1.4vw, 1.2rem);
+    display: flex; flex-direction: column; gap: var(--element-gap);
+    max-height: min(80vh, 700px);
+}
+.card .big { font-family: var(--font-display); font-size: clamp(1.3rem, 3vw, 2.6rem); line-height: 1; color: var(--ink-accent); }
+.card.t1 { border-top: 5px solid var(--tab-1); }
+.card.t2 { border-top: 5px solid var(--tab-2); }
+.card.t3 { border-top: 5px solid var(--tab-3); }
+.card.t4 { border-top: 5px solid var(--tab-4); }
+.card.t5 { border-top: 5px solid var(--tab-5); }
+.card.t6 { border-top: 5px solid var(--tab-6); }
+.card.no { opacity: 0.85; background: #f3efe6; }
+
+figure { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-height: 0; }
+img { max-width: 100%; max-height: min(52vh, 560px); object-fit: contain; display: block; }
+img.tall { max-height: min(62vh, 680px); }
+figcaption { font-size: var(--small-size); color: var(--text-secondary); text-align: center; }
+
+.callout {
+    border-left: 4px solid var(--ink-accent);
+    padding: 0.3em 0 0.3em 0.9em;
+    font-family: var(--font-display);
+    font-size: clamp(0.9rem, 1.7vw, 1.4rem);
+    line-height: 1.3;
+}
+
+table.use { width: 100%; border-collapse: collapse; font-size: var(--body-size); }
+table.use th { font-family: var(--font-display); font-weight: 400; font-size: var(--h3-size); text-align: left; padding: 0.3em 0.6em; border-bottom: 2px solid var(--text-primary); }
+table.use td { padding: clamp(0.25rem, 0.8vh, 0.55rem) 0.6em; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.35; }
+table.use td:first-child { border-right: 1px solid var(--rule); }
+
+/* ===========================================
+   ANIMATIONS — reveal on slide entry (.visible added by JS)
+   =========================================== */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
+.slide.visible .reveal { opacity: 1; transform: none; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.08s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.16s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.24s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.32s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: 0.40s; }
+
+/* Progress bar + nav dots */
+.progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--tab-2); width: 0; z-index: 20; transition: width 0.3s; }
+.nav-dots { position: fixed; left: clamp(0.15rem, 0.5vw, 0.5rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; z-index: 20; }
+.nav-dots button { width: 7px; height: 7px; border-radius: 50%; border: none; background: #777; cursor: pointer; padding: 0; }
+.nav-dots button.active { background: var(--bg-page); }
+
+/* ===========================================
+   RESPONSIVE BREAKPOINTS
+   =========================================== */
+@media screen and (max-height: 700px) {
+    :root { --page-pad: clamp(0.8rem, 2.4vw, 2rem); --content-gap: clamp(0.4rem, 1.2vw, 1rem); --title-size: clamp(1.25rem, 3.8vw, 2.6rem); --h2-size: clamp(1rem, 2.6vw, 1.8rem); }
+    img { max-height: 46vh; } img.tall { max-height: 54vh; }
+}
+@media screen and (max-height: 600px) {
+    :root { --page-pad: clamp(0.5rem, 2vw, 1.4rem); --body-size: clamp(0.66rem, 1.1vw, 0.9rem); --title-size: clamp(1.1rem, 3.4vw, 2rem); }
+    .nav-dots, .source, .slide-no { display: none; }
+}
+@media screen and (max-height: 500px) {
+    :root { --title-size: clamp(1rem, 3vw, 1.5rem); --h2-size: clamp(0.9rem, 2.3vw, 1.25rem); --body-size: clamp(0.62rem, 1vw, 0.82rem); }
+    img { max-height: 40vh; } img.tall { max-height: 44vh; }
+}
+@media screen and (max-width: 760px) {
+    .split, .split.wide-left { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr 1fr; }
+}
+/* PRINT / PDF EXPORT — one 16:9 page per slide, all content shown, no navigation chrome */
+@page { size: 1600px 900px; margin: 0; }
+@media print {
+    html, body { height: auto; overflow: visible; scroll-snap-type: none; background: var(--bg-outer); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide { width: 1600px; height: 900px; page-break-after: always; break-after: page; }
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .progress, .nav-dots { display: none; }
+    img { max-height: 470px; } img.tall { max-height: 560px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+    html { scroll-behavior: auto; }
+    .reveal { transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Slide navigation"></nav>
+
+<main>
+
+<!-- 1 · Title -->
+<section class="slide" data-sec="1">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-1)"></span>Beyond Boundaries · lab meeting · 7 Oct 2026</div>
+    <h1 class="reveal">What does the Xenium <em>multimodal segmentation kit</em> tell us that the transcriptome doesn't?</h1>
+    <p class="reveal muted" style="max-width:60ch">Mouse EAE spinal cord, RRMAP2 runs 5 + 6 · 18 Xenium 5K images · 51 tissue pieces · 25 animals · 500,379 annotated cells · 201 image features per cell</p>
+  </div><span class="slide-no">01</span></div>
+</section>
+
+<!-- 2 · The data -->
+<section class="slide" data-sec="1">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-1)"></span>The question</div>
+    <h2 class="reveal">Four stains are imaged anyway, to draw the cell masks. <em>Is there biology in them?</em></h2>
+    <figure class="reveal"><img src="assets/channels.png" alt="Four stain channels with cell (cyan) and nucleus (magenta) masks: DAPI, ATP1A1/CD45/E-cadherin, 18S rRNA, alphaSMA/vimentin"></figure>
+    <p class="reveal small muted">DAPI · ATP1A1/CD45/E-Cad (boundary) · 18S rRNA (interior; drew ~95 % of masks) · αSMA/Vimentin. Per cell: intensity in nucleus / cytoplasm / rim / surrounding ring, texture, polarity, shape. <b>Vim, Acta2 and Atp1a1 are not on the 5K panel.</b></p>
+  </div><span class="source">notebooks 00–01</span><span class="slide-no">02</span></div>
+</section>
+
+<!-- 3 · Bottom line -->
+<section class="slide" data-sec="2">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-2)"></span>Bottom line</div>
+    <h2 class="reveal">Three kinds of added information. <em>No hidden cell states.</em></h2>
+    <div class="grid reveal">
+      <div class="card t2"><span class="big">Protein</span><h3>…for genes not on the panel</h3><p>Vimentin, αSMA, ATP1A1 per cell. Astrocyte vimentin lags reactive RNA in active disease.</p></div>
+      <div class="card t2"><span class="big">Tissue</span><h3>…context around each cell</h3><p>White-matter neuropil loss in lesions (−25 %). Anatomy that adds to the transcriptome (0.68 → 0.73).</p></div>
+      <div class="card t2"><span class="big">Images alone</span><h3>…recognise cells and map lesions</h3><p>Cell type 46 % (chance 7 %), lesion maps AUROC 0.90, and this holds <b>across imaging runs</b>.</p></div>
+    </div>
+    <p class="reveal muted">Not added: CD45 (undetectable in mouse cord); lesion identity and clinical score beyond what the transcriptome already gives. ~85 % of image variance is unexplained by RNA, but that's mostly optics.</p>
+  </div><span class="slide-no">03</span></div>
+</section>
+
+<!-- 4 · Sanity checks -->
+<section class="slide" data-sec="3">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-3)"></span>Do the stains measure what they claim?</div>
+    <h2 class="reveal">Known biology: yes, in every animal. <em>CD45: no.</em></h2>
+    <div class="grid reveal">
+      <div class="card t3"><span class="big">0.86</span><p>ependymal vimentin</p></div>
+      <div class="card t3"><span class="big">0.78</span><p>neuronal 18S (cytoplasm)</p></div>
+      <div class="card t3"><span class="big">0.73</span><p>leukocyte vimentin &gt; neuron / oligo</p></div>
+      <div class="card t3"><span class="big">0.66</span><p>VSMC αSMA-bright</p></div>
+      <div class="card t3 no"><span class="big" style="color:#777">0.48</span><p>leukocyte CD45 at the rim: <b>chance</b>; boundary channel = ATP1A1 neuropil only</p></div>
+    </div>
+    <p class="reveal small muted">AUROC; positives &gt; 0.5 in 25/25 animals; also in boundary-segmented cells. → Ask 10x whether the kit's CD45 antibody is mouse-reactive.</p>
+  </div><span class="source">notebook 03</span><span class="slide-no">04</span></div>
+</section>
+
+<!-- 5 · How much is new -->
+<section class="slide" data-sec="3">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-3)"></span>How much of the image is new?</div>
+    <h2 class="reveal">Most of the image isn't in the transcriptome, <em>but most of that is optics</em></h2>
+    <div class="split">
+      <ul class="bullet-list reveal">
+        <li>Covariates + 50 transcriptome PCs explain a median <span class="num">~15 %</span> of each image feature (best: nucleus:cell ratio, rim/cyto intensity).</li>
+        <li>The remainder is spatially coherent, but largely a <b>local field shared across cell types</b> (r ≈ 0.38; follows neuropil glow, not lesions).</li>
+        <li>The cell-specific remainder barely moves with lesion state: 19/924 tests, ~0.1 SD.</li>
+        <li>Residual clustering: no discrete hidden states, only continuous gradients.</li>
+      </ul>
+      <div class="callout reveal">The kit is not a source of new cell <i>types</i>. It's a source of new <i>measurements</i> for specific questions.</div>
+    </div>
+  </div><span class="source">notebooks 04–05</span><span class="slide-no">05</span></div>
+</section>
+
+<!-- 6 · Cell type from images -->
+<section class="slide" data-sec="4">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-4)"></span>Images alone, held-out animals</div>
+    <div class="split wide-left">
+      <figure class="reveal"><img class="tall" src="assets/celltype_recall.png" alt="Per-cell-type recall from image features only"></figure>
+      <div style="display:flex;flex-direction:column;gap:var(--content-gap)">
+        <h2 class="reveal">No transcripts: <em>46 %</em> of 14 cell types (chance 7 %)</h2>
+        <ul class="bullet-list reveal">
+          <li>Ependymal 0.86 · neuron 0.81 · Schwann 0.76</li>
+          <li>Immune poor (myeloid 0.16, T 0.26): no CD45</li>
+          <li>Errors stay within lineage</li>
+          <li>Subtypes: microglia 72 %, reactive astrocytes 68 %, cholinergic neurons 72 %</li>
+          <li>Identity is spread across all four stains, so it's not an artefact of the 18S masks</li>
+        </ul>
+      </div>
+    </div>
+  </div><span class="source">notebook 08</span><span class="slide-no">06</span></div>
+</section>
+
+<!-- 7 · Lesion maps -->
+<section class="slide" data-sec="4">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-4)"></span>Images alone, held-out animals</div>
+    <h2 class="reveal">Lesion maps from images: <em>AUROC 0.90</em> <span class="muted" style="font-size:0.6em">(transcriptome neighbourhood 0.92)</span></h2>
+    <figure class="reveal"><img class="tall" src="assets/lesion_maps.png" alt="Lesion annotation (orange, from transcriptome) next to lesion probability from images only, three sections"></figure>
+    <p class="reveal small muted">Top signal: vimentin-channel texture/intensity in surrounding tissue. Anatomy (10 regions): images 0.63, transcriptome 0.68, both 0.73.</p>
+  </div><span class="source">notebook 08</span><span class="slide-no">07</span></div>
+</section>
+
+<!-- 8 · Transfer -->
+<section class="slide" data-sec="4">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-4)"></span>New today · does it survive a new run?</div>
+    <h2 class="reveal">Images identify their run with 100 % accuracy, <em>yet the models still transfer</em></h2>
+    <figure class="reveal"><img src="assets/transfer.png" alt="Lesion AUROC and cell-type balanced accuracy when training on one run and testing on the other"></figure>
+    <ul class="bullet-list reveal">
+      <li>Train run5 → test run6: lesion AUROC <span class="num">0.90</span> (per animal 0.91); run6 → run5 <span class="num">0.87</span>. Within-run: 0.90.</li>
+      <li>Cell type 0.42–0.45 vs 0.46 within-run. Per-image rank transform doesn't help, so per-image normalisation is enough.</li>
+    </ul>
+  </div><span class="source">notebook 09</span><span class="slide-no">08</span></div>
+</section>
+
+<!-- 9 · Neuropil loss -->
+<section class="slide" data-sec="5">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-5)"></span>Biology only the images show · 1</div>
+    <h2 class="reveal">White-matter lesions lose <em>25 %</em> of the ATP1A1 around each cell</h2>
+    <figure class="reveal"><img src="assets/neuropil_map.png" alt="Neuropil index map next to curated niche states for one section"></figure>
+    <p class="reveal">Lesion vs healthy WM <b>within the same piece</b>: 38 pieces, p = 8×10⁻⁶. Grey matter: no change (p = 0.62). This is tissue damage the cell's own transcriptome can't carry. <span class="muted">Not related to clinical score.</span></p>
+  </div><span class="source">notebook 06</span><span class="slide-no">09</span></div>
+</section>
+
+<!-- 10 · Astrocytes -->
+<section class="slide" data-sec="5">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-5)"></span>Biology only the images show · 2</div>
+    <h2 class="reveal">Astrocyte reactive RNA <em>precedes</em> vimentin protein</h2>
+    <figure class="reveal"><img src="assets/astro.png" alt="Astrocyte protein (vimentin channel) vs RNA reactivity; quadrant shares by disease stage"></figure>
+    <ul class="bullet-list reveal">
+      <li>Protein vs RNA reactivity ρ = 0.48 (C3 0.50, Gfap 0.38; Vim itself isn't on the panel)</li>
+      <li><b>RNA-only</b> astrocytes peak in active disease (PEAK1 20 %, CFA 3.5 %), fall in remission (active vs remission p = 0.019)</li>
+    </ul>
+  </div><span class="source">notebook 06</span><span class="slide-no">10</span></div>
+</section>
+
+<!-- 11 · 18S -->
+<section class="slide" data-sec="5">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-5)"></span>Biology only the images show · 3</div>
+    <h2 class="reveal">18S rRNA: activation, and <em>T cells facing the vessel</em></h2>
+    <figure class="reveal"><img src="assets/tcell.png" alt="Gallery of perivascular T cells with 18S polarity arrow and direction to nearest vessel"></figure>
+    <ul class="bullet-list reveal">
+      <li>18S polarity points vessel-wards in T cells (cos 0.13; 0.20 in the most polarised quarter), fibroblasts and MDM, but not in neurons or oligodendrocytes, so it's not blur</li>
+      <li>Lesion 18S rises beyond RNA content in activated cells (Schwann +0.8, endothelium +0.4 SD); the oligodendrocyte drop is just RNA loss</li>
+    </ul>
+  </div><span class="source">notebooks 06–07</span><span class="slide-no">11</span></div>
+</section>
+
+<!-- 12 · 18S texture -->
+<section class="slide" data-sec="5">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-5)"></span>Candidate · needs replication</div>
+    <div class="split wide-left">
+      <figure class="reveal"><img class="tall" src="assets/r18s_texture.png" alt="18S channel crops of myeloid cells and astrocytes from the lowest and highest score animal in one section"></figure>
+      <div style="display:flex;flex-direction:column;gap:var(--content-gap)">
+        <h2 class="reveal">Smoother 18S texture in <em>sicker animals</em></h2>
+        <ul class="bullet-list reveal">
+          <li>Rises with clinical score in 6 cell types</li>
+          <li>Holds <b>within section</b> (ρ 0.53–0.86) and after a crowding adjustment (0.41–0.81)</li>
+          <li>DAPI texture (same optics) doesn't follow, so it's probably not focus</li>
+          <li>Ribosome redistribution / RNA degradation, or tissue handling per animal</li>
+        </ul>
+        <p class="reveal small muted">Animal level: score from images ρ 0.62 vs transcriptome 0.79. Images are informative but redundant.</p>
+      </div>
+    </div>
+  </div><span class="source">notebooks 05, 07</span><span class="slide-no">12</span></div>
+</section>
+
+<!-- 13 · How to use -->
+<section class="slide" data-sec="6">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-6)"></span>Take-home</div>
+    <h2 class="reveal">How to use the segmentation stains</h2>
+    <table class="use reveal">
+      <thead><tr><th>Use them for</th><th>Don't use them for</th></tr></thead>
+      <tbody>
+        <tr><td>Vimentin / αSMA / ATP1A1 protein (targets missing from the panel)</td><td>CD45 / immune membrane (undetectable in mouse cord)</td></tr>
+        <tr><td>Tissue context: neuropil loss, anatomy, lesion maps</td><td>Replacing the transcriptome for lesion identity or severity</td></tr>
+        <tr><td>Protein-vs-RNA timing (astrocyte reactivity)</td><td>Cell polarity from DAPI or αSMA/Vim (optical bleed)</td></tr>
+        <tr><td>Per-cell 18S as a ribosome / activation readout (adjusted for transcript density)</td><td>Pooling <i>raw</i> feature values across runs (models transfer; raw values don't)</td></tr>
+        <tr><td>QC: segmentation method, spill-over-prone neighbourhoods</td><td>18S distribution features as biology in 18S-segmented cells</td></tr>
+      </tbody>
+    </table>
+  </div><span class="source">notebook 09</span><span class="slide-no">13</span></div>
+</section>
+
+<!-- 14 · Caveats + next -->
+<section class="slide" data-sec="6">
+  <div class="page"><div class="slide-content">
+    <div class="kicker reveal"><span class="chip" style="background:var(--tab-6)"></span>Caveats &amp; next steps</div>
+    <div class="split" style="align-items:start">
+      <div class="reveal">
+        <h3 style="margin-bottom:0.6em">Caveats</h3>
+        <ul class="bullet-list">
+          <li>Lesion niches are transcriptome-defined, so image-vs-RNA comparisons for lesions are tilted toward RNA</li>
+          <li>αSMA and vimentin share a channel</li>
+          <li>18S drew ~95 % of the masks</li>
+          <li>25 animals, 2 CFA pieces; 2 runs from one batch</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <h3 style="margin-bottom:0.6em">Next</h3>
+        <ul class="bullet-list">
+          <li><b>Replicate on runs 1–3</b> (P drive): 18S texture, WM neuropil loss, astrocyte RNA → protein lag, T-cell polarity, image-model transfer</li>
+          <li>Separate vimentin from αSMA (VSMC-adjacent subset); check CD45 reactivity with 10x</li>
+          <li>Feed the neuropil-loss index and per-cell 18S into RRMAP2 lesion/niche analyses as covariates</li>
+        </ul>
+      </div>
+    </div>
+    <p class="reveal small muted">Everything: <code>notebooks/00_summary</code> · <code>09_conclusions</code> · <code>report/BeyondBoundaries_summary.pdf</code></p>
+  </div><span class="slide-no">14</span></div>
+</section>
+
+</main>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   - Builds the section tab strip on every slide and the nav dots
+   - Keyboard (arrows / space / PageUp/Down / Home / End), wheel, touch
+   - IntersectionObserver adds .visible to trigger the reveal animations
+   =========================================== */
+const SECTIONS = { 1: "Question", 2: "Answer", 3: "Checks", 4: "Images alone", 5: "Biology", 6: "Use it" };
+
+class SlidePresentation {
+    constructor() {
+        this.slides = [...document.querySelectorAll(".slide")];
+        this.current = 0;
+        this.locked = false;
+        this.buildTabs();
+        this.buildDots();
+        this.observe();
+        this.bindKeys();
+        this.bindWheel();
+        this.bindTouch();
+    }
+
+    // Full tab strip on each slide; the slide's own section is "pulled out".
+    buildTabs() {
+        this.slides.forEach(slide => {
+            const strip = document.createElement("div");
+            strip.className = "tabs";
+            strip.setAttribute("aria-hidden", "true");
+            Object.entries(SECTIONS).forEach(([k, label]) => {
+                const t = document.createElement("div");
+                t.className = "tab" + (slide.dataset.sec === k ? " active" : "");
+                t.dataset.sec = k;
+                t.textContent = label;
+                t.addEventListener("click", () => this.go(this.slides.findIndex(s => s.dataset.sec === k)));
+                strip.appendChild(t);
+            });
+            slide.appendChild(strip);
+        });
+    }
+
+    buildDots() {
+        const nav = document.querySelector(".nav-dots");
+        this.dots = this.slides.map((_, i) => {
+            const b = document.createElement("button");
+            b.setAttribute("aria-label", `Go to slide ${i + 1}`);
+            b.addEventListener("click", () => this.go(i));
+            nav.appendChild(b);
+            return b;
+        });
+    }
+
+    observe() {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add("visible");
+                    this.current = this.slides.indexOf(e.target);
+                    this.update();
+                }
+            });
+        }, { threshold: 0.55 });
+        this.slides.forEach(s => io.observe(s));
+    }
+
+    update() {
+        this.dots.forEach((d, i) => d.classList.toggle("active", i === this.current));
+        document.querySelector(".progress").style.width = `${(this.current + 1) / this.slides.length * 100}%`;
+    }
+
+    go(i) {
+        i = Math.max(0, Math.min(this.slides.length - 1, i));
+        this.slides[i].scrollIntoView({ behavior: "smooth" });
+    }
+
+    bindKeys() {
+        document.addEventListener("keydown", e => {
+            if (["ArrowDown", "ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); this.go(this.current + 1); }
+            else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); this.go(this.current - 1); }
+            else if (e.key === "Home") this.go(0);
+            else if (e.key === "End") this.go(this.slides.length - 1);
+        });
+    }
+
+    // One wheel gesture = one slide (debounced so trackpads don't skip slides).
+    bindWheel() {
+        window.addEventListener("wheel", e => {
+            e.preventDefault();
+            if (this.locked || Math.abs(e.deltaY) < 10) return;
+            this.locked = true;
+            this.go(this.current + (e.deltaY > 0 ? 1 : -1));
+            setTimeout(() => (this.locked = false), 700);
+        }, { passive: false });
+    }
+
+    bindTouch() {
+        let y0 = null;
+        window.addEventListener("touchstart", e => (y0 = e.touches[0].clientY), { passive: true });
+        window.addEventListener("touchend", e => {
+            if (y0 === null) return;
+            const dy = y0 - e.changedTouches[0].clientY;
+            if (Math.abs(dy) > 50) this.go(this.current + (dy > 0 ? 1 : -1));
+            y0 = null;
+        }, { passive: true });
+    }
+}
+
+new SlidePresentation();
+</script>
+</body>
+</html>

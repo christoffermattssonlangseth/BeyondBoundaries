@@ -1,0 +1,5 @@
+direction,features,AUROC,median_AUROC_per_animal,test_animals
+train run5 → test run6,as normalised,0.8967335318193137,0.9107514695054365,6
+train run5 → test run6,rank within image,0.8727421757017898,0.9135282552053594,6
+train run6 → test run5,as normalised,0.8718906621051405,0.8771648949556674,19
+train run6 → test run5,rank within image,0.8630988872853578,0.8675840132300179,19

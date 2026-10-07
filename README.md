@@ -3,7 +3,9 @@
 What do the Xenium Multimodal Cell Segmentation stains (DAPI, ATP1A1/CD45/E-Cadherin, 18S rRNA, αSMA/Vimentin) add to
 the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 5/6; 18 sections, 25 animals, 500k annotated cells).
 
-**Start here:** `notebooks/00_summary.ipynb` (also `report/BeyondBoundaries_summary.pdf`) — all findings with figures.
+**Start here:** `report/BeyondBoundaries_conclusions.pdf` — the answer, conclusions and key figures (9 pages).
+Lab-meeting deck: `report/slides/BeyondBoundaries_labmeeting.html` (PDF alongside). All findings in detail:
+`notebooks/00_summary.ipynb` (also `report/BeyondBoundaries_summary.pdf`).
 Every analysis notebook has **Finding** cells next to the plots that support them.
 
 | notebook | content |
@@ -17,6 +19,7 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `06_targeted_readouts` | astrocyte vimentin vs RNA reactivity, leukocyte polarity vs vessels, 18S lesion vs physiological, neuropil loss |
 | `07_visual_checks` | images behind the findings: perivascular T cells, protein-only astrocytes vs VSMC, 18S texture, crowding test |
 | `08_image_only_prediction` | what images alone predict: cell type, subtypes, anatomy, lesion state + lesion maps, animal metadata (vs transcriptome) |
+| `09_conclusions` | cross-run transfer test (train run5 → test run6 and back), one-figure summary, conclusions + how to use the stains |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.
