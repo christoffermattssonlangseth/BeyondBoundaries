@@ -54,6 +54,8 @@ fa[_f64] = fa[_f64].astype(np.float32)            # halves memory on the shared 
 for ch in CH:
     fa[f"{ch}_rim_over_ring"] = (fa[f"{ch}_rim_mean"] + fa[f"{ch}_bg_local"] / fa[f"{ch}_scale"]) / \
                                 (fa[f"{ch}_ring_mean"] + fa[f"{ch}_bg_local"] / fa[f"{ch}_scale"])
+_num = fa.select_dtypes("number").columns
+fa[_num] = fa[_num].replace([np.inf, -np.inf], np.nan)   # ratios with ~0 denominators; trees handle NaN
 
 CELL = []
 for ch in CH:
