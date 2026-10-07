@@ -381,7 +381,10 @@ TASKS5 = [
 rows, store = [], {}
 for name, d, target, kind in TASKS5:
     for inp, feats in INPUTS.items():
-        cache = CACHE / f"animal_{name.split(' (')[0].split(':')[0].replace(' ', '_')}_{target}_{d.model.nunique()}_{inp}.parquet"
+        slug = "".join(ch if ch.isalnum() else "_" for ch in name.split(" —")[0]).strip("_")
+        while "__" in slug:
+            slug = slug.replace("__", "_")
+        cache = CACHE / f"animal_{slug}__{inp}.parquet"
         if cache.exists():
             r = pd.read_parquet(cache)
         else:
