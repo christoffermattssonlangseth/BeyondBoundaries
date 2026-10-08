@@ -151,8 +151,11 @@ for sid in sorted(obs.sample_id.unique()):
     pool_tot.append((ind @ tot).toarray().astype(np.float32))
     pool_nuc.append((ind @ nuc).toarray().astype(np.float32))
 cells = obs.join(pd.concat(parts).fillna(0), how="inner")
-pool = pd.DataFrame({"key": pool_keys})
-pool_tot, pool_nuc = np.vstack(pool_tot), np.vstack(pool_nuc)
+# an animal can have pieces on several sections: sum its pools across sections
+codes, uniq = pd.factorize(np.array(pool_keys))
+agg = sp.csr_matrix((np.ones(len(codes)), (codes, np.arange(len(codes)))), shape=(len(uniq), len(codes)))
+pool = pd.DataFrame({"key": uniq})
+pool_tot, pool_nuc = agg @ np.vstack(pool_tot), agg @ np.vstack(pool_nuc)
 print(f"{len(cells):,} cells; {cells.n_total.sum():,.0f} transcripts in cells; "
       f"{cells.halo_all.sum():,.0f} outside cells within {HALO:.0f} µm of one")
 
@@ -576,7 +579,7 @@ plotting.save_fig(fig, "q3_nuclear_retention", OUT, SRC)
 rows = []
 for t in TYPES:
     w = nucz[t].unstack()
-    if "core" not in w:
+    if not {"core", "healthy"} <= set(w.columns):
         continue
     lf = np.log2(w.core / w.healthy).dropna().rename("lf").to_frame().join(clin[["score", "first_peak", "auc"]])
     for c in ["score", "first_peak", "auc"]:
