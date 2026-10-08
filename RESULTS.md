@@ -363,3 +363,14 @@ regions, median 96 % lesion cells inside; depth from the cord outline):
   (p = 0.36); territory +0.16 (n.s.).
 - **Answer:** no measurable barrier; vimentin is a marker of the resolution phase (lesion-wide, highest in animals that
   recover), not a physical restriction of infiltrating immune cells at this resolution.
+
+## 2026-10-08 — How strong is the vimentin–outcome link? (`notebooks/18_vimentin_outcome.ipynb`)
+35 post-peak animals; lesion astrocyte vimentin (inside − outside lesion regions, within-image z).
+- vs clinical score: ρ −0.34 (p = 0.046); adjusted for days since first peak −0.44 (p = 0.008); leave-one-run-out
+  −0.42 to −0.55 (all p < 0.03); within lesion states S0 −0.49, S2 −0.56, S1 −0.45, S4 −0.41 (p < 0.04).
+- Weakened by lesion share (−0.26, n.s.) and first-attack height (−0.29, p = 0.09): entangled with disease burden.
+- Within-image pairs: 12/19 concordant (63 %, p = 0.36); same-day 4/5.
+- Runs 1–3 "non-replication" = no score variance (chronic post-peak in runs 1–3 = MILD30, all score 1.0); RR runs 1–3
+  ρ −0.46 (p = 0.10).
+- Beyond RNA: astrocyte RNA reactivity ρ +0.29 with score; vimentin | RNA reactivity ρ −0.63 (p < 0.001).
+- Strength: moderate; hypothesis with decent support, not established.
