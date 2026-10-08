@@ -1,0 +1,6 @@
+test,n,rho,p
+VSMC signal vs score,35,-0.35551197995507555,0.036093671394841514
+astro vimentin vs VSMC signal (same animal),35,0.5565826330532213,0.0005161077590871107
+astro lesion vimentin vs score | VSMC signal,35,-0.3240896358543418,0.057521149744904986
+astro (inside − outside) vs score | VSMC signal,35,-0.3238095238095238,0.057749668889961185
+astro − VSMC vs score,35,-0.35915394665280287,0.03409981626738438

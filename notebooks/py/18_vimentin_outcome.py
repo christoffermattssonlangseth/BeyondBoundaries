@@ -296,3 +296,45 @@ pd.DataFrame(rows).round(3)
 # > RNA reactivity (ρ ≈ −0.45), but entangled with overall disease burden and only weakly supported by within-image
 # > pairs. A hypothesis with decent support, not an established result; separate vimentin/GFAP antibodies on more
 # > animals at matched days would settle it.
+
+# %% [markdown]
+# ## 6. Could it be vascular smooth muscle (αSMA) instead?
+# The channel pools αSMA and vimentin. Mislabelled VSMCs and bleed-through from neighbouring VSMCs were excluded earlier
+# (notebook 15: no smooth-muscle transcripts in lesion astrocytes; effect holds with no VSMC/endothelial/fibroblast
+# within 20 µm). Remaining question: does the whole channel simply run brighter in some animals' sections (the VSMC
+# calibrator was higher in the milder group for MILD16 vs SEVERE16 and chronic vs RR)? Per animal: median VSMC signal
+# (within-image z, all VSMC), then (i) astrocyte vimentin relative to the animal's own VSMC signal, (ii) the score
+# association adjusted for VSMC signal, (iii) VSMC signal itself vs score.
+
+# %%
+vs = obs[obs.Anno_L1_curated == "VSMC"].groupby("sample_name", observed=True).vim_z.agg(["median", "count"])
+P2 = P.join(vs[vs["count"] >= 10]["median"].rename("vsmc_signal"), how="inner")
+P2["astro_minus_vsmc"] = P2.vim_inside - P2.vsmc_signal
+rows = [dict(test="VSMC signal vs score", **partial(P2, "vsmc_signal", "score", ["days_since_peak"])),
+        dict(test="astro vimentin vs VSMC signal (same animal)", **partial(P2, "vim_inside", "vsmc_signal", [])),
+        dict(test="astro lesion vimentin vs score | VSMC signal", **partial(P2, "vim_inside", "score", ["days_since_peak", "vsmc_signal"])),
+        dict(test="astro (inside − outside) vs score | VSMC signal", **partial(P2, "vim_contrast", "score", ["days_since_peak", "vsmc_signal"])),
+        dict(test="astro − VSMC vs score", **partial(P2, "astro_minus_vsmc", "score", ["days_since_peak"]))]
+vsmc_tab = pd.DataFrame(rows)
+vsmc_tab.to_csv(OUT / "vsmc_check.csv", index=False)
+vsmc_tab.round(3)
+
+# %%
+fig, axs = plt.subplots(1, 2, figsize=(11, 3.8))
+axs[0].scatter(P2.vsmc_signal, P2.vim_inside, s=26, c=P2.score, cmap="viridis")
+axs[0].set(xlabel="VSMC αSMA/Vim signal (z, per animal)", ylabel="lesion astrocyte vimentin (z, per animal)")
+sc_ = axs[1].scatter(P2.vsmc_signal, P2.score, s=26, color=COL[5])
+axs[1].set(xlabel="VSMC αSMA/Vim signal (z, per animal)", ylabel="clinical score at sacrifice")
+fig.colorbar(axs[0].collections[0], ax=axs[0], label="score")
+fig.tight_layout()
+plotting.save_fig(fig, "vsmc_check", OUT, SRC)
+
+# %% [markdown]
+# > **Finding — part of the effect is channel-wide (shared with VSMCs).** VSMC αSMA/Vim signal per animal also falls with
+# > clinical score (ρ −0.36, p = 0.04) and tracks the animal's astrocyte vimentin (ρ +0.56), so some of the association
+# > is shared by every cell in this channel: piece-level staining/brightness that within-image normalisation doesn't
+# > remove (pieces of different animals share an image), or real vascular αSMA biology. After removing it, an
+# > astrocyte-specific association remains but is smaller: astrocyte vimentin vs score adjusted for VSMC signal ρ −0.32
+# > (p = 0.06), astrocyte − VSMC ρ −0.36 (p = 0.03). **Revised strength: weak to moderate.** Post-Xenium
+# > immunofluorescence with separate vimentin and αSMA antibodies on the same sections would remove the shared-channel
+# > problem.

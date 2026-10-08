@@ -374,3 +374,6 @@ regions, median 96 % lesion cells inside; depth from the cord outline):
   ρ −0.46 (p = 0.10).
 - Beyond RNA: astrocyte RNA reactivity ρ +0.29 with score; vimentin | RNA reactivity ρ −0.63 (p < 0.001).
 - Strength: moderate; hypothesis with decent support, not established.
+- **VSMC check:** VSMC αSMA/Vim per animal also falls with score (ρ −0.36, p = 0.04) and tracks astrocyte vimentin
+  (ρ +0.56) → part of the effect is channel-wide (staining/brightness or vascular biology). Astrocyte-specific remainder:
+  ρ −0.32 adjusted for VSMC (p = 0.06); astrocyte − VSMC −0.36 (p = 0.03). Revised strength: weak to moderate.
