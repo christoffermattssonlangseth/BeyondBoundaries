@@ -342,3 +342,44 @@ fig.legend(fontsize=7, loc="lower center", ncol=4, bbox_to_anchor=(0.5, -0.06))
 fig.suptitle("image readouts per animal × lesion state, all five runs (≥ 50 cells per point)", fontsize=10)
 fig.tight_layout()
 plotting.save_fig(fig, "image_readouts_by_state_all_runs", OUT, SRC)
+
+# %% [markdown]
+# ## Findings
+#
+# > **1. Vimentin marks lesions that are being contained, and it is the one signal only the images give.** Astrocyte
+# > vimentin inside lesions (robust z within image; *Vim* is not on the panel) is higher wherever disease is
+# > resolving or milder, in every contrast: chronic MILD16 vs SEVERE16 2.3 vs 0.7 (same run; MILD30 vs SEVERE30
+# > 4.4 vs 2.0); MONOPHASIC vs REMISSION1 3.3 vs 1.1 (tissue vimentin 1.9 vs 0.1); chronic vs RR PEAK1 2.6 vs 0.2
+# > (p = 0.04); and within the same lesion state from peak to recovery (S0 0.16 → 1.14, p = 0.055; tissue vimentin in
+# > S0/S3 p = 0.009/0.005, q = 0.13). Among chronic-late animals, more lesion vimentin goes with a lower score
+# > (ρ = −0.66). Groups are small (3–19 animals) and nothing survives a strict correction; the consistency across
+# > independent contrasts is the evidence. The channel also carries αSMA.
+# >
+# > **2. Chronic severity tracks ongoing inflammation, not just loss.** At d27–41 severe animals still carry more lesion
+# > (0.52 vs 0.28; 0.42 vs 0.30) with more active monocyte-derived states (S1, S4), T cells and cellularity (all in the
+# > same direction in both cohorts). Across chronic-late animals the score follows cellularity (ρ 0.89), S4 (0.83),
+# > T cells (0.80) and lesion share (0.77). Myelinating oligodendrocytes are depleted in severe WM (0.08 vs 0.15 per WM
+# > cell), but the neuropil index does not differ. The tissue-loss hypothesis is not supported: severe animals have
+# > lesions that stayed active and unscarred. Caveat: MILD30 is run 1 only, so the 13-animal correlations mix run and
+# > severity; the same-run MILD16 vs SEVERE16 contrast agrees in direction.
+# >
+# > **3. Relapse: B cells.** RR animals accumulate B cells after the first attack and move them into aggregates and the
+# > meninges (per 1000 cells: PEAK1 14 → REMISSION1 22 → PEAK2_MILD 25 / PEAK3 19; aggregated share 0.26 → 0.55;
+# > meningeal share 0.16 at PEAK1 → 0.58–0.90 later). Never-relapsing MONOPHASIC animals have fewer B cells than
+# > REMISSION1 animals (9 vs 22, p = 0.03; aggregated 0.31 vs 0.55), recovered further after the first attack (nadir
+# > 0.25 vs 0.75, p = 0.03) and show more lesion vimentin (finding 1). The chronic arm has few B cells throughout (≤ 8).
+# > Same-day relapsed vs monophasic differences (lesion share 0.68 vs 0.35, lipid-associated myeloid, neuron loss) are
+# > what the relapse did, not its cause.
+# >
+# > **4. Chronic vs RR at the same peak** (both d13–18, score ~3; different models and runs): RR lesions are more
+# > monocyte-derived/oligo-damage (S4 0.26 vs 0.17, p = 0.01) with less lipid-associated myeloid signal (5.4 vs 9.1,
+# > p = 0.01), more B cells (14 vs 3 per 1000) and more weight loss (22 vs 14 %); chronic lesions have more astrocyte
+# > vimentin (above) and lower WM neuropil (0.43 vs 0.82, p = 0.13).
+# >
+# > **5. Damage memory, all runs** (19 peak vs 13 recovery animals): within the same lesion state, neuropil trends back
+# > towards normal (S1 0.79 → 1.03, S5 0.88 → 0.99 p = 0.02, S2 0.92 → 1.07) while vimentin builds (finding 1). This
+# > replicates the runs 5/6 pilot in direction; no single test survives BH (best q = 0.13).
+# >
+# > To check: lesion neuropil index > 1 in some chronic groups (e.g. MILD16 1.09) is at odds with notebook 06's WM
+# > lesion loss; the non-lesion reference (control-referenced calls, per piece × WM/GM) differs from notebook 06's and
+# > needs a direct comparison.

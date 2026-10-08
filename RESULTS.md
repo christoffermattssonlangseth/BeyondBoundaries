@@ -257,3 +257,27 @@ runs 5/6 only (runs 1–3 copying). Daily clinical scores/weights: `data/clinica
   non-lesion tissue) lower at peak than in recovery within the same state (S1 0.79 vs 0.95; S5 0.82 vs 0.94; S3 0.93
   vs 1.05, p = 0.01); vimentin trends the other way (tissue vimentin in S1 1.8 vs 3.2 z; astro vimentin in S0 0.13 vs
   0.90). Suggests neuropil recovers while a vimentin scar builds — needs runs 1–3 (13 more recovery animals).
+
+## 2026-10-08 — Runs 1–3 images; disease courses (`notebooks/11_disease_courses.ipynb`)
+
+- Runs 1–3 (36 sections) copied (images + masks only), integrity-checked (`scripts/check_bundle_integrity.py`: all
+  zip CRCs, parquet/h5 reads, every image tile; one corrupted cells.zarr.zip from the copy was re-fetched and
+  md5-verified), extracted (201 features, XOA 3.2 works after skipping AppleDouble `._*` files) and normalised with
+  the notebook 02 method (`scripts/02_normalise_all_runs.py` → `data/features_norm_all.parquet`; runs 5/6 reproduce
+  `features_norm.parquet` exactly). Runs 1–3 have no transcripts.parquet → no AF proxy (QC only).
+- Pieces touch in runs 1–3 (6–30 µm in 8 images): cells < 20 µm from another piece excluded from image readouts
+  (0.01–0.03 % of cells).
+- **Vimentin marks contained/resolving lesions** (astro vimentin in lesions, z within image): MILD16 vs SEVERE16 2.3
+  vs 0.7, MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1, chronic vs RR PEAK1 2.6 vs 0.2
+  (p = 0.04), peak → recovery within state S0 0.16 → 1.14; chronic-late ρ(score) = −0.66. Small groups; consistency
+  across contrasts is the evidence.
+- **Chronic severity = persistent active inflammation**: severe vs mild more lesion, S1/S4, T cells, cellularity
+  (ρ with score 0.77–0.89 over 13 chronic-late animals; run1 = MILD30 confound), MOL depleted; neuropil no
+  difference. Tissue-loss hypothesis not supported.
+- **Relapse and B cells**: RR B cells rise after the first attack and move into aggregates/meninges (PEAK1 14 →
+  REMISSION1 22 per 1000; aggregated 0.26 → 0.55); MONOPHASIC < REMISSION1 (9 vs 22, p = 0.03), with a deeper first
+  recovery (nadir 0.25 vs 0.75, p = 0.03). Chronic arm ≤ 8 per 1000.
+- **Chronic vs RR PEAK1**: RR more S4 (0.26 vs 0.17), less lipid-associated myeloid, more B cells, more weight loss.
+- **Damage memory (all runs)**: neuropil back towards normal, vimentin up from peak to recovery within states —
+  direction replicates the pilot; best q = 0.13.
+- Open: lesion neuropil index > 1 in some chronic groups vs notebook 06's WM loss — compare references.
