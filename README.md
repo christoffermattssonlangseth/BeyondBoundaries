@@ -42,6 +42,7 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `15_vimentin_robustness` | vimentin effect vs batch, brightness, focus, αSMA; vimentin ring at the lesion edge |
 | `16_scar_containment` | lesion regions (real outlines); where vimentin sits; does the scar contain lesions (lesion level) |
 | `17_local_barrier` | within-lesion barrier tests: edge stretches vs immune escape; do scarred old lesions stay quiet at relapse |
+| `18_vimentin_outcome` | how strong is the vimentin–outcome link: adjusted models, leave-one-run-out, within lesion states, beyond RNA, within-image pairs |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.

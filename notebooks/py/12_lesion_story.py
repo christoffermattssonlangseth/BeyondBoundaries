@@ -19,8 +19,8 @@
 # 1. The two disease courses (clinical scores)
 # 2. Lesions redefined against controls, and the six lesion states
 # 3. Lesion states in the tissue, along both courses
-# 4. **Vimentin marks milder and resolving lesions** (the stains' clearest contribution), with the technical and αSMA
-#    tests (notebook 15) and where in the lesion it sits
+# 4. **Vimentin tends to be higher in lesions of animals that do well** (moderate strength), with the technical and αSMA
+#    tests (notebook 15), where in the lesion it sits, and how strong the link is (notebook 18)
 # 5. Chronic severity = lesions that stayed active
 # 6. Relapse: B cells, and new vs reactivated lesions (notebook 14)
 # 7. Chronic vs relapsing–remitting at the same peak
@@ -194,7 +194,7 @@ plotting.save_fig(fig, "lesion_state_maps", OUT, SRC)
 show("10_lesion_states/lesion_state_trajectories.png")
 
 # %% [markdown]
-# ## 4. Vimentin marks milder and resolving lesions
+# ## 4. Vimentin in lesions of animals that do well
 # *Vim* is not on the 5K panel, so the αSMA/vimentin stain is the only per-cell vimentin readout. In astrocytes it
 # reports reactive, scar-forming astrocytes. Astrocyte vimentin **inside lesions** (robust z within image) is higher
 # wherever disease is milder or resolving, in every contrast we have:
@@ -368,10 +368,10 @@ t.round(2)
 # > lesion-specific vimentin difference is not explained by it (numbers in the table above).
 
 # %% [markdown]
-# > **Finding — vimentin marks milder and resolving lesions.** Lesion astrocyte vimentin: MILD16 vs SEVERE16 2.3 vs 0.7 (same
+# > **Finding — lesion vimentin tends to be higher in milder and resolving disease.** Lesion astrocyte vimentin: MILD16 vs SEVERE16 2.3 vs 0.7 (same
 # > images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1, chronic vs RR first peak 2.6 vs 0.2
 # > (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13 chronic-late animals, more
-# > vimentin goes with a lower score (ρ = −0.80, the strongest correlate of severity). Mild and resolving lesions are filled with vimentin-bright reactive
+# > vimentin goes with a lower score (ρ = −0.80, partly a run artefact; strength in section 4d). Mild and resolving lesions are filled with vimentin-bright reactive
 # > astrocytes; severe and active ones are not (yet). The transcriptome can't show this: *Vim* is not on the panel and
 # > reactive-astrocyte RNA is similar between groups (notebook 11). Caveats: 3–19 animals per group, no single test
 # > survives strict correction, and the channel also contains αSMA (vascular smooth muscle).
@@ -409,6 +409,19 @@ show("16_scar_containment/vimentin_edge_profiles_regions.png")
 # > earlier "edge ring" (notebook 15) was an artefact of a cell-based edge distance and is withdrawn.
 
 # %% [markdown]
+# ### 4d. How strong is the link with outcome? (notebook 18)
+
+# %%
+show("18_vimentin_outcome/vimentin_vs_time_by_arm.png")
+
+# %% [markdown]
+# > **Strength: moderate.** Across 35 post-peak animals, lesion vimentin vs clinical score ρ −0.34 (p = 0.046), −0.44
+# > after adjusting for days since the first peak; stable when each run is left out (−0.42 to −0.55), within lesion
+# > states (−0.41 to −0.56), and beyond RNA astrocyte reactivity (ρ −0.63 adjusted for it). But adjusting for lesion
+# > share or first-attack height weakens it (−0.26 / −0.29), and in pairs of animals imaged together the worse animal
+# > has less vimentin in only 12 of 19 pairs. A hypothesis with decent support, not an established result.
+
+# %% [markdown]
 # ## 5. Chronic severity = lesions that stayed active
 # Each chronic-late animal (d27–50): clinical score against how active its lesions still are, and against lesion
 # vimentin.
@@ -433,8 +446,8 @@ show("11_disease_courses/chronic_mild_vs_severe.png")
 # > **Finding — severity: lesions that stayed active and never got the vimentin response.** Severe chronic animals
 # > still carry more lesion, more active monocyte-derived states (S1/S4), more T cells and denser infiltrates at
 # > d28–41, and have lost more myelinating oligodendrocytes (0.08 vs 0.15 per WM cell); surrounding neuropil is not
-# > reduced more. Across all 13 chronic-late animals, the **strongest correlate of the score is low lesion astrocyte
-# > vimentin (ρ = −0.80)**, then lesion share (0.58), T cells (0.47) and cellularity (0.38). In run 5 alone (n = 8, no
+# > reduced more. Across all 13 chronic-late animals the score goes with low lesion astrocyte vimentin (ρ = −0.80, partly a
+# > run artefact; section 4d), then lesion share (0.58), T cells (0.47) and cellularity (0.38). In run 5 alone (n = 8, no
 # > MILD30) the inflammation correlations are higher (0.77–0.89) and vimentin −0.66. So the severe course is lesions that
 # > did not resolve, more than irreversible loss. MILD30 is the only run-1 group (MILD30 names were matched to the
 # > score sheet by sacrifice day and sex, `scripts/clinical_metrics.py`).

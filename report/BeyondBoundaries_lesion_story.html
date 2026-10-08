@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><title>Beyond Boundaries — lesion story</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Beyond Boundaries — lesion story</title>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
 /* Written report, rendered to A4 PDF with headless Chrome (see README in report/).
@@ -60,150 +59,50 @@ td.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowra
 tr.no td { color: var(--muted); }
 code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; }
 </style>
-
-</head><body>
-<main>
+<style>
+.qa { margin: 1.6mm 0; }
+.qa b.lab { display:inline-block; min-width: 26mm; font-family:'Bodoni Moda',serif; font-weight:700; color: var(--accent); }
+.strength { background:#faf7f0; border-left:3px solid var(--rule); padding:2mm 3.5mm; margin:2mm 0 3mm; font-size:9pt; }
+h3 { margin-top: 5mm; }
+</style></head><body><main>
 <div class="cover">
   <div class="kicker">Beyond Boundaries · lesion story · 8 October 2026</div>
-  <h1>How EAE lesions <em>form, resolve or persist</em> — and what the segmentation stains add</h1>
-  <p class="meta">Mouse EAE spinal cord, RRMAP2 runs 1–6 (all five runs): 67 animals, 1.38 M annotated cells, daily clinical scores,
-  four segmentation-kit stains imaged for every section. Chronic (MOG35–55) and relapsing–remitting (PLP139–151) courses.
-  Analyses in <code>notebooks/10–16</code>; illustrated walk-through in <code>notebooks/12_lesion_story.ipynb</code>.</p>
+  <h1>How EAE lesions <em>form, resolve or persist</em>, and what the segmentation stains add</h1>
+  <p class="meta">Mouse EAE spinal cord, RRMAP2 runs 1–6 (five runs): 67 animals, 1.38 M annotated cells, daily clinical scores, the four
+  segmentation-kit stains imaged for every section. Chronic (MOG35–55) and relapsing–remitting (PLP139–151) courses. Analyses in
+  <code>notebooks/10–18</code>; full methods in <code>report/BeyondBoundaries_methods_results.pdf</code>.</p>
   <div class="tabsbar"><span style="background:var(--tab-1)"></span><span style="background:var(--tab-2)"></span><span style="background:var(--tab-3)"></span><span style="background:var(--tab-4)"></span><span style="background:var(--tab-5)"></span><span style="background:var(--tab-6)"></span></div>
 </div>
-
 <div class="answer">
-  <p class="big">Lesions run from an <em>active infiltrate</em> to a <em>fibrotic, demyelinated</em> state and largely resolve. In animals that do
-  well, lesions fill with <em>vimentin-bright reactive astrocytes</em>, which only the images can see. Severe chronic animals keep
-  active lesions without it, and relapse-prone animals accumulate meningeal B-cell aggregates.</p>
+  <p class="big">Lesions run from an <em>active infiltrate</em> to a <em>fibrotic, demyelinated</em> state and largely resolve. Severe chronic animals
+  keep active lesions, and relapse-prone animals accumulate meningeal B-cell aggregates. In the images, lesion astrocyte <em>vimentin</em>
+  is low at peak and tends to be higher in animals that do well, but it is not a measurable barrier to immune cells.</p>
   <ul>
-    <li><b>Lesions redefined.</b> Against control tissue, never-immunised animals come out ~1 % lesion, down from 4–20 % with the curated labels.
-    The lesion share falls from 0.93 at the first peak to 0.14 in long remission.</li>
-    <li><b>Six lesion states</b>: active monocyte-derived (S1, S4) at every peak; fibrotic / myelin-loss (S2) and glial-reactive (S0, S3)
-    later; lymphocytic infiltrate (S5) throughout.</li>
-    <li><b>Vimentin</b> (<i>Vim</i> is not on the panel): lesion astrocytes carry more vimentin in milder / resolving disease in every contrast.
-    It is the strongest correlate of chronic severity (ρ = −0.80). It survives batch, brightness, focus and αSMA controls. It fills the lesion interior (no ring at the edge): low at peak and
-    strongest in mild and never-relapsing animals, so it marks <b>a lesion-wide resolution response</b>. Within-lesion tests show it does not
-    act as a measurable barrier to infiltrating immune cells.</li>
-    <li><b>Chronic severity</b> is set at the first attack (all SEVERE peaked at 3.5) and means lesions that stayed active, not more neuropil loss.</li>
-    <li><b>Relapse</b> can't be predicted clinically. B cells accumulate after the first attack and move into meningeal aggregates
-    (fewer in never-relapsing animals). Relapses are mostly new lesions, with some flaring at old borders.</li>
-    <li><b>Earlier image findings replicate</b> in runs 1–3: white-matter neuropil loss, astrocyte RNA-before-vimentin, T cells facing
-    vessels, image models on unseen runs. The 18S texture marker replicates only partly.</li>
+    <li><b>Lesions redefined</b> against control tissue: never-immunised animals ~1 % lesion (curated labels 4–20 %); lesion share falls from 0.93 at the
+    first peak to 0.14 in long remission.</li>
+    <li><b>Six lesion states</b>: active monocyte-derived (S1, S4) at every peak; fibrotic / myelin-loss (S2) and glial-reactive (S0, S3) later.</li>
+    <li><b>Vimentin</b> (not on the RNA panel; only the stain measures it) fills lesion interiors. Its link to a better outcome is <b>moderate</b>
+    (ρ ≈ −0.45 with clinical score after adjusting for time). It is robust to run, lesion state and RNA reactivity, but entangled with overall
+    disease burden. It does <b>not</b> hold back immune cells at lesion edges.</li>
+    <li><b>Chronic severity</b> is set at the first attack and means lesions that stayed active, not more neuropil loss.</li>
+    <li><b>Relapse</b> can't be predicted clinically; B cells accumulate after the first attack (fewer in never-relapsing animals); relapses are mostly
+    new lesions.</li>
+    <li><b>Earlier image findings replicate</b> in runs 1–3 (neuropil loss, astrocyte RNA-before-protein, T-cell polarity, image models on unseen runs).</li>
   </ul>
 </div>
-
-<figure><img src="../results/12_lesion_story/clinical_courses.png">
-<figcaption><b>Figure 1 · Disease courses.</b> Daily scores of every animal, coloured by sacrifice stage (dot = sacrifice). Severe chronic animals
-all peaked at 3.5 and never recovered; first attacks look alike in animals that will and won't relapse.</figcaption></figure>
-
-<section class="newpage">
-  <h2><span class="no" style="background:var(--tab-1)">1</span>Lesions redefined, six lesion states</h2>
-  <p class="finding">Each cell's 30-cell neighbourhood (cell-type mix, seven disease programs, cellularity) is compared with control
-  animals of the same region (white matter, grey matter, meninges). It counts as lesion when it lies outside the control range, calibrated so
-  held-out controls are ~1 % lesion. 72 % of cells labelled "Lesion_mix" look like normal tissue.</p>
-  <div class="two">
-    <figure><img src="../results/10_lesion_states/lesion_share_old_vs_new.png"><figcaption><b>Figure 2a</b> · Lesion share per animal, curated (grey) vs control-referenced.</figcaption></figure>
-    <figure><img src="../results/10_lesion_states/lesion_state_profiles.png"><figcaption><b>Figure 2b</b> · The six lesion states: median axis value vs control.</figcaption></figure>
-  </div>
-  <figure><img class="h110" src="../results/12_lesion_story/lesion_state_maps.png">
-  <figcaption><b>Figure 3 · Lesion states in the tissue</b>, one representative animal per stage (median lesion share, largest piece). Active
-  monocyte-derived lesion (orange/pink) fills the white matter at the first peak. Later, fibrotic (green) and glial-reactive (blue) tissue
-  remains; long remission leaves small residues; chronic severe animals keep active tissue at d28–41.</figcaption></figure>
-</section>
-
-<section class="newpage">
-  <h2><span class="no" style="background:var(--tab-5)">2</span>Vimentin marks milder and resolving lesions</h2>
-  <figure><img class="h65" src="../results/12_lesion_story/vimentin_contrasts.png">
-  <figcaption><b>Figure 4 · Lesion astrocyte vimentin per animal</b> in five independent contrasts; green = milder / resolving.</figcaption></figure>
-  <figure><img src="../results/12_lesion_story/vimentin_overview_mild_vs_severe.png">
-  <figcaption><b>Figure 5 · Same image, same contrast:</b> αSMA/vimentin channel of a MILD16 and a SEVERE16 piece, with lesion states. (The
-  severe piece is dark overall; the quantitative evidence is the within-piece contrast.)</figcaption></figure>
-  <figure><img class="h80" src="../results/12_lesion_story/vimentin_astrocyte_gallery.png">
-  <figcaption><b>Figure 6 · Random lesion astrocytes</b> (cyan outline), vimentin channel only, normalised per image, common scale.</figcaption></figure>
-</section>
-
-<section>
-  <h3>Technical or αSMA? Every alternative tested (notebook 15)</h3>
-  <p class="finding">The effect keeps its direction in all four contrasts within animals, far from vessels, with <b>no VSMC, endothelial or
-  fibroblast cell within 20 µm</b>, in deep white matter, in reactive astrocytes only, and within lesion states. Controls stay near zero:
-  DAPI, neurons and oligodendrocytes, focus, and smooth-muscle / pericyte / fibroblast RNA in the astrocytes. A VSMC calibrator flags some
-  channel-brightness contribution in MILD16 vs SEVERE16 and chronic vs RR; the within-animal contrast removes it.</p>
-  <figure><img class="h110" src="../results/15_vimentin_robustness/robustness_forest.png"><figcaption><b>Figure 7 · Robustness.</b> Each row a test, each colour a contrast;
-  positive = more vimentin in the milder group.</figcaption></figure>
-  <figure><img class="h65" src="../results/16_scar_containment/vimentin_edge_profiles_regions.png"><figcaption><b>Figure 8 · Where in the lesion.</b> Vimentin against distance
-  to the edge of lesion regions (real outlines): it rises on entering the lesion and stays high through the interior, highest in MILD and MONOPHASIC
-  animals. Inside − outside astrocyte vimentin: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01; MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs
-  REMISSION1 1.26. (An earlier "edge ring" came from a cell-based edge distance and is withdrawn.)</figcaption></figure>
-</section>
-
-<section class="newpage">
-  <h2><span class="no" style="background:var(--tab-4)">3</span>Does a vimentin scar contain lesions?</h2>
-  <p class="finding">A collaborator's hypothesis: a successful astrocyte scar restricts immune infiltration. With lesion <b>regions</b> (smoothed
-  lesion-cell density, 356 regions in 53 animals, real outlines, depth from the cord outline), lesions with more border vimentin have <b>neither fewer
-  nor more</b> immune cells around them than other lesions of the same animal (median ρ 0.00, p = 0.65; deep regions ρ −0.39, n.s.). Where vimentin
-  is bright it fills the lesion rather than lining it. A first analysis with cell-linkage objects suggested the opposite; its objects were diffuse
-  scatters without real outlines, so it is withdrawn. Testing restriction needs time-resolved data or an intervention on astrocyte reactivity.</p>
-  <p class="finding"><b>Sharper within-lesion tests (notebook 17).</b> Each lesion edge cut into 100 µm stretches (3,188 stretches, 392 lesions, 53
-  animals) and compared within the same lesion, adjusted for the immune load inside, activity and depth: vimentin-rich stretches do <b>not</b> have fewer
-  immune cells just outside (astrocyte vimentin, median per-animal ρ +0.035, 95 % CI −0.016 to +0.073; a barrier would give ρ &lt; 0). They have more
-  immune cells inside the edge and the same outside. Vimentin-rich old lesions at relapse have as much new active tissue next to them (ρ −0.02).
-  <b>Answer at this resolution: vimentin marks the resolution phase; it does not act as a measurable barrier.</b></p>
-  <figure><img class="h50" src="../results/17_local_barrier/immune_gradient_by_local_vimentin.png"><figcaption><b>Figure 9b · Immune share across the lesion edge</b>
-  for vimentin-rich vs vimentin-poor stretches of the same lesions: no steeper drop-off across vimentin-rich edges.</figcaption></figure>
-  <figure><img class="h110" src="../results/16_scar_containment/random_lesion_regions.png"><figcaption><b>Figure 9 · Random lesion regions</b> at day ~30
-  (not chosen by eye), sorted by border vimentin: αSMA/vimentin (magma), region outline (cyan), infiltrating immune cells (red).</figcaption></figure>
-</section>
-
-<section class="newpage">
-  <h2><span class="no" style="background:var(--tab-3)">4</span>Chronic severity: lesions that stayed active</h2>
-  <p class="finding">Severe chronic animals still carry more lesion (0.52 vs 0.28), active monocyte-derived states, T cells and dense infiltrates at d28–41,
-  and fewer myelinating oligodendrocytes (0.08 vs 0.15 per WM cell); neuropil is not lost more. Across 13 chronic-late animals the strongest
-  correlate of the score is <b>low lesion vimentin (ρ = −0.80)</b>, then lesion share (0.58) and T cells (0.47).</p>
-  <figure><img class="h50" src="../results/12_lesion_story/chronic_severity_scatter.png"><figcaption><b>Figure 10</b> · Score at sacrifice vs lesion measures, chronic-late animals.</figcaption></figure>
-
-  <h2 style="margin-top:6mm"><span class="no" style="background:var(--tab-2)">5</span>Relapse: B cells, and new vs reactivated lesions</h2>
-  <p class="finding">B cells per 1000 cells: RR PEAK1 14 → REMISSION1 22 → PEAK2_MILD 25; aggregated share 0.26 → 0.55; meningeal share 0.16 → 0.58–0.90.
-  Never-relapsing animals: 9 vs 22 (p = 0.03), deeper first recovery, more lesion vimentin. Chronic arm ≤ 8 throughout.</p>
-  <figure><img class="h50" src="../results/12_lesion_story/b_cell_maps.png"><figcaption><b>Figure 11</b> · B cells (red; aggregated dark red) and meninges (blue).</figcaption></figure>
-  <figure><img class="h50" src="../results/12_lesion_story/b_cell_aggregate_microscopy.png"><figcaption><b>Figure 12</b> · A B-cell aggregate (REMISSION1), each stain separately, B cells outlined.</figcaption></figure>
-</section>
-
-<section>
-  <p class="finding"><b>Relapse is mostly new lesions, plus flaring at old borders.</b> Active tissue at relapse touches old fibrotic tissue more than
-  at the first attack (0.23 vs 0.05 within 50 µm, p = 4e-4). Relapse animals have more separate lesions (17 vs 8), and only 19 % of active relapse tissue
-  is in lesions that contain old tissue. B-cell aggregates sit near old lesions at relapse (0.72 vs 0.31).</p>
-  <figure><img class="h65" src="../results/14_relapse_lesion_origin/F_maps.png"><figcaption><b>Figure 13</b> · Active (orange) vs old fibrotic (blue) tissue, B-cell
-  aggregates (black): three relapse pieces and a first-attack piece.</figcaption></figure>
-</section>
-
-<section class="newpage">
-  <h2><span class="no" style="background:var(--tab-6)">6</span>Replication, damage memory, caveats</h2>
-  <table>
-    <thead><tr><th>Earlier image finding</th><th>Runs 1–3</th></tr></thead>
-    <tbody>
-      <tr><td>White-matter neuropil loss in lesions</td><td><b>replicated</b>: ×0.72 (58 pieces, p &lt; 1e-4) vs ×0.79</td></tr>
-      <tr><td>Astrocyte reactive RNA before vimentin protein</td><td><b>replicated</b>: ρ 0.51–0.58 per run; RNA-only astrocytes more common in active disease</td></tr>
-      <tr><td>T cells orient 18S-rich cytoplasm towards vessels</td><td><b>replicated</b>: cos 0.19 (33 animals) vs 0.14</td></tr>
-      <tr><td>Image-only models on an unseen run</td><td><b>yes, every run</b>: lesion AUROC 0.85–0.91, cell type 0.42–0.47</td></tr>
-      <tr><td>18S texture severity marker</td><td><b>partly</b>: astrocytes, myeloid, oligodendrocytes only</td></tr>
-    </tbody>
-  </table>
-  <p class="finding"><b>Damage memory.</b> Within the same lesion state, neuropil trends back towards normal from peak to recovery while vimentin
-  rises (19 vs 13 animals; best q = 0.13). Persisting lesions look repaired in neuropil but scarred in vimentin.</p>
-  <h3>Caveats</h3>
-  <ul>
-    <li>Small groups (2–19 animals): the evidence is consistency across independent contrasts, not single p values.</li>
-    <li>The arms differ in antigen, likely strain, and run. MILD30 is run 1 only. MONOPHASIC and REMISSION1 never share an image.</li>
-    <li>Lesion calls and states come from the transcriptome; the image readouts are independent of them.</li>
-    <li>Cross-sectional design: "builds", "precedes" and "resolves" are inferred from animals sacrificed at different times.</li>
-  </ul>
-  <h3>Next</h3>
-  <ol>
-    <li>Validate vimentin vs αSMA with separate antibodies on a few MILD/SEVERE and MONOPHASIC/REMISSION1 sections.</li>
-    <li>Order events along the active → fibrotic trajectory (when neuropil, vimentin and 18S change).</li>
-    <li>Time-resolved or interventional test of whether the vimentin border restricts infiltration.</li>
-  </ol>
-</section>
-</main>
-</body></html>
+<figure><img src="../results/12_lesion_story/clinical_courses.png"><figcaption><b>Figure 1 · The two disease courses.</b> Daily scores of every animal, coloured by the stage at which it was taken (dot = sacrifice).</figcaption></figure><section class="newpage"><h2><span class="no" style="background:var(--tab-1)">1</span>The disease courses and the questions</h2><p class="qa"><b class="lab">Question</b> What distinguishes animals that recover from those that stay severe, and those that relapse from those that don't?</p><p class="qa"><b class="lab">Data</b> Daily clinical scores and weights from d0 to sacrifice for all 67 animals. Per animal: onset day, first-attack peak (maximum within 10 days of onset), lowest score afterwards, area under the score curve, maximum weight loss.</p><p class="qa"><b class="lab">Found</b> <b>Chronic severity is set at the first attack:</b> all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD animals peaked at 1.5–2.5 and partly recovered. <b>Relapse is not predictable clinically:</b> never-relapsing (MONOPHASIC) first peaks 2.25–2.75 vs relapsers 2.5–3.0, with similar onset, weight loss and early recovery. So the tissue is where to look.</p></section><section><h2><span class="no" style="background:var(--tab-1)">2</span>What counts as a lesion?</h2><p class="qa"><b class="lab">Question</b> The curated niche labels call 4–20 % of never-immunised control tissue "lesion". Can we define lesions so that controls are ~0 %, and then follow lesion burden through the disease?</p><p class="qa"><b class="lab">How</b> Each cell's 30 nearest cells (same tissue piece) are described by their cell-type mix (23 types incl. reactive astrocytes, disease-associated oligodendrocytes, macrophages, T and B cells), seven gene programs (lipid-associated myeloid, MHC-II, interferon, astrocyte reactivity, homeostatic microglia, myelin, fibrosis) and cellularity. Within each region (white matter, grey matter, meninges) a neighbourhood is called lesion when it lies outside the range of control animals. The threshold is set so held-out control animals come out ~1 % lesion.</p><p class="qa"><b class="lab">Found</b> Controls 0.3–2.4 % lesion (both control types alike); 72 % of cells labelled "Lesion_mix" look like control tissue. <b>Lesions resolve:</b> RR lesion share 0.93 at the first peak → 0.53 REMISSION1 → 0.35 MONOPHASIC → 0.30 REMISSION2 → 0.14 long remission; chronic PEAK1 0.87, SEVERE16 0.52 vs MILD16 0.28.</p><div class="two"><figure><img src="../results/10_lesion_states/lesion_share_old_vs_new.png"><figcaption><b>Figure 2a</b> · Lesion share per animal: curated labels (grey) vs control-referenced (coloured).</figcaption></figure><figure><img src="../results/10_lesion_states/lesion_state_profiles.png"><figcaption><b>Figure 2b</b> · The six lesion states: how far each sits from control tissue on ten axes.</figcaption></figure></div></section><section class="newpage"><h2><span class="no" style="background:var(--tab-1)">3</span>Lesion states and how they change</h2><p class="qa"><b class="lab">Question</b> Are lesions all the same, or do they pass through distinct states as disease progresses and resolves?</p><p class="qa"><b class="lab">How</b> Lesion neighbourhoods were clustered on ten interpretable axes (infiltration, monocyte-derived myeloid, lipid-associated myeloid, MHC-II/interferon, astrocyte reactivity, oligodendrocyte disease state, myelinating-oligodendrocyte loss, microglia homeostasis loss, fibrosis, cellularity) into six states, named by what distinguishes them.</p><p class="qa"><b class="lab">Found</b> <b>S1</b> and <b>S4</b> are active, monocyte-derived lesions (S1 ~35 % of tissue at every peak, ~0 in long remission). <b>S2</b> is the late fibrotic, demyelinated lesion (SEVERE30 20 %, MILD30 13 %, REMISSION2 12 %). <b>S0/S3</b> are glial-reactive tissue that persists after the peak; <b>S5</b> is lymphocytic infiltrate. The course runs active → fibrotic and glial-reactive.</p><figure><img class=" h110"src="../results/12_lesion_story/lesion_state_maps.png"><figcaption><b>Figure 3 · Lesion states in the tissue.</b> One representative animal per stage (the one with the median lesion share of its stage, largest piece; not chosen by eye).</figcaption></figure></section><section class="newpage"><h2><span class="no" style="background:var(--tab-5)">4</span>Vimentin in lesion astrocytes</h2><p class="qa"><b class="lab">Question</b> <i>Vim</i> is not on the 5K panel, so the αSMA/vimentin stain is the only per-cell vimentin readout. In reactive astrocytes vimentin marks a scar-forming state. Does it differ between animals that do well and those that don't?</p><p class="qa"><b class="lab">How</b> Vimentin in astrocytes inside lesions, as a robust z-score within each Xenium image (so animals are only compared with cells stained and imaged with them). Five independent contrasts: chronic MILD vs SEVERE (two cohorts), MONOPHASIC vs REMISSION1, chronic vs RR at the first peak, and the same lesion state at peak vs in recovery.</p><p class="qa"><b class="lab">Found</b> The milder or recovering group has the higher median in every contrast: MILD16 vs SEVERE16 2.3 vs 0.7 (same images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1, chronic vs RR peak 2.6 vs 0.2, glial state peak → recovery 0.16 → 1.14.</p><figure><img class=" h65"src="../results/12_lesion_story/vimentin_contrasts.png"><figcaption><b>Figure 4 · Lesion astrocyte vimentin per animal</b> in the five contrasts (green = milder / recovering).</figcaption></figure><figure><img class=" h80"src="../results/12_lesion_story/vimentin_astrocyte_gallery.png"><figcaption><b>Figure 5 · Random lesion astrocytes</b> (cyan outline), vimentin channel only, normalised per image, common scale.</figcaption></figure></section><section><h3>4a · Is it technical, or αSMA?</h3><p class="qa"><b class="lab">How</b> Every alternative got a test: comparing lesion with non-lesion astrocytes of the same animal (cancels piece brightness); the same contrast in DAPI, 18S and ATP1A1; astrocytes far from vessels and with no smooth-muscle, endothelial or fibroblast cell within 20 µm; deep white matter only; reactive astrocytes only; within each lesion state; neurons and oligodendrocytes as negative controls; vascular smooth muscle αSMA as a calibrator; image sharpness; smooth-muscle and fibroblast transcripts inside the astrocytes.</p><p class="qa"><b class="lab">Found</b> The direction holds in all four contrasts under every test. Controls stay near zero, and there is no sign of αSMA-cell contamination. One caveat: the vascular calibrator is also higher in the milder group for MILD16 vs SEVERE16 and chronic vs RR, so part of those two raw differences may be channel brightness. The within-animal contrast removes it; chronic vs RR is the weakest contrast.</p><figure><img class=" h110"src="../results/15_vimentin_robustness/robustness_forest.png"><figcaption><b>Figure 6 · Robustness.</b> Each row a test, each colour a contrast; positive = more vimentin in the milder group. Controls and calibrators should sit near zero.</figcaption></figure></section><section class="newpage"><h3>4b · Where in the lesion?</h3><p class="qa"><b class="lab">How</b> Lesion <b>regions</b> with real outlines (smoothed lesion-cell density on a 10 µm grid; 356 regions). Vimentin against distance to the region edge.</p><p class="qa"><b class="lab">Found</b> Vimentin rises on entering a lesion and <b>stays high through the interior</b>; there is no ring at the edge. Inside minus outside, per animal: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01; MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs REMISSION1 1.26. <i>Correction: an earlier "edge ring" came from a cell-based edge distance, where "just inside" meant isolated lesion cells in healthy tissue. It is withdrawn.</i></p><figure><img class=" h65"src="../results/16_scar_containment/vimentin_edge_profiles_regions.png"><figcaption><b>Figure 7 · Vimentin across the lesion edge</b> (negative = outside), median over animals per group.</figcaption></figure><h3>4c · How strong is the link with outcome?</h3><p class="qa"><b class="lab">How</b> 35 post-peak animals: vimentin (inside − outside) against the clinical score at sacrifice, adjusting for days since the first peak, first-attack height, arm, run, lesion share and RNA astrocyte reactivity; leaving one run out; within each lesion state; and, most strictly, pairs of animals imaged together.</p><p class="qa"><b class="lab">Found</b> ρ −0.34 (p = 0.046), −0.44 after adjusting for time (p = 0.008). Stable when each run is left out (−0.42 to −0.55) and within lesion states (S0 −0.49, S2 −0.56, S1 −0.45, S4 −0.41). <b>Beyond RNA:</b> astrocyte RNA reactivity rises slightly with worse scores, vimentin protein falls; adjusted for RNA reactivity, vimentin vs score is ρ −0.63 (p &lt; 0.001). But adjusting for lesion share or first-attack height weakens it (−0.26 / −0.29), and in the strict same-image test the worse animal has less vimentin in 12 of 19 pairs (p = 0.36). An apparent failure to replicate in runs 1–3 came from no score variance there (all MILD30 animals score 1.0).</p><p class="strength"><b>Strength: moderate.</b> Consistent direction, robust to run, time, lesion state and RNA, but entangled with overall disease burden and only weakly supported within images. A hypothesis with decent support, not an established result. Separate vimentin/GFAP antibodies on more animals at matched days would settle it.</p><figure><img class=" h65"src="../results/18_vimentin_outcome/vimentin_vs_time_by_arm.png"><figcaption><b>Figure 8 · Vimentin against days since the first peak</b>, per animal and arm (green = mild / remission / monophasic, red = peak / severe).</figcaption></figure></section><section class="newpage"><h2><span class="no" style="background:var(--tab-4)">5</span>Is vimentin a barrier to immune cells?</h2><p class="qa"><b class="lab">Question</b> A collaborator's hypothesis: a successful astrocyte scar is good for recovery because it restricts immune infiltration. If so, lesions or stretches of lesion edge with more vimentin should have fewer immune cells escaping into the tissue around them.</p><p class="qa"><b class="lab">How</b> Three tests, from coarse to sharp. (1) Across lesions of the same animal: border vimentin vs infiltrating immune cells (T, B, NK/DC, DC, macrophages, neutrophils) just outside, relative to the animal's distant tissue. (2) Along the edge of the same lesion: each edge cut into 100 µm stretches (3,188 stretches, 392 lesions, 53 animals), compared within the lesion so age, size, activity, animal and image cancel, adjusted for the immune load inside. (3) In relapse animals: do vimentin-rich old lesions have less new active inflammation next to them?</p><p class="qa"><b class="lab">Found</b> No test shows a barrier. (1) Across lesions: median ρ 0.00 (p = 0.65). (2) Along edges: ρ +0.035 (95 % CI −0.016 to +0.073; a barrier would be negative). Vimentin-rich stretches have <i>more</i> immune cells just inside and the same outside. (3) Old lesions: ρ −0.02. <i>Correction: a first analysis with cell-linkage lesion objects suggested the opposite; its objects were diffuse scatters without real outlines, and it is withdrawn.</i></p><p class="strength"><b>Answer at this resolution:</b> vimentin behaves as a marker of the resolution phase, not as a measurable physical barrier. What remains possible: a barrier acting earlier than our time points, on cells we didn't count (e.g. microglia), or below ~100 µm. Scar components we didn't stain (GFAP protein, CSPGs) could also be involved.</p><figure><img class=" h50"src="../results/17_local_barrier/immune_gradient_by_local_vimentin.png"><figcaption><b>Figure 9 · Immune cells across the lesion edge</b> for vimentin-rich vs vimentin-poor stretches of the same lesions: no steeper drop-off across vimentin-rich edges.</figcaption></figure><figure><img class=" h110"src="../results/16_scar_containment/random_lesion_regions.png"><figcaption><b>Figure 10 · Random lesion regions</b> at day ~30 (not chosen by eye), sorted by border vimentin: αSMA/vimentin (magma), region outline (cyan), infiltrating immune cells (red). Where vimentin is bright it fills the lesion rather than lining it.</figcaption></figure></section><section class="newpage"><h2><span class="no" style="background:var(--tab-3)">6</span>Why are some chronic animals severe?</h2><p class="qa"><b class="lab">Question</b> Severe animals all had a bigger first attack. At day 27–41, does their tissue show more ongoing inflammation, or more irreversible loss (neurons, myelinating oligodendrocytes, neuropil)?</p><p class="qa"><b class="lab">How</b> MILD16 vs SEVERE16 (same days, same run, same images) and MILD30 vs SEVERE30 (different runs, support only). Across all 13 chronic-late animals: score against lesion share, active states, T cells, cellularity, cell loss and the stains.</p><p class="qa"><b class="lab">Found</b> Severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30) with more active monocyte-derived states, T cells and dense infiltrate, and fewer myelinating oligodendrocytes in white matter (0.08 vs 0.15 per white-matter cell). Surrounding neuropil is not lost more. Score correlates with lesion share (ρ 0.58), T cells (0.47) and cellularity (0.38), and with low lesion vimentin (−0.80). That last one is partly a run artefact, because MILD30 is the only run-1 group (section 4c).</p><p class="strength"><b>Reading:</b> the severe course is lesions that stayed active, more than irreversible tissue loss. Groups of 2–5 animals.</p><figure><img class=" h50"src="../results/12_lesion_story/chronic_severity_scatter.png"><figcaption><b>Figure 11 · Chronic-late animals:</b> score at sacrifice against lesion measures.</figcaption></figure><h2 style="margin-top:7mm"><span class="no" style="background:var(--tab-2)">7</span>Relapse: B cells, and new vs reactivated lesions</h2><p class="qa"><b class="lab">Question</b> Since the clinical course doesn't predict relapse, does the tissue? And are relapses new lesions or old ones flaring up?</p><p class="qa"><b class="lab">How</b> B cells per 1000 cells, the share in aggregates (≥ 5 B cells among a B cell's 15 nearest cells) and in the meninges, along the RR course. For relapses: how close active tissue (S1/S4) sits to old fibrotic tissue (S2), compared with the first attack and with a permutation null; how many separate lesions there are; and how much active tissue lies in lesions that also contain old tissue.</p><p class="qa"><b class="lab">Found</b> <b>B cells accumulate after the first attack</b> (PEAK1 14 → REMISSION1 22 → PEAK2_MILD 25 per 1000), increasingly in aggregates (0.26 → 0.55) and in the meninges. Never-relapsing animals have fewer than REMISSION1 animals (9 vs 22, p = 0.03) and recovered further after the first attack. The chronic arm has ≤ 8 throughout. <b>Relapses are mostly new lesions:</b> active tissue touches old fibrotic tissue more than at the first attack (0.23 vs 0.05 of active cells within 50 µm, p = 4 × 10⁻⁴), but relapse animals have more separate lesions (17 vs 8) and only 19 % of active relapse tissue is in lesions that also contain old tissue. B-cell aggregates at relapse sit near old lesions.</p><p class="strength"><b>Strength:</b> cross-sectional, 4–5 animals per group; REMISSION1 animals' future is unknown. Candidate picture: relapse-prone animals build meningeal B-cell aggregates.</p></section><section><figure><img class=" h50"src="../results/12_lesion_story/b_cell_maps.png"><figcaption><b>Figure 12 · B cells</b> (red; aggregated dark red) and meninges (blue) in representative RR animals.</figcaption></figure><figure><img class=" h50"src="../results/12_lesion_story/b_cell_aggregate_microscopy.png"><figcaption><b>Figure 13 · A B-cell aggregate</b> (REMISSION1), each stain separately, B cells outlined.</figcaption></figure><figure><img class=" h65"src="../results/14_relapse_lesion_origin/F_maps.png"><figcaption><b>Figure 14 · Relapse lesions:</b> active (orange) vs old fibrotic (blue) tissue and B-cell aggregates (black); three relapse pieces and a first-attack piece.</figcaption></figure></section><section class="newpage"><h2><span class="no" style="background:var(--tab-6)">8</span>Chronic vs relapsing–remitting at the same peak</h2><p class="qa"><b class="lab">How</b> PEAK1 in both arms (d13–18, score ~3). The arms differ in antigen, likely mouse strain, and run, so this is descriptive.</p><p class="qa"><b class="lab">Found</b> RR first-peak lesions are more monocyte-derived with oligodendrocyte damage (S4 0.26 vs 0.17 of tissue, p = 0.01) and less lipid-laden. RR animals have more B cells (14 vs 3 per 1000) and lose more weight (22 vs 14 %).</p><h2 style="margin-top:6mm"><span class="no" style="background:var(--tab-6)">9</span>Damage memory</h2><p class="qa"><b class="lab">Question</b> Do lesions that persist into recovery look like peak lesions in the stains?</p><p class="qa"><b class="lab">How</b> The same lesion state compared between peak (19 animals) and recovery (13 animals): neuropil (ATP1A1 around each cell) and vimentin.</p><p class="qa"><b class="lab">Found</b> Neuropil trends back toward normal (active S1 0.79 → 1.03) while vimentin rises (glial-state tissue vimentin p = 0.009/0.005; best q = 0.13). Persisting lesions look repaired in neuropil and scarred in vimentin, but this is a trend, not a firm result.</p><h2 style="margin-top:6mm"><span class="no" style="background:var(--tab-6)">10</span>Do the earlier image findings replicate in runs 1–3?</h2><table><thead><tr><th>Finding (runs 5/6)</th><th>Runs 1–3</th></tr></thead><tbody>
+<tr><td>White-matter neuropil loss in lesions</td><td><b>replicated</b>: ×0.72 (58 pieces, p &lt; 10⁻⁴) vs ×0.79</td></tr>
+<tr><td>Astrocyte reactive RNA before vimentin protein</td><td><b>replicated</b>: ρ 0.51–0.58 per run; RNA-only astrocytes more common in active disease</td></tr>
+<tr><td>T cells orient 18S-rich cytoplasm towards vessels</td><td><b>replicated</b>: cos 0.19 (33 animals) vs 0.14</td></tr>
+<tr><td>Image-only models on an unseen run</td><td><b>yes, every run</b>: lesion AUROC 0.85–0.91, cell type 0.42–0.47 (chance 0.07)</td></tr>
+<tr><td>18S texture as a severity marker</td><td><b>partly</b>: astrocytes, myeloid, oligodendrocytes only</td></tr></tbody></table><h3>Caveats</h3><ul>
+<li>Small groups (2–19 animals) and a cross-sectional design: "builds", "precedes" and "resolves" are inferred from animals taken at different times.</li>
+<li>The arms differ in antigen, likely strain, and run. MILD30 is run 1 only. MONOPHASIC and REMISSION1 never share an image.</li>
+<li>Lesion calls and states come from the transcriptome; the image readouts are independent of them.</li>
+<li>αSMA and vimentin share one channel. Tests find no αSMA contribution in astrocytes, but separate antibodies would settle it.</li>
+<li>Two earlier claims were withdrawn after checking (the vimentin edge ring; immune cells around better-bordered lesions). Both came from a lesion-object definition that didn't match the tissue.</li></ul>
+<h3>Next</h3><ol>
+<li>Validate vimentin (and GFAP) with separate antibodies at matched days: MILD vs SEVERE, MONOPHASIC vs relapsing.</li>
+<li>Follow B-cell aggregates and relapse risk with more REMISSION1-stage animals.</li>
+<li>Time-resolved or interventional tests of astrocyte reactivity and lesion resolution.</li></ol>
+</section></main></body></html>

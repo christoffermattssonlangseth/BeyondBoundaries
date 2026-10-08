@@ -214,7 +214,16 @@ median (animals resampled, 5000×). **Old lesions at relapse** (PEAK2, PEAK2_MIL
 (S2) cells; vimentin of the old tissue (S2 astrocytes; S2 territory) vs the active (S1/S4) share among cells within
 60 µm, centred within region, per-animal partial ρ adjusting for log depth and log old-cell count.
 
-### 13. Software and statistics
+### 13. Strength of the vimentin–outcome association (notebook 18)
+
+35 post-peak animals with ≥ 30 lesion astrocytes. Measure: median astrocyte vimentin (within-image z) inside lesion
+regions minus the same animal's astrocytes > 60 µm outside. Partial Spearman ρ with the clinical score at sacrifice
+(residuals after linear adjustment for days since the first peak, first-attack height, arm, run (one-hot), lesion share,
+or RNA astrocyte reactivity (reactive − homeostatic gene z, lesion astrocytes)); leave-one-run-out; within lesion states
+(≥ 20 astrocytes of that state); within-image pairs (all pairs of post-peak animals sharing a Xenium image with different
+scores; sign test over animal pairs).
+
+### 14. Software and statistics
 
 Python 3.12.14; numpy 2.2.6, pandas 2.2.3, scipy 1.15.2, scikit-learn 1.7.2, anndata 0.12.19, scanpy 1.11.5,
 scikit-image 0.25.2, tifffile 2025.10.16, zarr 2.18.7, matplotlib 3.10.9 (`environment.yml`). Notebooks are paired
@@ -277,12 +286,20 @@ glial-reactive tissue.
 ![Lesion states in tissue](../results/12_lesion_story/lesion_state_maps.png)
 *Lesion states in one representative animal per stage (median lesion share of its stage, largest piece).*
 
-### C. Vimentin marks milder and resolving lesions
+### C. Lesion vimentin and outcome
 
 Astrocyte αSMA/vimentin inside lesions (within-image z) is higher in the milder or resolving group in every contrast:
 MILD16 vs SEVERE16 2.3 vs 0.7 (same images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1,
 chronic vs RR PEAK1 2.6 vs 0.2 (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13
-chronic-late animals it is the strongest correlate of the clinical score (ρ = −0.80) [11, 12].
+chronic-late animals it correlates with the clinical score (ρ = −0.80), partly a run artefact (MILD30 is run 1 only) [11, 12].
+
+**Strength of the link with outcome** [18]. Across 35 post-peak animals, lesion vimentin (inside − outside) vs
+clinical score: ρ −0.34 (p = 0.046), −0.44 adjusted for days since the first peak (p = 0.008); stable when each run is
+left out (−0.42 to −0.55), within lesion states (S0 −0.49, S2 −0.56, S1 −0.45, S4 −0.41), and beyond RNA astrocyte
+reactivity (vimentin | RNA reactivity ρ −0.63, p < 0.001; RNA reactivity itself +0.29). Adjusting for lesion share
+(−0.26, n.s.) or first-attack height (−0.29, p = 0.09) weakens it, and in pairs of animals imaged together the worse
+animal has less vimentin in 12 of 19 pairs (p = 0.36). The apparent non-replication in runs 1–3 reflects no score
+variance there (MILD30 all 1.0; RR runs 1–3 ρ −0.46). Overall: moderate support, entangled with disease burden.
 
 **Not technical, not αSMA** [15]. The effect keeps its direction in all four contrasts within animals (lesion −
 non-lesion astrocytes: +1.10, +1.09, +3.31, +0.40), far from vessels, with no VSMC, endothelial or fibroblast cell
@@ -335,7 +352,8 @@ measurable barrier to infiltrating immune cells.**
 Severity is set at the first attack: all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD peaked 1.5–2.5
 and partly recovered. At d27–41 severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30), more active
 states (S1, S4), T cells and cellularity, and fewer myelinating oligodendrocytes in WM (0.08 vs 0.15 per WM cell);
-neuropil is not lost more. Across 13 chronic-late animals the score correlates with low lesion vimentin (ρ −0.80),
+neuropil is not lost more. Across 13 chronic-late animals the score correlates with low lesion vimentin (ρ −0.80; partly
+run-confounded),
 lesion share (0.58), T cells (0.47) and cellularity (0.38) (run 5 alone: inflammation 0.77–0.89). The tissue-loss
 hypothesis is not supported [11, 12].
 

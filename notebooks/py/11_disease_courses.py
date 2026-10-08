@@ -346,13 +346,15 @@ plotting.save_fig(fig, "image_readouts_by_state_all_runs", OUT, SRC)
 # %% [markdown]
 # ## Findings
 #
-# > **1. Vimentin marks lesions that are being contained, and it is the one signal only the images give.** Astrocyte
+# > **1. Lesion vimentin is higher in milder or resolving disease (only the images measure it; strength moderate, see
+# > notebooks 15–18).** Astrocyte
 # > vimentin inside lesions (robust z within image; *Vim* is not on the panel) is higher wherever disease is
 # > resolving or milder, in every contrast: chronic MILD16 vs SEVERE16 2.3 vs 0.7 (same run; MILD30 vs SEVERE30
 # > 4.4 vs 2.0); MONOPHASIC vs REMISSION1 3.3 vs 1.1 (tissue vimentin 1.9 vs 0.1); chronic vs RR PEAK1 2.6 vs 0.2
 # > (p = 0.04); and within the same lesion state from peak to recovery (S0 0.16 → 1.14, p = 0.055; tissue vimentin in
 # > S0/S3 p = 0.009/0.005, q = 0.13). Among chronic-late animals, more lesion vimentin goes with a lower score
-# > (ρ = −0.80). Groups are small (3–19 animals) and nothing survives a strict correction; the consistency across
+# > (ρ = −0.80, partly a run artefact: MILD30 is the only run-1 group; across 35 post-peak animals ρ ≈ −0.45 after
+# > adjusting for time, notebook 18). Groups are small (3–19 animals) and nothing survives a strict correction; the consistency across
 # > independent contrasts is the evidence. The channel also carries αSMA.
 # >
 # > **2. Chronic severity: lesions that stayed active and unscarred.** At d27–41 severe animals still carry more lesion
