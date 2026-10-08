@@ -388,3 +388,12 @@ also B, DC, MDM, fibroblasts; not neurons) and much less at a same-distance non-
 - → bleed from 18S-bright perivascular neighbours + outline geometry. The finding in notebooks 06, 07, 09, 13 and in the
   reports/deck is withdrawn. Lesson: polarity of small cells near bright neighbours needs brightness-matched and
   outline-free controls.
+
+## 2026-10-08 — White-matter neuropil loss: stress test (`notebooks/20_neuropil_loss.ipynb`)
+ATP1A1 territory index, WM lesion ÷ healthy WM of the same piece, all five runs: curated ×0.73 (107 pieces, 85 % < 1),
+control-referenced ×0.88–0.91. Robust to crowding (density-matched ×0.73; density + territory-size adjusted ×0.74,
+p = 7e-14), composition (same cell type: astro 0.74, MOL 0.74, microglia 0.77, endothelium 0.67), tissue surface (> 200 µm
+from surface ×0.72, 92 % of 99 pieces), channel specificity (DAPI/18S territory ×1.03–1.16; αSMA/Vim ×4–5). Tracks MOL
+loss across pieces (ρ +0.25, p = 0.01); deepest in active/glial lesion states (×0.86), absent in late fibrotic (×1.01).
+The region-edge dip is a surface artefact on top. Not obvious by eye in random crops (average shift, varies by piece).
+**Holds.**

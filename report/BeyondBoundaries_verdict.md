@@ -13,7 +13,7 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
 | Readout | Evidence | Use |
 |---|---|---|
 | **Segmentation** (the kit's purpose) | 18S interior stain draws ~95 % of cell masks | real; not benchmarked against alternatives here |
-| **White-matter neuropil loss** (ATP1A1 around each cell; *Atp1a1* not on the panel) | lesion WM ×0.79 (runs 5/6) and ×0.72 (runs 1–3, p < 10⁻⁴) vs healthy WM of the same piece | tissue damage the RNA can't show; weaker with stricter lesion calls (×0.93); crowding control still to do |
+| **White-matter neuropil loss** (ATP1A1 around each cell; *Atp1a1* not on the panel) | lesion WM ×0.79 (runs 5/6) and ×0.72 (runs 1–3, p < 10⁻⁴) vs healthy WM of the same piece | tissue damage the RNA can't show; **survives crowding, composition and tissue-surface controls** (notebook 20; deep cells ×0.72); −12 to −28 % depending on lesion definition; an average shift, not obvious by eye in single crops |
 | **Astrocyte reactive RNA comes before vimentin protein** (*Vim* not on the panel) | protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes enriched in active disease in both run sets | the clearest protein-vs-RNA insight |
 | **Images alone map lesions and cell types on unseen runs** | lesion AUROC 0.85–0.91, cell type 0.42–0.47 (chance 0.07), leave-one-run-out over 5 runs | QC and annotation cross-check; redundant with RNA for biology |
 
@@ -59,5 +59,5 @@ lesions that stayed active. Relapse can't be predicted clinically; B cells accum
 meningeal aggregates (fewer in never-relapsing animals), and relapses are mostly new lesions.
 
 **For discussion:** (1) the paper's framing, disease biology or kit evaluation; (2) whether the slides are available
-for post-Xenium immunofluorescence; (3) which open threads to close first (neuropil-loss crowding control; B cells and
-relapse with more REMISSION1-stage animals).
+for post-Xenium immunofluorescence; (3) which open threads to close first (B cells and relapse with more REMISSION1-stage
+animals; vimentin with separate antibodies).

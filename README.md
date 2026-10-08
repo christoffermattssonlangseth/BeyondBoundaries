@@ -45,6 +45,7 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `17_local_barrier` | within-lesion barrier tests: edge stretches vs immune escape; do scarred old lesions stay quiet at relapse |
 | `18_vimentin_outcome` | how strong is the vimentin–outcome link: adjusted models, leave-one-run-out, within lesion states, beyond RNA, within-image pairs |
 | `19_tcell_polarity` | T-cell 18S "orientation towards vessels" tested with outline-free and brightness-matched controls: **an imaging artefact (withdrawn)** |
+| `20_neuropil_loss` | white-matter neuropil loss stress test: crowding, composition, tissue surface, channel controls; microscopy — **holds** |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.

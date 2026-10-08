@@ -222,6 +222,14 @@ at the same distance that is at least as bright in raw 18S cell mean as the near
 MHC-II-high myeloid cell; plus an outline-free version (18S centroid minus DAPI centroid, i.e. relative to the cell's
 own nucleus). Perivascular = < 15 µm; per-animal mean (≥ 20 cells; ≥ 10 for the matched controls); Wilcoxon.
 
+### 13a. Neuropil-loss controls (notebook 20)
+
+ATP1A1 territory index (raw territory mean ÷ median of the same piece × WM/GM) for WM lesion vs healthy WM cells of
+the same piece (≥ 100 / ≥ 50 cells), with both lesion definitions; the same index for DAPI, 18S and αSMA/vimentin as
+channel controls; density-matched (within-piece quintiles of cells within 20 µm, ≥ 30 cells per bin per group);
+regression on log density and log territory pixel count; same-cell-type comparisons; restriction to cells > 30–200 µm
+from the tissue-mask edge; per-piece Spearman with the MOL-share ratio; profiles across lesion-region edges.
+
 ### 13b. Strength of the vimentin–outcome association (notebook 18)
 
 35 post-peak animals with ≥ 30 lesion astrocytes. Measure: median astrocyte vimentin (within-image z) inside lesion
@@ -267,6 +275,10 @@ accuracy [08, 09, 13].
 **Biology only the images show** (replicated in runs 1–3 unless stated) [06, 07, 13]:
 - *White-matter neuropil loss*: lesion WM has less surrounding ATP1A1 than physiological WM of the same piece (×0.79 in
   runs 5/6, ×0.72 in runs 1–3, 58 pieces, p < 10⁻⁴); grey matter ~unchanged.
+- *Neuropil-loss stress test* [20]: robust to local cell density (×0.73 density-matched), lesion composition (same cell
+  type ×0.67–0.77), the tissue surface (cells > 200 µm deep ×0.72, 92 % of 99 pieces) and channel (DAPI/18S territory do
+  not drop); tracks myelinating-oligodendrocyte loss (ρ +0.25); deepest in active/glial lesion states, absent in late
+  fibrotic tissue. Size depends on the lesion definition (−12 to −28 %).
 - *Astrocyte reactive RNA precedes vimentin protein*: protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
   more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
 - ~~*Perivascular T cells orient their 18S-rich cytoplasm towards the vessel*~~ — **withdrawn** [19]. The measure
