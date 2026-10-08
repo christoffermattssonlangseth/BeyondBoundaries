@@ -281,3 +281,12 @@ runs 5/6 only (runs 1–3 copying). Daily clinical scores/weights: `data/clinica
 - **Damage memory (all runs)**: neuropil back towards normal, vimentin up from peak to recovery within states —
   direction replicates the pilot; best q = 0.13.
 - Open: lesion neuropil index > 1 in some chronic groups vs notebook 06's WM loss — compare references.
+
+### Correction (2026-10-08): MILD30 clinical scores
+The first notebook 11 run missed the MILD30 scores (annotation `C_L_k` vs score sheet `C_M30_k`), so the chronic-late
+score correlations used 8 animals (run 5 only). Fixed in `scripts/clinical_metrics.py` (k = 1, 4, 5 unique on day +
+sex; 2/3 paired by number). With all 13: strongest correlate of score = **low lesion astrocyte vimentin ρ = −0.80**;
+lesion share 0.58, T cells 0.47, cellularity 0.38 (run 5 only: 0.77–0.89). Notebook 12: vimentin effect survives a
+within-piece contrast (lesion − non-lesion astrocytes of the same animal: MILD16 2.1 vs SEVERE16 1.0, MILD30 3.0 vs
+SEVERE30 1.9, MONOPHASIC 4.6 vs REMISSION1 1.3, chronic vs RR PEAK1 1.1 vs 0.6) while the DAPI contrast is ~0 →
+not piece brightness.

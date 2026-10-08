@@ -352,16 +352,16 @@ plotting.save_fig(fig, "image_readouts_by_state_all_runs", OUT, SRC)
 # > 4.4 vs 2.0); MONOPHASIC vs REMISSION1 3.3 vs 1.1 (tissue vimentin 1.9 vs 0.1); chronic vs RR PEAK1 2.6 vs 0.2
 # > (p = 0.04); and within the same lesion state from peak to recovery (S0 0.16 → 1.14, p = 0.055; tissue vimentin in
 # > S0/S3 p = 0.009/0.005, q = 0.13). Among chronic-late animals, more lesion vimentin goes with a lower score
-# > (ρ = −0.66). Groups are small (3–19 animals) and nothing survives a strict correction; the consistency across
+# > (ρ = −0.80). Groups are small (3–19 animals) and nothing survives a strict correction; the consistency across
 # > independent contrasts is the evidence. The channel also carries αSMA.
 # >
-# > **2. Chronic severity tracks ongoing inflammation, not just loss.** At d27–41 severe animals still carry more lesion
-# > (0.52 vs 0.28; 0.42 vs 0.30) with more active monocyte-derived states (S1, S4), T cells and cellularity (all in the
-# > same direction in both cohorts). Across chronic-late animals the score follows cellularity (ρ 0.89), S4 (0.83),
-# > T cells (0.80) and lesion share (0.77). Myelinating oligodendrocytes are depleted in severe WM (0.08 vs 0.15 per WM
-# > cell), but the neuropil index does not differ. The tissue-loss hypothesis is not supported: severe animals have
-# > lesions that stayed active and unscarred. Caveat: MILD30 is run 1 only, so the 13-animal correlations mix run and
-# > severity; the same-run MILD16 vs SEVERE16 contrast agrees in direction.
+# > **2. Chronic severity: lesions that stayed active and unscarred.** At d27–41 severe animals still carry more lesion
+# > (0.52 vs 0.28; 0.42 vs 0.30) with more active monocyte-derived states (S1, S4), T cells and cellularity (same
+# > direction in both cohorts), and fewer myelinating oligodendrocytes in WM (0.08 vs 0.15 per WM cell); neuropil
+# > does not differ. Across all 13 chronic-late animals the strongest correlate of the score is **low lesion astrocyte
+# > vimentin (ρ = −0.80)**, then lesion share (0.58), T cells (0.47), cellularity (0.38); in run 5 alone (n = 8) the
+# > inflammation correlations are 0.77–0.89. (A first run of this notebook missed the MILD30 scores, a naming mismatch
+# > fixed in `scripts/clinical_metrics.py`.) The tissue-loss hypothesis is not supported.
 # >
 # > **3. Relapse: B cells.** RR animals accumulate B cells after the first attack and move them into aggregates and the
 # > meninges (per 1000 cells: PEAK1 14 → REMISSION1 22 → PEAK2_MILD 25 / PEAK3 19; aggregated share 0.26 → 0.55;
