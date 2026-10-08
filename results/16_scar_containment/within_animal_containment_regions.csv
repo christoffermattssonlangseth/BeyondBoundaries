@@ -1,0 +1,7 @@
+border,analysis,animals,median_rho,share_negative,wilcoxon_p
+border tissue vimentin,"all regions, adj. size, activity, depth",36,0.0,0.4722222222222222,0.650167036953933
+border tissue vimentin,"deep regions (> 100 µm), adj. size, activity",10,-0.39285714285714285,0.6,0.482421875
+border astro vimentin,"all regions, adj. size, activity, depth",36,0.22196969696969698,0.3611111111111111,0.13116004341605345
+border astro vimentin,"deep regions (> 100 µm), adj. size, activity",10,-0.2214285714285714,0.5,0.86328125
+edge spike,"all regions, adj. size, activity, depth",36,0.10229770229770231,0.4722222222222222,0.771126623752476
+edge spike,"deep regions (> 100 µm), adj. size, activity",10,1.0,0.3,0.083984375

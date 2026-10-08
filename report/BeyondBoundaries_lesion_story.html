@@ -73,8 +73,8 @@ code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; 
 </div>
 
 <div class="answer">
-  <p class="big">Lesions run from an <em>active infiltrate</em> to a <em>fibrotic, demyelinated</em> state and largely resolve. Animals that do
-  well build a <em>vimentin-bright astrocyte border</em> around their lesions, which only the images can see. Severe chronic animals keep
+  <p class="big">Lesions run from an <em>active infiltrate</em> to a <em>fibrotic, demyelinated</em> state and largely resolve. In animals that do
+  well, lesions fill with <em>vimentin-bright reactive astrocytes</em>, which only the images can see. Severe chronic animals keep
   active lesions without it, and relapse-prone animals accumulate meningeal B-cell aggregates.</p>
   <ul>
     <li><b>Lesions redefined.</b> Against control tissue, never-immunised animals come out ~1 % lesion, down from 4–20 % with the curated labels.
@@ -82,9 +82,9 @@ code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; 
     <li><b>Six lesion states</b>: active monocyte-derived (S1, S4) at every peak; fibrotic / myelin-loss (S2) and glial-reactive (S0, S3)
     later; lymphocytic infiltrate (S5) throughout.</li>
     <li><b>Vimentin</b> (<i>Vim</i> is not on the panel): lesion astrocytes carry more vimentin in milder / resolving disease in every contrast.
-    It is the strongest correlate of chronic severity (ρ = −0.80). It survives batch, brightness, focus and αSMA controls, and it forms a
-    ring at the lesion edge in milder and never-relapsing animals. The border builds between the peak and d30 only in animals that do well.
-    Within animals, though, it sits where immune cells are active: <b>a response at the lesion edge, not proven containment</b>.</li>
+    It is the strongest correlate of chronic severity (ρ = −0.80). It survives batch, brightness, focus and αSMA controls. It fills the lesion interior (no ring at the edge): low at peak and
+    strongest in mild and never-relapsing animals, so it marks <b>a lesion-wide resolution response</b>. Whether it contains infiltration
+    could not be shown either way.</li>
     <li><b>Chronic severity</b> is set at the first attack (all SEVERE peaked at 3.5) and means lesions that stayed active, not more neuropil loss.</li>
     <li><b>Relapse</b> can't be predicted clinically. B cells accumulate after the first attack and move into meningeal aggregates
     (fewer in never-relapsing animals). Relapses are mostly new lesions, with some flaring at old borders.</li>
@@ -131,19 +131,21 @@ all peaked at 3.5 and never recovered; first attacks look alike in animals that 
   channel-brightness contribution in MILD16 vs SEVERE16 and chronic vs RR; the within-animal contrast removes it.</p>
   <figure><img class="h110" src="../results/15_vimentin_robustness/robustness_forest.png"><figcaption><b>Figure 7 · Robustness.</b> Each row a test, each colour a contrast;
   positive = more vimentin in the milder group.</figcaption></figure>
-  <figure><img class="h65" src="../results/15_vimentin_robustness/vimentin_edge_profiles.png"><figcaption><b>Figure 8 · A ring at the lesion edge.</b> MILD and MONOPHASIC
-  animals have a sharp vimentin peak in the first ~10 µm inside the lesion edge, absent in SEVERE, REMISSION1 and PEAK animals.</figcaption></figure>
+  <figure><img class="h65" src="../results/16_scar_containment/vimentin_edge_profiles_regions.png"><figcaption><b>Figure 8 · Where in the lesion.</b> Vimentin against distance
+  to the edge of lesion regions (real outlines): it rises on entering the lesion and stays high through the interior, highest in MILD and MONOPHASIC
+  animals. Inside − outside astrocyte vimentin: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01; MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs
+  REMISSION1 1.26. (An earlier "edge ring" came from a cell-based edge distance and is withdrawn.)</figcaption></figure>
 </section>
 
 <section class="newpage">
-  <h2><span class="no" style="background:var(--tab-4)">3</span>Does the scar contain lesions? Day ~30 vs chronic peak</h2>
-  <p class="finding"><b>The border builds by d30 in animals that do well</b>: border tissue vimentin chronic PEAK1 0.04 → MILD16 0.97 (p = 0.02), SEVERE16 0.02;
-  never-relapsing MONOPHASIC 2.91 vs relapsed PEAK2 0.30 at d32–33. <b>But within animals</b>, lesions with a stronger vimentin border have
-  <i>more</i> infiltrating immune cells just outside (ρ +0.3 to +0.45). This holds on deep lesions with depth as a covariate (ρ +0.25 to +0.31). Reading:
-  astrocytes build the border where immune cells are active at the lesion edge. It is a response; restriction would need time-resolved data.</p>
-  <figure><img class="h65" src="../results/16_scar_containment/day30_vs_peak.png"><figcaption><b>Figure 9</b> · Border vimentin and leakage per animal, chronic peak vs day ~30.</figcaption></figure>
-  <figure><img class="h110" src="../results/16_scar_containment/best_vs_worst_bordered_lesion.png"><figcaption><b>Figure 10</b> · Best- vs worst-bordered lesion of one
-  MONOPHASIC animal: vimentin channel (left), lesion, edge band and infiltrating immune cells (right).</figcaption></figure>
+  <h2><span class="no" style="background:var(--tab-4)">3</span>Does a vimentin scar contain lesions?</h2>
+  <p class="finding">A collaborator's hypothesis: a successful astrocyte scar restricts immune infiltration. With lesion <b>regions</b> (smoothed
+  lesion-cell density, 356 regions in 53 animals, real outlines, depth from the cord outline), lesions with more border vimentin have <b>neither fewer
+  nor more</b> immune cells around them than other lesions of the same animal (median ρ 0.00, p = 0.65; deep regions ρ −0.39, n.s.). Where vimentin
+  is bright it fills the lesion rather than lining it. A first analysis with cell-linkage objects suggested the opposite; its objects were diffuse
+  scatters without real outlines, so it is withdrawn. Testing restriction needs time-resolved data or an intervention on astrocyte reactivity.</p>
+  <figure><img class="h110" src="../results/16_scar_containment/random_lesion_regions.png"><figcaption><b>Figure 9 · Random lesion regions</b> at day ~30
+  (not chosen by eye), sorted by border vimentin: αSMA/vimentin (magma), region outline (cyan), infiltrating immune cells (red).</figcaption></figure>
 </section>
 
 <section class="newpage">
@@ -151,20 +153,20 @@ all peaked at 3.5 and never recovered; first attacks look alike in animals that 
   <p class="finding">Severe chronic animals still carry more lesion (0.52 vs 0.28), active monocyte-derived states, T cells and dense infiltrates at d28–41,
   and fewer myelinating oligodendrocytes (0.08 vs 0.15 per WM cell); neuropil is not lost more. Across 13 chronic-late animals the strongest
   correlate of the score is <b>low lesion vimentin (ρ = −0.80)</b>, then lesion share (0.58) and T cells (0.47).</p>
-  <figure><img class="h50" src="../results/12_lesion_story/chronic_severity_scatter.png"><figcaption><b>Figure 11</b> · Score at sacrifice vs lesion measures, chronic-late animals.</figcaption></figure>
+  <figure><img class="h50" src="../results/12_lesion_story/chronic_severity_scatter.png"><figcaption><b>Figure 10</b> · Score at sacrifice vs lesion measures, chronic-late animals.</figcaption></figure>
 
   <h2 style="margin-top:6mm"><span class="no" style="background:var(--tab-2)">5</span>Relapse: B cells, and new vs reactivated lesions</h2>
   <p class="finding">B cells per 1000 cells: RR PEAK1 14 → REMISSION1 22 → PEAK2_MILD 25; aggregated share 0.26 → 0.55; meningeal share 0.16 → 0.58–0.90.
   Never-relapsing animals: 9 vs 22 (p = 0.03), deeper first recovery, more lesion vimentin. Chronic arm ≤ 8 throughout.</p>
-  <figure><img class="h50" src="../results/12_lesion_story/b_cell_maps.png"><figcaption><b>Figure 12</b> · B cells (red; aggregated dark red) and meninges (blue).</figcaption></figure>
-  <figure><img class="h50" src="../results/12_lesion_story/b_cell_aggregate_microscopy.png"><figcaption><b>Figure 13</b> · A B-cell aggregate (REMISSION1), each stain separately, B cells outlined.</figcaption></figure>
+  <figure><img class="h50" src="../results/12_lesion_story/b_cell_maps.png"><figcaption><b>Figure 11</b> · B cells (red; aggregated dark red) and meninges (blue).</figcaption></figure>
+  <figure><img class="h50" src="../results/12_lesion_story/b_cell_aggregate_microscopy.png"><figcaption><b>Figure 12</b> · A B-cell aggregate (REMISSION1), each stain separately, B cells outlined.</figcaption></figure>
 </section>
 
 <section>
   <p class="finding"><b>Relapse is mostly new lesions, plus flaring at old borders.</b> Active tissue at relapse touches old fibrotic tissue more than
   at the first attack (0.23 vs 0.05 within 50 µm, p = 4e-4). Relapse animals have more separate lesions (17 vs 8), and only 19 % of active relapse tissue
   is in lesions that contain old tissue. B-cell aggregates sit near old lesions at relapse (0.72 vs 0.31).</p>
-  <figure><img class="h65" src="../results/14_relapse_lesion_origin/F_maps.png"><figcaption><b>Figure 14</b> · Active (orange) vs old fibrotic (blue) tissue, B-cell
+  <figure><img class="h65" src="../results/14_relapse_lesion_origin/F_maps.png"><figcaption><b>Figure 13</b> · Active (orange) vs old fibrotic (blue) tissue, B-cell
   aggregates (black): three relapse pieces and a first-attack piece.</figcaption></figure>
 </section>
 

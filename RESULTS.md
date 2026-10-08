@@ -338,3 +338,18 @@ Collaborator's hypothesis: a successful astrocyte scar restricts immune infiltra
   cells are active at the lesion edge (a response); whether it later restricts spread needs time-resolved data.
 - First leakage measure (outside ÷ inside) was confounded by lesions emptying while resolving — replaced by escape vs
   the animal's distant tissue.
+
+### Correction (2026-10-08): lesion objects → lesion regions (notebook 16)
+The user spotted that the "best vs worst bordered lesion" example looked alike. Checking showed the cell-linkage lesion
+objects (cells < 30 µm apart) were often diffuse scatters without a real outline, and tissue-mask depth was wrong next
+to roots/meninges. Redone with lesion **regions** (smoothed lesion-cell density on a 10 µm grid, threshold 0.5; 356
+regions, median 96 % lesion cells inside; depth from the cord outline):
+- **Withdrawn:** "better-bordered lesions have more immune cells around them" (now median ρ 0.00, p = 0.65; deep ρ −0.39
+  n.s.) and "border builds by d30 in mild animals" (border vimentin PEAK1 0.67 → MILD16 0.50; SEVERE16 0.02).
+  Containment is neither supported nor refuted.
+- **Withdrawn:** notebook 15's "vimentin ring at the lesion edge". With region outlines there is no edge peak; vimentin
+  rises on entering a lesion and stays high through its interior. The ring came from the cell-based edge distance
+  ("just inside" = isolated lesion cells in healthy tissue).
+- **Holds, now with regions:** astrocyte vimentin inside lesions minus outside: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01;
+  MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs REMISSION1 1.26 → a lesion-wide astrocyte response, low at peak,
+  strongest in animals that recover.

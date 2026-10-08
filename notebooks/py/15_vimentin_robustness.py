@@ -468,7 +468,11 @@ res.assign(positive=res["diff"] > 0).groupby("test", sort=False).agg(
 # > channel brightness. The within-animal contrast removes it (+1.10 for MILD16 vs SEVERE16; chronic vs RR shrinks to
 # > +0.40, the weakest contrast). MILD30 vs SEVERE30 (calibrator +0.25) and MONOPHASIC vs REMISSION1 (+0.06) are clean.
 # >
-# > **Finding — a vimentin ring at the lesion edge in milder and never-relapsing animals.** Edge profiles: MILD and
+# > **Superseded (notebook 16): no ring.** With proper lesion-region outlines there is no edge peak; the profile below
+# > came from a cell-based edge distance where "just inside" meant isolated lesion cells in healthy tissue. Kept for
+# > the record:
+# >
+# > ~~A vimentin ring at the lesion edge in milder and never-relapsing animals.~~ Edge profiles: MILD and
 # > MONOPHASIC animals show a sharp vimentin peak in the first ~10 µm inside the lesion edge (tissue vimentin z ≈ 1.6 and
 # > 3.3; ~0 just outside), a dip at 20–45 µm, and high vimentin again in the lesion core. SEVERE, REMISSION1 and PEAK
 # > animals have no edge peak and less core vimentin. So milder outcomes come with both a containment ring and

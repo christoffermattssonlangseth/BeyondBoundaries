@@ -20,12 +20,12 @@
 # 2. Lesions redefined against controls, and the six lesion states
 # 3. Lesion states in the tissue, along both courses
 # 4. **Vimentin marks milder and resolving lesions** (the stains' clearest contribution), with the technical and αSMA
-#    tests (notebook 15) and the vimentin ring at the lesion edge
+#    tests (notebook 15) and where in the lesion it sits
 # 5. Chronic severity = lesions that stayed active
 # 6. Relapse: B cells, and new vs reactivated lesions (notebook 14)
 # 7. Chronic vs relapsing–remitting at the same peak
 # 8. Damage memory: neuropil returns, vimentin builds
-# 9. Does the scar contain lesions? Day ~30 vs chronic peak (notebook 16)
+# 9. Does a vimentin scar contain lesions? (notebook 16)
 # 10. Which earlier image findings replicate in runs 1–3 (notebook 13)
 # 11. Caveats and what's next
 
@@ -371,7 +371,7 @@ t.round(2)
 # > **Finding — vimentin marks milder and resolving lesions.** Lesion astrocyte vimentin: MILD16 vs SEVERE16 2.3 vs 0.7 (same
 # > images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1, chronic vs RR first peak 2.6 vs 0.2
 # > (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13 chronic-late animals, more
-# > vimentin goes with a lower score (ρ = −0.80, the strongest correlate of severity). Mild and resolving lesions are wrapped by vimentin-bright reactive
+# > vimentin goes with a lower score (ρ = −0.80, the strongest correlate of severity). Mild and resolving lesions are filled with vimentin-bright reactive
 # > astrocytes; severe and active ones are not (yet). The transcriptome can't show this: *Vim* is not on the panel and
 # > reactive-astrocyte RNA is similar between groups (notebook 11). Caveats: 3–19 animals per group, no single test
 # > survives strict correction, and the channel also contains αSMA (vascular smooth muscle).
@@ -395,17 +395,18 @@ show("15_vimentin_robustness/robustness_forest.png", 1000)
 # > MILD30/SEVERE30 and MONOPHASIC/REMISSION1 have flat calibrators.
 
 # %% [markdown]
-# ### 4c. A vimentin ring at the lesion edge
-# Vimentin against signed distance to the lesion edge (negative = outside, positive = inside), median over animals:
+# ### 4c. Where in the lesion? Throughout the interior, not a ring
+# Vimentin against distance to the edge of lesion *regions* (smoothed lesion-cell density with real outlines; notebook
+# 16), median over animals per group. Negative = outside, positive = inside.
 
 # %%
-show("15_vimentin_robustness/vimentin_edge_profiles.png")
+show("16_scar_containment/vimentin_edge_profiles_regions.png")
 
 # %% [markdown]
-# > **Finding — milder and never-relapsing animals have a vimentin ring at the lesion edge.** MILD and MONOPHASIC
-# > animals show a sharp peak in the first ~10 µm inside the edge (tissue vimentin z ≈ 1.6 and 3.3; ~0 just outside),
-# > a dip, and high vimentin again in the lesion core. SEVERE, REMISSION1 and PEAK animals have neither the ring nor
-# > much core vimentin.
+# > **Finding — vimentin fills lesions in animals that do well; there is no ring.** Vimentin rises on entering a lesion
+# > and stays high through its interior. Astrocyte vimentin inside lesion regions minus the same animal's tissue outside:
+# > PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01; MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs REMISSION1 1.26. An
+# > earlier "edge ring" (notebook 15) was an artefact of a cell-based edge distance and is withdrawn.
 
 # %% [markdown]
 # ## 5. Chronic severity = lesions that stayed active
@@ -583,33 +584,19 @@ show("11_disease_courses/image_readouts_by_state_all_runs.png")
 # > in white matter alone lesions stay below 1, notebook 13.)
 
 # %% [markdown]
-# ## 9. Does the scar contain lesions? Day ~30 vs chronic peak (notebook 16)
-# A collaborator's hypothesis: a successful astrocyte scar is a good sign for recovery because it restricts immune
-# infiltration. Lesions as objects (419 in 53 animals); border vimentin (−30…+30 µm) per animal by group:
+# ## 9. Does a vimentin scar contain lesions? (notebook 16)
+# A collaborator's hypothesis: a successful astrocyte scar restricts immune infiltration. Tested with lesion regions
+# (356 regions in 53 animals, real outlines). Eight random regions from day ~30 animals, sorted by border vimentin:
 
 # %%
-show("16_scar_containment/day30_vs_peak.png")
+show("16_scar_containment/random_lesion_regions.png")
 
 # %% [markdown]
-# > **The border builds between the chronic peak and day ~30, in animals that do well.** Border tissue vimentin: chronic
-# > PEAK1 0.04 → MILD16 0.97 (p = 0.02), but SEVERE16 0.02; never-relapsing MONOPHASIC 2.91 vs relapsed PEAK2 0.30 at
-# > d32–33.
-
-# %% [markdown]
-# Within one animal, a well- and a poorly-bordered lesion (vimentin channel; lesion, edge band and infiltrating immune
-# cells on the right):
-
-# %%
-show("16_scar_containment/best_vs_worst_bordered_lesion.png", 1000)
-show("16_scar_containment/immune_profile_by_edge_vimentin.png")
-
-# %% [markdown]
-# > **But within animals it does not look like containment.** Lesions with a stronger vimentin border have *more*
-# > infiltrating immune cells just outside them, not fewer (ρ +0.3 to +0.45). Surface lesions confound this (glia
-# > limitans plus meningeal entry), yet on deep lesions and with depth as a covariate the link stays positive
-# > (ρ +0.25 to +0.31, p ≤ 0.03). Reading: astrocytes build the vimentin border where immune cells are active at the
-# > lesion edge. At the animal level, borders form in the animals that recover. A border that forms in response to the
-# > infiltrate and later helps resolve it fits both; proving restriction needs time-resolved data.
+# > **Finding — no evidence either way for containment.** Within animals, lesions with more border vimentin do not have
+# > fewer (or more) immune cells around them (median ρ 0.00, p = 0.65; deep regions ρ −0.39, n.s.). Where vimentin is
+# > bright it fills the lesion rather than lining it (images above, section 4c). A first version of this analysis
+# > (cell-linkage objects) suggested the opposite; it was an artefact of diffuse objects and is withdrawn. Testing
+# > restriction would need time-resolved data or an intervention on astrocyte reactivity.
 
 # %% [markdown]
 # ## 10. Do the earlier image findings replicate in runs 1–3? (notebook 13)

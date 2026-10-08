@@ -179,21 +179,28 @@ edge; reactive astrocytes only; within each lesion state; lesion neurons and oli
 αSMA/Vim (calibrator); raw intensities within the four images that hold both MILD16 and SEVERE16 animals; piece
 sharpness (variance of the Laplacian of DAPI at 0.43 µm/px); smooth-muscle/contractile (*Myh11, Tagln, Cnn1, Des, Mylk,
 Smtn*), pericyte (*Pdgfrb, Kcnj8*) and fibroblast (*Postn, Col1a1*) transcripts in lesion astrocytes; per run.
-**Lesion edge**: signed distance of every cell to the lesion edge within its piece (inside: distance to the nearest
-non-lesion cell; outside: minus the distance to the nearest lesion cell); vimentin profiles in distance bins, medians of
-per-animal medians (≥ 15 cells per bin).
+A first edge profile used a cell-based signed distance (inside: distance to the nearest non-lesion cell; outside: minus
+the distance to the nearest lesion cell). It is superseded by the region-based profile (section 11), because with a
+cell-based distance "just inside the edge" mostly means isolated lesion cells in healthy tissue.
 
-### 11. Scar and containment (notebook 16)
+### 11. Lesion regions, vimentin location and containment (notebook 16)
 
-Lesion objects: control-referenced lesion cells linked within 30 µm in a piece, ≥ 100 cells (419 objects, 53 animals);
-non-lesion cells within 50 µm outside are assigned to the nearest object. Per object: border astrocyte and tissue
-vimentin (−30…+30 µm), core astrocyte vimentin (> 60 µm inside), **edge spike** (tissue vimentin 0–10 µm inside minus
-the mean of −30…−10 µm and +20…+45 µm), active share (S1 + S4), infiltrating immune share (T, B, NK/DC, DC, MDM,
-neutrophils; not microglia) inside and 0–50 µm outside, and **escape** = log₂(immune share outside ÷ the same animal's
-immune share > 150 µm from any lesion). Per-animal summaries are size-weighted means over objects. **Within-animal
-test**: for animals with ≥ 5 objects, Spearman ρ between border vimentin and escape across their lesions, raw or after
-regressing out log size and active share (and log depth from the tissue surface), Wilcoxon signed-rank of the
-per-animal ρ against 0; deep lesions = median distance from the tissue edge > 100 µm.
+**Lesion regions** (used for all lesion-level results): per tissue piece on a 10 µm grid, the share of control-referenced
+lesion cells among the cells of each grid square, smoothed (Gaussian σ = 15 µm, density-weighted), thresholded at 0.5
+within tissue, holes filled; connected regions ≥ 0.005 mm² with ≥ 100 cells and ≥ 30 cells within 50 µm outside (356
+regions in 53 animals; median 96 % lesion cells inside). Each cell gets a signed distance to the nearest region edge
+(distance transform; + inside, − outside), and cells ≤ 50 µm outside are assigned to the nearest region. **Depth from
+the cord surface**: the piece's tissue (grid squares with cells, closed by 30 µm, holes filled), largest connected
+component = cord (drops detached roots and meninges), distance to its outline. Per region: border tissue and astrocyte
+vimentin (−30…+30 µm), edge spike (tissue vimentin 0–10 µm inside minus the mean of −30…−10 µm and +20…+45 µm), active
+share (S1 + S4), infiltrating immune share (T, B, NK/DC, DC, MDM, neutrophils; not microglia) 0–50 µm outside, and
+**escape** = log₂(that share ÷ the animal's immune share > 150 µm from any region). **Vimentin location**: profiles of
+astrocyte and territory vimentin against the region-edge distance (bins −150…+300 µm, median of per-animal medians, ≥ 15
+cells per bin); per animal, astrocyte vimentin inside regions minus outside (> 60 µm away). **Containment test**: for
+animals with ≥ 5 regions, Spearman ρ between border vimentin and escape across their regions after regressing out log
+size, active share and log depth; Wilcoxon signed-rank of per-animal ρ against 0; deep regions (> 100 µm) separately.
+A first version used cell-linkage objects (lesion cells < 30 µm apart); many were diffuse scatters without a real
+outline and its tissue-mask depth was wrong next to roots and meninges, so its results are withdrawn.
 
 ### 12. Software and statistics
 
@@ -274,32 +281,31 @@ calibrator is also higher in the milder group for MILD16 vs SEVERE16 (+1.16) and
 those two raw differences may be channel brightness; the within-animal contrast removes it, leaving chronic vs RR as
 the weakest contrast (+0.40). MILD30/SEVERE30 and MONOPHASIC/REMISSION1 have flat calibrators.
 
-**A vimentin ring at the lesion edge** [15]. MILD and MONOPHASIC animals show a sharp vimentin peak in the first ~10 µm
-inside the lesion edge (tissue vimentin z ≈ 1.6 and 3.3; ~0 just outside) and high vimentin in the lesion core; SEVERE,
-REMISSION1 and PEAK animals show neither.
+**Vimentin fills lesions; there is no ring** [16]. Against distance to the edge of lesion regions, vimentin rises on
+entering a lesion and stays high through the interior, with no edge peak. Astrocyte vimentin inside lesion regions minus
+the same animal's tissue outside: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01; MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC
+4.28 vs REMISSION1 1.26. Vimentin marks a lesion-wide astrocyte response that is low at peak and strongest in animals
+that recover. (A first, cell-based edge profile [15] showed an apparent ring; it was an artefact and is withdrawn.)
 
-![Vimentin edge profiles](../results/15_vimentin_robustness/vimentin_edge_profiles.png)
-*Vimentin against signed distance to the lesion edge (negative = outside), median over animals per group.*
+![Vimentin edge profiles](../results/16_scar_containment/vimentin_edge_profiles_regions.png)
+*Vimentin against distance to the edge of lesion regions (negative = outside), median over animals per group.*
 
 ![Robustness](../results/15_vimentin_robustness/robustness_forest.png)
 *The vimentin effect under each technical test; controls and calibrators should sit near zero.*
 
-### D. Does the scar contain lesions?
+### D. Does a vimentin scar contain lesions?
 
-**The border builds between the chronic peak and day ~30, in animals that do well** [16]. Border tissue vimentin:
-chronic PEAK1 0.04 → MILD16 0.97 (p = 0.02) but SEVERE16 0.02; never-relapsing MONOPHASIC 2.91 vs relapsed PEAK2 0.30
-at d32–33; RR PEAK1 → MONOPHASIC p = 0.03.
+A collaborator's hypothesis was that a successful astrocyte scar restricts immune infiltration. With lesion regions, lesions
+with more border vimentin have **neither fewer nor more** infiltrating immune cells around them than other lesions of the
+same animal (median ρ 0.00, p = 0.65, 36 animals; deep regions ρ −0.39, n.s., 10 animals). Border vimentin does not
+clearly rise from the chronic peak to MILD16 (0.67 → 0.50) and is lowest in SEVERE16 (0.02). Where vimentin is bright it
+fills the lesion rather than lining it, so the data neither support nor refute containment [16]. A first version with
+cell-linkage objects suggested more immune cells around better-bordered lesions and a border built by day 30; both were
+artefacts of diffuse objects and are withdrawn.
 
-**Within animals it does not look like containment** [16]. Across lesions of the same animal, stronger vimentin
-borders go with *more* infiltrating immune cells just outside (escape ρ +0.3 to +0.45, p < 0.01; 37 animals). Surface
-lesions confound this (vimentin-rich glia limitans and meningeal immune entry; lesion depth vs border vimentin ρ −0.44,
-vs escape −0.34), but on deep lesions and with depth as a covariate the association stays positive (ρ +0.25 to +0.31,
-p = 0.003–0.03). Reactive astrocytes build the vimentin border where immune cells are active at the lesion edge.
-Whether the border later restricts spread cannot be decided from single time points.
-
-![Best vs worst bordered lesion](../results/16_scar_containment/best_vs_worst_bordered_lesion.png)
-*Best- and worst-bordered lesion of one MONOPHASIC animal: vimentin channel (left); lesion, edge band and infiltrating
-immune cells (right).*
+![Random lesion regions](../results/16_scar_containment/random_lesion_regions.png)
+*Eight random lesion regions from day ~30 animals: αSMA/vimentin (magma), region outline (cyan), infiltrating immune
+cells (red).*
 
 ### E. Chronic severity: lesions that stayed active
 

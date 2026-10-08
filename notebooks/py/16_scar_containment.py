@@ -21,7 +21,7 @@
 #    (T, B, NK/DC, DC, monocyte-derived macrophages, neutrophils; not microglia) sit just **outside** it relative to
 #    inside ("leakage"). The decisive comparison is **between lesions of the same animal** (same image, staining,
 #    disease stage): do better-bordered lesions leak less?
-# 3. **The tissue**: the best- and worst-bordered lesion of one animal, side by side.
+# 3. **The tissue**: strongly vs weakly bordered deep lesions within the same piece, for several animals.
 #
 # Lesion objects: control-referenced lesion cells (notebook 10) linked within 30 µm in the same tissue piece, ≥ 100
 # cells. Border band: −30 to +30 µm around the lesion edge. Perilesional zone: non-lesion cells 0–50 µm outside the
@@ -254,54 +254,6 @@ fig.tight_layout()
 plotting.save_fig(fig, "within_animal_containment", OUT, SRC)
 
 # %% [markdown]
-# ## 3. The tissue: best- vs worst-bordered lesion of one animal
-# A day ~30 animal (MILD16 / SEVERE16 / PEAK2 / PEAK2_MILD / MONOPHASIC) with the largest within-animal spread of
-# border vimentin among lesions ≥ 300 cells in one piece. Left: αSMA/vimentin channel (magma, same image, same
-# contrast); right: lesion cells (light) and infiltrating immune cells (red), lesion edge band (cyan).
-
-# %%
-bundles = find_bundles(data.load_config())
-d30 = objs[objs.stage.isin(["MILD16", "SEVERE16", "PEAK2", "PEAK2_MILD", "MONOPHASIC"]) & (objs["size"] >= 300)]
-d30 = d30.dropna(subset=["border tissue vimentin"])
-d30 = d30.assign(piece=d30.index.str.split("#").str[0])
-spread = d30.groupby("piece")["border tissue vimentin"].agg(lambda s: s.max() - s.min() if len(s) >= 2 else np.nan)
-piece = spread.idxmax()
-cand = d30[d30.piece == piece]
-hi_o, lo_o = cand["border tissue vimentin"].idxmax(), cand["border tissue vimentin"].idxmin()
-sec = obs[obs.meta_sample_id == piece].sample_id.iloc[0]
-b = XeniumBundle(bundles[str(sec)])
-lv, f = 2, 2 ** 2
-vim_img = b.read_level("smavim", lv)
-hiv = np.percentile(vim_img[vim_img > 0], 99.7)
-fig, axs = plt.subplots(2, 2, figsize=(12, 11))
-for row, ob in enumerate([hi_o, lo_o]):
-    c = obs[obs.obj == ob]
-    pad = 80
-    x0, x1 = c.x_centroid.min() - pad, c.x_centroid.max() + pad
-    y0, y1 = c.y_centroid.min() - pad, c.y_centroid.max() + pad
-    sl = (slice(int(y0 / (PX * f)), int(y1 / (PX * f))), slice(int(x0 / (PX * f)), int(x1 / (PX * f))))
-    axs[row, 0].imshow(np.clip(vim_img[sl] / hiv, 0, 1), cmap="magma", extent=(x0, x1, y1, y0))
-    axs[row, 0].set_title(f"{'best' if row == 0 else 'worst'}-bordered lesion: border vimentin "
-                          f"{objs.loc[ob, 'border tissue vimentin']:+.2f} z, leakage {objs.loc[ob, 'leakage']:+.2f}",
-                          fontsize=9)
-    w = obs[(obs.meta_sample_id == piece) & obs.x_centroid.between(x0, x1) & obs.y_centroid.between(y0, y1)]
-    ax = axs[row, 1]
-    ax.scatter(w.x_centroid, w.y_centroid, s=1.5, color="#e6e6e6", lw=0)
-    ax.scatter(w[w.les].x_centroid, w[w.les].y_centroid, s=2, color="#f3c6a8", lw=0)
-    bb = w[(w.obj == ob) & w.edge_um.between(-30, 30)]
-    ax.scatter(bb.x_centroid, bb.y_centroid, s=2, color="#3fb8d6", lw=0)
-    im_ = w[w.immune]
-    ax.scatter(im_.x_centroid, im_.y_centroid, s=7, color="#c0261b", lw=0)
-    ax.set_xlim(x0, x1); ax.set_ylim(y1, y0); ax.set_aspect("equal")
-    ax.set_title("lesion (peach), edge band ±30 µm (cyan), infiltrating immune cells (red)", fontsize=9)
-    for a_ in axs[row]:
-        a_.axis("off")
-fig.suptitle(f"{piece} · {objs.loc[hi_o, 'sample_name']} ({objs.loc[hi_o, 'stage']}): two lesions in the same piece",
-             fontsize=10)
-fig.tight_layout()
-plotting.save_fig(fig, "best_vs_worst_bordered_lesion", OUT, SRC)
-
-# %% [markdown]
 # ## 2b. A fairer containment test
 # The leakage ratio (outside ÷ inside immune share) rises when a lesion empties of immune cells while resolving, even
 # if nothing escapes, and vimentin is highest in resolving lesions; so the ratio confounds "leaky" with "resolving".
@@ -411,23 +363,286 @@ print("does depth drive both? across all lesions:",
        for c in ["border tissue vimentin", "edge spike", "escape"]})
 
 # %% [markdown]
+# ## 3. The tissue: strongly vs weakly bordered deep lesions in the same piece
+# Pairs of **deep** lesions (median > 100 µm from the cord surface, so no glia limitans; ≥ 300 cells) in the same tissue
+# piece, for the three animals with the largest within-piece difference in border tissue vimentin. αSMA/vimentin channel
+# (magma, 0.43 µm/px, same image and contrast within a row), the lesion outline (cyan; lesion cells rasterised at 4 µm,
+# closed by 10 µm) and infiltrating immune cells (small red dots). The measured border is the band ±30 µm around the
+# cyan line.
+
+# %%
+from skimage.measure import find_contours
+from scipy import ndimage as ndi_
+
+bundles = find_bundles(data.load_config())
+dd = objs[(objs["lesion depth from surface (µm)"] > 100) & (objs["size"] >= 300)].dropna(
+    subset=["border tissue vimentin"]).copy()
+dd["piece"] = dd.index.str.split("#").str[0]
+sp = dd.groupby("piece")["border tissue vimentin"].agg(lambda s: s.max() - s.min() if len(s) >= 2 else np.nan).dropna()
+sp = sp.sort_values(ascending=False)
+pieces, seen = [], set()
+for pc in sp.index:
+    an_ = dd[dd.piece == pc].sample_name.iloc[0]
+    if an_ not in seen:
+        pieces.append(pc); seen.add(an_)
+    if len(pieces) == 3:
+        break
+
+
+def outline(ax, cells, x0, y0, step=4.0, close_um=10):
+    gx = ((cells.x_centroid - x0) / step).astype(int).to_numpy()
+    gy = ((cells.y_centroid - y0) / step).astype(int).to_numpy()
+    m = np.zeros((gy.max() + 3, gx.max() + 3), bool)
+    m[gy + 1, gx + 1] = True
+    m = ndi_.binary_closing(m, iterations=max(1, int(close_um / step)))
+    m = ndi_.binary_fill_holes(m)
+    for cnt in find_contours(m.astype(float), 0.5):
+        ax.plot(x0 + (cnt[:, 1] - 1) * step, y0 + (cnt[:, 0] - 1) * step, color="#3fd0f0", lw=1.1)
+
+
+lv, f = 1, 2
+fig, axs = plt.subplots(len(pieces), 2, figsize=(12, 5.2 * len(pieces)))
+axs = np.atleast_2d(axs)
+for r, pc in enumerate(pieces):
+    cand = dd[dd.piece == pc]
+    hi_o, lo_o = cand["border tissue vimentin"].idxmax(), cand["border tissue vimentin"].idxmin()
+    sec = obs[obs.meta_sample_id == pc].sample_id.iloc[0]
+    vim_img = XeniumBundle(bundles[str(sec)]).read_level("smavim", lv)
+    crops = []
+    for ob in (hi_o, lo_o):
+        c = obs[(obs.obj == ob) & obs.les]
+        pad = 60
+        x0, x1 = c.x_centroid.min() - pad, c.x_centroid.max() + pad
+        y0, y1 = c.y_centroid.min() - pad, c.y_centroid.max() + pad
+        sl = (slice(max(int(y0 / (PX * f)), 0), int(y1 / (PX * f))), slice(max(int(x0 / (PX * f)), 0), int(x1 / (PX * f))))
+        crops.append((ob, c, x0, x1, y0, y1, vim_img[sl]))
+    hiv = np.percentile(np.concatenate([cr[-1].ravel() for cr in crops]), 99.5)
+    for k, (ob, c, x0, x1, y0, y1, im) in enumerate(crops):
+        ax = axs[r, k]
+        ax.imshow(np.clip(im / hiv, 0, 1), cmap="magma", extent=(x0, x1, y1, y0))
+        outline(ax, c, x0, y0)
+        w = obs[(obs.meta_sample_id == pc) & obs.immune & obs.x_centroid.between(x0, x1) & obs.y_centroid.between(y0, y1)]
+        ax.scatter(w.x_centroid, w.y_centroid, s=3, color="#ff3b30", lw=0)
+        ax.set_xlim(x0, x1); ax.set_ylim(y1, y0); ax.axis("off")
+        o_ = objs.loc[ob]
+        ax.set_title(f"{'strong' if k == 0 else 'weak'} border · {o_.sample_name} ({o_.stage})\n"
+                     f"border vimentin {o_['border tissue vimentin']:+.2f} z · depth "
+                     f"{o_['lesion depth from surface (µm)']:.0f} µm · escape {o_.escape:+.2f}", fontsize=8)
+fig.tight_layout()
+plotting.save_fig(fig, "best_vs_worst_bordered_lesion", OUT, SRC)
+
+# %% [markdown]
+# ## 4. Revision: lesion *regions* instead of linked cells
+# The figure above showed two problems with the cell-linkage objects: many are diffuse scatters of lesion-called cells
+# (no real outline, so "border" is ill-defined), and "depth" from the tissue mask is wrong where nerve roots or meninges
+# are attached. Revised definitions, per tissue piece on a 10 µm grid:
+#
+# - **Lesion regions**: share of lesion cells among the cells in each grid square, smoothed (Gaussian σ = 15 µm, weighted
+#   by cell density), thresholded at 0.5 within tissue, holes filled; connected regions ≥ 0.005 mm² (50 squares) = lesions.
+# - **Signed distance to the region edge** for every cell (distance transform on the grid; + inside, − outside).
+# - **Depth from the cord surface**: the piece's tissue = grid squares with cells, closed by 30 µm and holes filled; the
+#   largest connected tissue component is the cord (drops detached roots/meninges); depth = distance to its outline.
+# - Per region: border tissue vimentin (−30…+30 µm), edge spike, escape (immune share 0–50 µm outside ÷ the animal's
+#   share > 150 µm from any region), size, active share, depth (median over the region's cells).
+
+# %%
+from scipy import ndimage as ndi_
+from skimage.measure import label as sklabel
+
+G = 10.0
+cell_reg = pd.Series("-1", index=obs.index, dtype=object)
+cell_sd = pd.Series(np.nan, index=obs.index)
+cell_depth = pd.Series(np.nan, index=obs.index)
+for pc, g in obs[obs.lesion_state != "not scored"].groupby("meta_sample_id", observed=True):
+    if g.les.sum() < 100:
+        continue
+    gx = ((g.x_centroid - g.x_centroid.min()) / G).astype(int).to_numpy() + 3
+    gy = ((g.y_centroid - g.y_centroid.min()) / G).astype(int).to_numpy() + 3
+    H, W = gy.max() + 4, gx.max() + 4
+    n_all = np.zeros((H, W)); n_les = np.zeros((H, W))
+    np.add.at(n_all, (gy, gx), 1); np.add.at(n_les, (gy, gx), g.les.to_numpy().astype(float))
+    tissue = ndi_.binary_fill_holes(ndi_.binary_closing(n_all > 0, iterations=3))
+    lab_t = sklabel(tissue)
+    if lab_t.max() == 0:
+        continue
+    cord = lab_t == np.argmax(np.bincount(lab_t.ravel())[1:]) + 1
+    depth = ndi_.distance_transform_edt(cord) * G
+    sm_all = ndi_.gaussian_filter(n_all, 1.5); sm_les = ndi_.gaussian_filter(n_les, 1.5)
+    frac = np.where(sm_all > 1e-3, sm_les / np.maximum(sm_all, 1e-3), 0)
+    les_mask = ndi_.binary_fill_holes((frac >= 0.5) & tissue)
+    lab, nl = ndi_.label(les_mask)
+    if nl == 0:
+        continue
+    sizes = np.bincount(lab.ravel())
+    keep_lab = np.where(sizes >= 50)[0]
+    keep_lab = keep_lab[keep_lab > 0]
+    reg = np.where(np.isin(lab, keep_lab), lab, 0)
+    din = ndi_.distance_transform_edt(reg > 0) * G
+    dout, idx = ndi_.distance_transform_edt(reg == 0, return_indices=True)
+    nearest = reg[idx[0], idx[1]]
+    r_cell = np.where(reg[gy, gx] > 0, reg[gy, gx], np.where(dout[gy, gx] * G <= 50, nearest[gy, gx], 0))
+    cell_reg[g.index] = np.where(r_cell > 0, np.array([f"{pc}@{x}" for x in r_cell], dtype=object), "-1")
+    cell_sd[g.index] = np.where(reg[gy, gx] > 0, din[gy, gx], -dout[gy, gx] * G)
+    cell_depth[g.index] = depth[gy, gx]
+obs["reg"], obs["reg_dist"], obs["depth_um"] = cell_reg, cell_sd, cell_depth
+
+o = obs[obs.reg != "-1"]
+ins = o.reg_dist > 0
+far_ = obs[obs.reg_dist < -150].groupby("sample_name", observed=True).immune.mean()
+regs = pd.DataFrame({
+    "sample_name": o.groupby("reg").sample_name.first(),
+    "cells": o[ins].groupby("reg").size(),
+    "active share": o[ins].groupby("reg").lesion_state.agg(lambda s: s.str[:2].isin(["S1", "S4"]).mean()),
+    "lesion share inside": o[ins].groupby("reg").les.mean(),
+    "depth (µm)": o[ins].groupby("reg").depth_um.median(),
+    "border tissue vimentin": o[o.reg_dist.between(-30, 30)].groupby("reg").terr_vim_z.median(),
+    "border astro vimentin": o[o.reg_dist.between(-30, 30) & (o.Anno_L1_curated == "Astrocyte")].groupby("reg").vim_z.median(),
+    "immune outside": o[~ins].groupby("reg").immune.mean(),
+    "n outside": o[~ins].groupby("reg").size(),
+})
+z0 = o[o.reg_dist.between(0.1, 10)].groupby("reg").terr_vim_z.median()
+zo = o[o.reg_dist.between(-30, -10)].groupby("reg").terr_vim_z.median()
+zi = o[o.reg_dist.between(20, 45)].groupby("reg").terr_vim_z.median()
+regs["edge spike"] = z0 - (zo + zi) / 2
+regs["escape"] = np.log2((regs["immune outside"] + 0.002) / (regs.sample_name.map(far_) + 0.002))
+regs = regs.join(an, on="sample_name")
+regs = regs[(regs.cells >= 100) & (regs["n outside"] >= 30)]
+regs["size"] = regs.cells
+regs["lesion depth from surface (µm)"] = regs["depth (µm)"]
+regs.to_csv(OUT / "lesion_regions.csv")
+print(f"{len(regs)} lesion regions in {regs.sample_name.nunique()} animals; median lesion share inside "
+      f"{regs['lesion share inside'].median():.2f}; deep (> 100 µm): {(regs['depth (µm)'] > 100).sum()}")
+
+# %%
+rows = []
+for x in ["border tissue vimentin", "border astro vimentin", "edge spike"]:
+    for lab_, df_, fn in [("all regions, adj. size, activity, depth", regs, lambda d, x: within_animal_depth(d, x, "escape")),
+                          ("deep regions (> 100 µm), adj. size, activity",
+                           regs[regs["depth (µm)"] > 100], lambda d, x: within_animal(d, x, "escape", True, min_obj=4))]:
+        r = fn(df_, x).dropna()
+        rows.append(dict(border=x, analysis=lab_, animals=len(r), median_rho=r.median(), share_negative=(r < 0).mean(),
+                         wilcoxon_p=wilcoxon(r).pvalue if len(r) >= 6 else np.nan))
+cont4 = pd.DataFrame(rows)
+cont4.to_csv(OUT / "within_animal_containment_regions.csv", index=False)
+cont4.round(3)
+
+# %%
+def wavg(v, w):
+    ok = v.notna() & w.notna() & (w > 0)
+    return np.average(v[ok], weights=w[ok]) if ok.any() else np.nan
+
+
+par = regs.groupby("sample_name").apply(lambda g: pd.Series({
+    "border tissue vimentin": wavg(g["border tissue vimentin"], g["size"].astype(float)),
+    "edge spike": wavg(g["edge spike"], g["size"].astype(float)),
+    "escape": wavg(g.escape, g["size"].astype(float)), "regions": len(g)}), include_groups=False).join(an)
+par.to_csv(OUT / "per_animal_regions.csv")
+tab = pd.DataFrame({gname: par[f(par)][["border tissue vimentin", "edge spike", "escape", "regions"]].median()
+                    for gname, f in GROUP30.items()}).T
+tab["animals"] = [int(f(par).sum()) for f in GROUP30.values()]
+cmp2 = []
+for a_, b_ in [("chronic PEAK1 (d13–18)", "MILD16 (d27–28)"), ("chronic PEAK1 (d13–18)", "SEVERE16 (d28–29)"),
+               ("MILD16 (d27–28)", "SEVERE16 (d28–29)"), ("MONOPHASIC (d32–33)", "PEAK2 (d32–33)"),
+               ("RR PEAK1 (d14–18)", "MONOPHASIC (d32–33)")]:
+    x, y = par[GROUP30[a_](par)]["border tissue vimentin"].dropna(), par[GROUP30[b_](par)]["border tissue vimentin"].dropna()
+    if len(x) >= 2 and len(y) >= 2:
+        cmp2.append(dict(a=a_, b=b_, med_a=x.median(), med_b=y.median(), n=f"{len(x)}+{len(y)}", p=mannwhitneyu(x, y).pvalue))
+display(tab.round(2))
+pd.DataFrame(cmp2).round(3)
+
+# %% [markdown]
+# **Representative regions, not extremes.** Eight lesion regions drawn at random (seed 0) from day ~30 animals, each
+# with its outline (cyan), infiltrating immune cells (red) and the αSMA/vimentin channel (magma, per-row contrast).
+
+# %%
+from skimage.measure import find_contours
+
+pool = regs[regs.stage.isin(["MILD16", "SEVERE16", "PEAK2", "PEAK2_MILD", "MONOPHASIC"])].dropna(
+    subset=["border tissue vimentin"])
+pick = pool.sample(min(8, len(pool)), random_state=0).sort_values("border tissue vimentin", ascending=False)
+fig, axs = plt.subplots(2, 4, figsize=(18, 9.5))
+lv, f = 1, 2
+cache_img = {}
+for ax, (rid, rr) in zip(axs.ravel(), pick.iterrows()):
+    pc = rid.split("@")[0]
+    sec = str(obs[obs.meta_sample_id == pc].sample_id.iloc[0])
+    if sec not in cache_img:
+        cache_img[sec] = XeniumBundle(bundles[sec]).read_level("smavim", lv)
+    vim_img = cache_img[sec]
+    c = obs[(obs.reg == rid) & (obs.reg_dist > 0)]
+    pad = 80
+    x0, x1 = c.x_centroid.min() - pad, c.x_centroid.max() + pad
+    y0, y1 = c.y_centroid.min() - pad, c.y_centroid.max() + pad
+    sl = (slice(max(int(y0 / (PX * f)), 0), int(y1 / (PX * f))), slice(max(int(x0 / (PX * f)), 0), int(x1 / (PX * f))))
+    im = vim_img[sl]
+    ax.imshow(np.clip(im / np.percentile(im, 99.5), 0, 1), cmap="magma", extent=(x0, x1, y1, y0))
+    m = np.zeros((int((y1 - y0) / G) + 3, int((x1 - x0) / G) + 3), bool)
+    m[((c.y_centroid - y0) / G).astype(int) + 1, ((c.x_centroid - x0) / G).astype(int) + 1] = True
+    m = ndi_.binary_fill_holes(ndi_.binary_closing(m, iterations=2))
+    for cnt in find_contours(m.astype(float), 0.5):
+        ax.plot(x0 + (cnt[:, 1] - 1) * G, y0 + (cnt[:, 0] - 1) * G, color="#3fd0f0", lw=1.2)
+    w = obs[(obs.meta_sample_id == pc) & obs.immune & obs.x_centroid.between(x0, x1) & obs.y_centroid.between(y0, y1)]
+    ax.scatter(w.x_centroid, w.y_centroid, s=2.5, color="#ff3b30", lw=0)
+    ax.set_xlim(x0, x1); ax.set_ylim(y1, y0); ax.axis("off")
+    ax.set_title(f"{rr.sample_name} ({rr.stage})\nborder vim {rr['border tissue vimentin']:+.1f} z · edge spike "
+                 f"{rr['edge spike']:+.1f} · depth {rr['depth (µm)']:.0f} µm · escape {rr.escape:+.1f}", fontsize=7)
+fig.suptitle("random lesion regions at day ~30, sorted by border vimentin (high → low)", fontsize=10)
+fig.tight_layout()
+plotting.save_fig(fig, "random_lesion_regions", OUT, SRC)
+
+# %% [markdown]
+# ### Edge profile with region outlines (re-check of notebook 15's ring)
+# Notebook 15 measured distance to the nearest non-lesion / lesion *cell*, so "0–10 µm inside" mostly meant isolated
+# lesion cells scattered in healthy tissue. Here the same profile uses the region outlines.
+
+# %%
+GROUPS = {"MILD (16+30)": obs.stage.isin(["MILD16", "MILD30"]), "SEVERE (16+30)": obs.stage.isin(["SEVERE16", "SEVERE30"]),
+          "MONOPHASIC": obs.stage == "MONOPHASIC", "REMISSION1": obs.stage == "REMISSION1",
+          "PEAK (all)": obs.stage.isin(["PEAK1", "PEAK2", "PEAK2_MILD", "PEAK3"])}
+BINS = [-150, -90, -60, -30, -10, 0, 10, 30, 60, 90, 150, 300]
+mids = [(a + b) / 2 for a, b in zip(BINS[:-1], BINS[1:])]
+obs["rbin"] = pd.cut(obs.reg_dist, BINS)
+fig, axs = plt.subplots(1, 2, figsize=(14, 4.2), sharex=True)
+prof_rows = []
+for ax, (lab, m0, val) in zip(axs, [("astrocyte vimentin (z)", obs.Anno_L1_curated == "Astrocyte", "vim_z"),
+                                    ("tissue vimentin, 10 µm territory (z)", pd.Series(True, index=obs.index), "terr_vim_z")]):
+    for k, (gname, gm) in enumerate(GROUPS.items()):
+        d = obs[m0 & gm & obs.rbin.notna()]
+        pa_ = d.groupby(["sample_name", "rbin"], observed=True)[val].agg(["median", "count"])
+        med = pa_[pa_["count"] >= 15]["median"].unstack().median().reindex(obs.rbin.cat.categories)
+        ax.plot(mids, med.values, marker="o", ms=4, color=COL[k], label=gname)
+        prof_rows.append(pd.Series(med.values, index=[str(b) for b in obs.rbin.cat.categories], name=f"{lab} | {gname}"))
+    ax.axvline(0, color="#888888", lw=0.8, ls="--"); ax.axvspan(0, 300, color="#f4e3e3", alpha=0.4, lw=0)
+    ax.set(xlabel="distance to lesion-region edge (µm; negative = outside)", ylabel=lab)
+axs[0].legend(fontsize=7)
+fig.tight_layout()
+plotting.save_fig(fig, "vimentin_edge_profiles_regions", OUT, SRC)
+pd.DataFrame(prof_rows).round(2)
+
+# %%
+# per animal: vimentin inside lesion regions vs the same animal's tissue outside (> 60 µm away)
+ast_ = obs.Anno_L1_curated == "Astrocyte"
+inside_v = obs[ast_ & (obs.reg_dist > 0)].groupby("sample_name", observed=True).vim_z.median()
+outside_v = obs[ast_ & (obs.reg_dist < -60)].groupby("sample_name", observed=True).vim_z.median()
+iv = (inside_v - outside_v).rename("lesion-region − outside astrocyte vimentin").to_frame().join(an)
+iv.to_csv(OUT / "region_inside_minus_outside_vimentin.csv")
+iv.groupby("stage")["lesion-region − outside astrocyte vimentin"].agg(["median", "count"]).round(2)
+
+# %% [markdown]
 # ## Findings
 #
-# > **Finding — the vimentin border builds between the chronic peak and day ~30, but only in milder animals.** Border
-# > tissue vimentin per animal: chronic PEAK1 0.04 → MILD16 0.97 (p = 0.02) but SEVERE16 0.02 (no change); border
-# > astrocyte vimentin 0.58 → 2.65 (MILD16) vs 0.76 (SEVERE16). At d31–33 never-relapsing MONOPHASIC animals have the
-# > strongest borders (tissue 2.91, astrocyte 5.04) vs PEAK2 0.30 / 1.22 and PEAK2_MILD 0.63 / 3.84; RR PEAK1 → MONOPHASIC
-# > rises (p = 0.03). So a scar-like vimentin border forms by d30 in animals that do well, and not in those that stay
-# > severe or relapse. Small groups (2–6 animals).
+# > **Correction — the first lesion-level results were artefacts of the lesion objects.** Cells linked within 30 µm
+# > produce many diffuse "objects" (scattered lesion-called cells without a real outline), and the tissue-mask depth is
+# > wrong where roots or meninges are attached. With proper lesion **regions** (smoothed lesion-cell density, 356 regions,
+# > median 96 % lesion cells inside, real outlines; depth from the cord outline), the earlier claims do not hold: (i)
+# > within animals, border vimentin is **not** associated with immune cells around the lesion (median ρ 0.00, p = 0.65;
+# > deep regions ρ −0.39, n.s., 10 animals), so the data neither support nor refute containment; (ii) border vimentin
+# > does not clearly build from the chronic peak to MILD16 (0.67 → 0.50) and is lowest in SEVERE16 (0.02, p = 0.02 vs
+# > peak).
 # >
-# > **Finding — but in a snapshot it does not look like containment.** Comparing lesions *within the same animal*,
-# > better vimentin-bordered lesions have **more**, not fewer, infiltrating immune cells just outside them (escape vs the
-# > animal's distant healthy tissue: ρ +0.3 to +0.45, p < 0.01; immune profile across the edge slightly higher for
-# > strong-border lesions). Lesions near the cord surface have both more vimentin (glia limitans) and more immune cells
-# > (meningeal entry), but on deep lesions only (> 100 µm from the surface) and with depth as a covariate, border tissue
-# > vimentin still goes with more immune cells around the lesion (ρ +0.25 to +0.31, p = 0.003–0.03). The best reading:
-# > reactive astrocytes build their vimentin border **where immune cells are active at the lesion edge**, a response
-# > to the infiltrate. Whether that border then restricts further spread can't be decided from single time points:
-# > the animal-level pattern (borders form in milder animals) fits a protective role, the lesion-level pattern fits a
-# > response. Testing it would need time-resolved data (e.g. serial imaging, or an intervention on astrocyte
-# > reactivity).
+# > **Finding — no vimentin ring; vimentin fills lesions in animals that do well.** With region outlines, vimentin rises
+# > on entering a lesion and stays high through the lesion interior; there is no edge peak (notebook 15's "ring" came
+# > from the cell-based distance, where "just inside the edge" meant isolated lesion cells in healthy tissue). Astrocyte
+# > vimentin inside lesion regions minus the same animal's tissue outside: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01;
+# > MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs REMISSION1 1.26. So vimentin marks a lesion-wide astrocyte response
+# > that is low at peak and strongest in animals that recover: a resolution / gliosis phase, not a containment ring.
