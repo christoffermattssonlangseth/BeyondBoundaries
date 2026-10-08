@@ -1,0 +1,25 @@
+finding,runs,value,p
+"(a) 18S texture vs score, within section (median ρ over 6 types)",runs 5/6,0.7557222790079399,
+"(a) DAPI texture vs score (control, median ρ)",runs 5/6,-0.0031124399455339097,
+"(a) 18S texture vs score, within section (median ρ over 6 types)",runs 1–3,0.3159496817633921,
+"(a) DAPI texture vs score (control, median ρ)",runs 1–3,0.022689921905853568,
+(b) WM lesion ÷ physiological neuropil (curated niches),runs 5/6,0.7864610552787781,7.920032658148557e-06
+(b) WM lesion ÷ no-lesion neuropil (control-referenced calls),runs 5/6,0.9553496241569519,0.34791725337890966
+(b) WM lesion ÷ physiological neuropil (curated niches),runs 1–3,0.7242089509963989,3.007334641125305e-10
+(b) WM lesion ÷ no-lesion neuropil (control-referenced calls),runs 1–3,0.929304838180542,0.00017781646082331513
+(c) ρ protein vs RNA reactivity (astrocytes),runs 5/6,0.48229692507812505,
+(c) RNA-only share: active − recovery (median),runs 5/6,0.04004049407293457,0.019362130817239174
+(c) RNA-only share: pre/none (median),runs 5/6,0.03569484760522496,
+(c) ρ protein vs RNA reactivity (astrocytes),runs 1–3,0.5429375566693517,
+(c) RNA-only share: active − recovery (median),runs 1–3,0.03073921007223203,0.011799060742331042
+(c) RNA-only share: pre/none (median),runs 1–3,0.034229828850855744,
+(d) T-cell 18S polarity towards vessel (median cos),runs 5/6,0.14186705093257265,9.5367431640625e-07
+(d) neuron control (median cos),runs 5/6,0.0018189392848740702,0.8325093984603882
+(d) T-cell 18S polarity towards vessel (median cos),runs 1–3,0.1916219809776428,4.656612873077393e-10
+(d) neuron control (median cos),runs 1–3,-0.007172164427528655,0.10726747063108633
+"(e) lesion (curated niches), leave-one-run-out (median over held-out runs)",runs 5/6,0.8840985402507828,
+"(e) lesion (curated niches), leave-one-run-out (median over held-out runs)",runs 1–3,0.8855161358838002,
+"(e) lesion (control-referenced), leave-one-run-out (median over held-out runs)",runs 5/6,0.8634799008369711,
+"(e) lesion (control-referenced), leave-one-run-out (median over held-out runs)",runs 1–3,0.8836117452082883,
+"(e) cell type (L1), leave-one-run-out (median over held-out runs)",runs 5/6,0.4317724495305707,
+"(e) cell type (L1), leave-one-run-out (median over held-out runs)",runs 1–3,0.4431190080687946,

@@ -290,3 +290,30 @@ lesion share 0.58, T cells 0.47, cellularity 0.38 (run 5 only: 0.77–0.89). Not
 within-piece contrast (lesion − non-lesion astrocytes of the same animal: MILD16 2.1 vs SEVERE16 1.0, MILD30 3.0 vs
 SEVERE30 1.9, MONOPHASIC 4.6 vs REMISSION1 1.3, chronic vs RR PEAK1 1.1 vs 0.6) while the DAPI contrast is ~0 →
 not piece brightness.
+
+## 2026-10-08 — Replication on runs 1–3 (`notebooks/13_replication_runs123.ipynb`)
+Same code on runs 5/6 (reproduces earlier numbers) and on runs 1–3 (new):
+- **18S texture severity marker — partly replicated.** Within-section ρ in runs 1–3 holds for astrocytes 0.76,
+  myeloid 0.61, oligodendrocytes 0.54, but not endothelium (−0.01), fibroblasts (0.09), neurons (−0.32); median over six
+  types 0.76 → 0.32. DAPI control ~0. Downgrade from "candidate biomarker" to "glial/myeloid-specific, needs work".
+- **WM neuropil loss — replicated:** lesion ÷ physiological ×0.72 in runs 1–3 (58 pieces, p < 1e-4) vs ×0.79 in runs
+  5/6 (weaker with control-referenced calls: ×0.93 / ×0.96).
+- **Notebook 11's "neuropil index > 1"** is not a reference problem (references agree, ratio 1.00 GM / 1.005 WM): it
+  pooled WM and GM lesion cells; GM lesion cells sit at ≥ 1, WM at 0.91–0.98. Use WM-only.
+- **Astrocyte RNA vs vimentin — replicated:** ρ 0.51–0.58 per run; RNA-only astrocytes more common in active disease
+  than recovery (runs 1–3: 0.076 vs 0.046, p = 0.01; runs 5/6: 0.111 vs 0.071, p = 0.02).
+- **T-cell 18S polarity towards vessels — replicated:** cos 0.19 (33 animals, p < 1e-4) vs 0.14; also fibroblasts,
+  MDM, microglia; neurons ~0, oligodendrocytes 0.016 (small optical floor).
+- **Leave-one-run-out image models — transfer to every run:** lesion AUROC 0.88–0.89 (curated) / 0.85–0.91
+  (control-referenced); cell type 0.42–0.47 (chance 0.07).
+
+## 2026-10-08 — Relapse: new lesions or reactivated old ones? (`notebooks/14_relapse_lesion_origin.ipynb`)
+First attack (10 animals) vs relapse peaks (9):
+- Active (S1/S4) tissue at relapse touches old fibrotic S2 tissue far more: within 50 µm 0.23 vs 0.05 (p = 4e-4);
+  median distance 101 vs 265 µm; enrichment over permutation 0.33 vs 0.14 (p = 9e-4; < 1 in both → separate patches
+  that meet at borders).
+- But most relapse activity is in **new** lesions: more lesion objects (17 vs 8, p = 0.01); only 19 % of active relapse
+  tissue sits in mixed active/old objects (0 % at first attack, p = 0.002). Active tissue ~95 % WM in both.
+- B-cell aggregates at relapse sit near old tissue (0.72 vs 0.31) and in meninges (0.33 vs 0.05).
+- Vimentin shows no active/old interface signature (paired p ≥ 0.16).
+- Caveat: S2 also forms a thin pial rim at first attack (1.7 % of lesion tissue) — "old" is not purely old.

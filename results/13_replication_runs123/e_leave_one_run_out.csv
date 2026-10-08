@@ -1,0 +1,16 @@
+task,held_out,score,median_per_animal,animals,metric,chance
+lesion (curated niches),run1,0.8855161358838002,0.8709092568203458,18.0,AUROC,
+lesion (curated niches),run2,0.8805353090176065,0.8656709356660357,12.0,AUROC,
+lesion (curated niches),run3,0.890544755597554,0.8724302106102899,12.0,AUROC,
+lesion (curated niches),run5,0.8758550624433806,0.8749277968573823,18.0,AUROC,
+lesion (curated niches),run6,0.8923420180581851,0.9070803200027101,6.0,AUROC,
+lesion (control-referenced),run1,0.9070625659206708,0.8770236638160707,15.0,AUROC,
+lesion (control-referenced),run2,0.8702305476534529,0.858692603492997,12.0,AUROC,
+lesion (control-referenced),run3,0.8836117452082883,0.859865517059985,12.0,AUROC,
+lesion (control-referenced),run5,0.8473339589461537,0.8440851676865881,15.0,AUROC,
+lesion (control-referenced),run6,0.8796258427277884,0.9030875879063243,6.0,AUROC,
+cell type (L1),run1,0.43962278045989855,,,balanced accuracy,0.07142857142857142
+cell type (L1),run2,0.4692617509632435,,,balanced accuracy,0.07142857142857142
+cell type (L1),run3,0.4431190080687946,,,balanced accuracy,0.07142857142857142
+cell type (L1),run5,0.4185505306972197,,,balanced accuracy,0.07142857142857142
+cell type (L1),run6,0.44499436836392164,,,balanced accuracy,0.07142857142857142
