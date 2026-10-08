@@ -1,5 +1,87 @@
 # RESULTS log — Beyond Boundaries
 
+## Review response (2026-10)
+
+External review of methods, six tasks. Code: `src/beyondboundaries/orthogonality.py` (nonlinear arm),
+`tests/test_orthogonality.py`, `scripts/02_nesting_audit.py`, `scripts/03_mild30_sensitivity.py`,
+`notebooks/21_nonlinear_orthogonality.ipynb`. Tests: 10/10 pass (`OMP_NUM_THREADS=2 PYTHONPATH=src python -m pytest -q tests`).
+The lesion threshold (99th percentile on held-out control animals) and earlier withdrawals are unchanged.
+
+**1. Nonlinear residual test (`21_nonlinear_orthogonality`, runs 5/6, same cells and features as notebook 04).**
+Gradient-boosted trees (`HistGradientBoostingRegressor`, one model per image feature, GroupKFold by animal, fold-wise
+PCA on the training animals) instead of ridge. New test: the nonlinear arm finds a nonlinear dependence that the
+linear arm misses on synthetic data (nonlinear ΔR² 0.43 vs linear 0.32; image-free features < 0.05).
+
+| cell type | cells | ΔR²(tx \| cov) linear → nonlinear | R² full linear → nonlinear | features where nonlinear higher |
+|---|---|---|---|---|
+| Oligodendrocyte | 30,000 | 0.090 → 0.086 | 0.152 → 0.183 | 34% |
+| Myeloid | 30,000 | 0.105 → 0.082 | 0.163 → 0.200 | 34% |
+| Neuron | 30,000 | 0.072 → 0.079 | 0.127 → 0.153 | 53% |
+| Fibroblast | 30,000 | 0.068 → 0.067 | 0.123 → 0.156 | 35% |
+| Astrocyte | 30,000 | 0.071 → 0.064 | 0.177 → 0.195 | 38% |
+| Endothelial | 30,000 | 0.075 → 0.081 | 0.156 → 0.188 | 46% |
+| Schwann cell | 20,686 | 0.068 → 0.060 | 0.112 → 0.163 | 34% |
+| DC | 16,866 | 0.080 → 0.075 | 0.165 → 0.183 | 28% |
+| T cell | 15,921 | 0.091 → 0.070 | 0.171 → 0.211 | 15% |
+| OPC | 14,242 | 0.067 → 0.056 | 0.160 → 0.176 | 27% |
+| VSMC | 9,328 | 0.091 → 0.090 | 0.148 → 0.163 | 38% |
+| B cell | 4,548 | 0.067 → 0.052 | 0.148 → 0.128 | 25% |
+| Ependymal cell | 3,007 | 0.064 → 0.037 | 0.130 → 0.108 | 19% |
+| NK/DC | 2,046 | 0.056 → 0.051 | 0.142 → 0.111 | 25% |
+
+**Not materially larger.** The transcriptome's unique contribution is the same or smaller with the nonlinear model
+in every cell type (median per-feature difference −0.02 to +0.001); the extra R² of the flexible model comes from the
+covariates (position, image, size). In the small types (B cells, ependymal, NK/DC) the nonlinear model fits worse
+overall. Joint tests (all image features together):
+- **J1** residual clustering (Leiden on the nonlinear residuals): 8/14 types form one cluster; where clusters appear
+  they are not lesion-associated (q ≥ 0.49) except a 1.3 % endothelial cluster (+1.2 points lesion share, q = 0.009),
+  and none is dominated by one image or animal (largest shares 7–30 %).
+- **J2** reverse (images → 20 transcriptome PCs beyond covariates): unique R² 0.03–0.07 nonlinear vs 0.01–0.04 linear;
+  the images carry a little RNA-related signal a flexible model can use.
+- **J3a** lesion vs physiological per cell type: AUROC RNA 0.81–0.96; adding all image features changes it by −0.016
+  to +0.006.
+- **J3b** clinical score (run 5, per held-out animal): single cell types predict the held-out animal's score poorly from RNA alone (ρ −0.52 to +0.17, 16–19 animals) and adding all image features does not help consistently (change −0.07 to +0.23, mixed sign).
+
+README keeps "no hidden cell states"; the residual is not hiding nonlinear, lesion-related or RNA-predictable states.
+
+**2. Run/animal nesting (`scripts/02_nesting_audit.py`).** Every animal is in exactly one run, and arm is nearly
+confounded with run, so animal-grouped CV never holds a run out. Output:
+
+```
+{nest_txt}
+```
+
+Headline prediction numbers are now cross-run (leave-one-run-out over 5 runs, notebook 13): cell type 42–47 %
+(14 types, chance 7 %), lesion AUROC 0.88–0.89 (curated; 0.85–0.91 per held-out run). Pooled animal-grouped values
+(46 %, 0.90) are kept as optimistic. Anatomy (0.68 → 0.73) and clinical score (ρ 0.62 vs 0.79) have **no cross-run
+estimate** and are labelled pooled/optimistic (README, methods/results, verdict).
+
+**3. MILD30 sensitivity (`scripts/03_mild30_sensitivity.py`).** "Chronic severity is set at the first attack":
+all chronic-late animals, MILD first-attack peak 1.5–3.0 vs SEVERE 3.5 (one-sided p = 0.0014; every SEVERE peak above
+every MILD; ρ(first peak, score at sacrifice) +0.83, n = 13). MILD30 (run-1 only) excluded: 2.0–2.5 vs 3.5
+(p = 0.008), complete separation, ρ +0.86 (n = 8). MILD16 vs SEVERE16 only (same run, same day): p = 0.03. Holds.
+
+**4. Vimentin–outcome relabelled exploratory / hypothesis-generating** (README, RESULTS, methods/results, notebook 18):
+ρ −0.34 (p = 0.046, n = 35 after adjustment); the VSMC signal in the same channel tracks score similarly (ρ −0.36);
+astrocyte-specific ≈ −0.33.
+
+**5. RNA-before-protein wording softened** to "consistent with RNA preceding protein (inferred from animals sacrificed
+at successive stages, not a within-animal time course)" in README, RESULTS, methods/results, notebook 06, verdict.
+
+**6. Neuropil counts and normalisation.** Piece counts labelled everywhere (runs 5/6: 38 pieces; runs 1–3: 58; all
+runs: 107). The earlier "25 %" was the index-unit difference (−0.25); the ratio is ×0.79 (21 %). Normalisation note
+(methods §4): the index uses raw intensity ÷ a within-piece reference that includes lesion cells, and the p90 scale
+absorbs section-wide depression; both make the loss conservative.
+
+**Found during this work (corrections beyond the review).**
+- **WM neuropil loss narrowed to the grey/white-matter border** (notebook 20, section 9): ATP1A1 falls steeply with
+  distance from grey matter and lesions lie deeper in WM; at matched distance the loss is ×0.80–0.92 within ~75 µm of
+  grey matter (×0.78, 25/31 animals, runs 1–3; ×0.83, 13/18, runs 5/6) and absent beyond. README, verdict,
+  methods/results, lesion story, summary, conclusions and slides corrected.
+- **Notebook 23** (transcripts relative to the stain outlines): nuclear RNA retention in lesion oligodendrocytes
+  withdrawn (white/grey-matter mix); see the 2026-10-08 entry at the end of this log.
+- Remaining older wording in notebooks 09, 12 and 00 is annotated rather than rewritten (they are historical records).
+
 ## 2026-10-06 — Step 0: inspection (no analysis yet)
 
 Scripts: `scripts/00_inspection/` (run on the analysis Mac, env `sc_py312`). Outputs: `results/00_inspection/`.

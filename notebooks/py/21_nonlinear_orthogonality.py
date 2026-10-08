@@ -363,3 +363,25 @@ j3b.to_csv(OUT / "J3b_score_run5_rna_vs_rna_plus_images.csv")
 print(f"clinical score per held-out animal (run 5), median over types: ρ RNA {j3b.rho_rna.median():.3f} → RNA + images "
       f"{j3b.rho_rna_plus_images.median():.3f} (median gain {j3b.gain.median():+.3f})")
 j3b.round(3)
+
+# %% [markdown]
+# ## Findings
+#
+# > **Per feature: the nonlinear model does not find more transcriptome information.** With gradient-boosted trees
+# > instead of ridge, the transcriptome's unique contribution to each image feature (ΔR² beyond covariates) is the same
+# > or smaller in all 14 cell types (median per-feature difference −0.020 to +0.001; the nonlinear value is higher for
+# > 15–53 % of features). The flexible model's extra R² comes from the covariates (position, image, size); in the
+# > smallest types (B cells, ependymal, NK/DC) it fits worse overall.
+# >
+# > **Jointly, all image features together:**
+# > - **J1** — clustering the nonlinear residuals: 8 of 14 types form one cluster; the clusters that appear are not
+# >   lesion-associated (q ≥ 0.49) except a 1.3 % endothelial cluster (+1.2 points), and none is dominated by one image
+# >   or animal.
+# > - **J2** — images → transcriptome PCs beyond covariates: unique R² 0.03–0.07 (nonlinear) vs 0.01–0.04 (linear): a
+# >   little RNA-related signal is reachable with a flexible model.
+# > - **J3a** — lesion vs physiological: RNA AUROC 0.81–0.96; adding all image features changes it by −0.016 to +0.006.
+# > - **J3b** — clinical score per held-out run-5 animal: poor from RNA alone (ρ −0.52 to +0.17) and not consistently
+# >   improved by images (−0.07 to +0.23).
+# >
+# > **Answer to the review:** the "no hidden cell states" conclusion holds under nonlinear models and joint use of the
+# > images; the unexplained image variance is not hiding nonlinear, lesion-related or RNA-predictable cell states.
