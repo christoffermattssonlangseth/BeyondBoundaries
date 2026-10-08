@@ -453,3 +453,24 @@ fig.tight_layout()
 plotting.save_fig(fig, "robustness_forest", OUT, SRC)
 res.assign(positive=res["diff"] > 0).groupby("test", sort=False).agg(
     contrasts_positive=("positive", "sum"), contrasts=("positive", "size"), median_diff=("diff", "median")).round(2)
+
+# %% [markdown]
+# ## Findings
+#
+# > **Finding — the vimentin effect is not a technical artefact and not αSMA.** Every vimentin test keeps the
+# > direction in all four contrasts (milder − more severe, z): within-animal lesion − non-lesion astrocytes +1.10 /
+# > +1.09 / +3.31 / +0.40; astrocytes > 20 µm from any VSMC/endothelial/fibroblast cell +0.78 / +1.21 / +2.22 / +0.96;
+# > deep white matter +2.36 / +1.24 / +2.43 / +1.61; reactive astrocytes only +1.17 / +1.07 / +3.30 / +0.94; and
+# > within lesion states S1, S2, S4. Controls stay near zero: DAPI −0.21…0.00, lesion neurons/oligodendrocytes ~0–0.3,
+# > piece sharpness ~0, and smooth-muscle / pericyte / fibroblast transcripts in the lesion astrocytes ~0 (no sign
+# > of αSMA-cell contamination). **Caveat from the calibrator:** VSMC αSMA/Vim is also higher in the milder group for
+# > MILD16 vs SEVERE16 (+1.16) and chronic vs RR PEAK1 (+0.91), so part of those two raw differences may be piece-level
+# > channel brightness. The within-animal contrast removes it (+1.10 for MILD16 vs SEVERE16; chronic vs RR shrinks to
+# > +0.40, the weakest contrast). MILD30 vs SEVERE30 (calibrator +0.25) and MONOPHASIC vs REMISSION1 (+0.06) are clean.
+# >
+# > **Finding — a vimentin ring at the lesion edge in milder and never-relapsing animals.** Edge profiles: MILD and
+# > MONOPHASIC animals show a sharp vimentin peak in the first ~10 µm inside the lesion edge (tissue vimentin z ≈ 1.6 and
+# > 3.3; ~0 just outside), a dip at 20–45 µm, and high vimentin again in the lesion core. SEVERE, REMISSION1 and PEAK
+# > animals have no edge peak and less core vimentin. So milder outcomes come with both a containment ring and
+# > vimentin-rich lesion interiors. The edge-minus-core "ring index" misses this (the core is high too); notebook 16
+# > uses an edge-spike measure and tests whether better-bordered lesions leak fewer immune cells.

@@ -317,3 +317,13 @@ First attack (10 animals) vs relapse peaks (9):
 - B-cell aggregates at relapse sit near old tissue (0.72 vs 0.31) and in meninges (0.33 vs 0.05).
 - Vimentin shows no active/old interface signature (paired p ≥ 0.16).
 - Caveat: S2 also forms a thin pial rim at first attack (1.7 % of lesion tissue) — "old" is not purely old.
+
+## 2026-10-08 — Vimentin robustness, lesion border, αSMA (`notebooks/15_vimentin_robustness.ipynb`)
+- Vimentin effect (milder − severe) keeps its direction in all four contrasts under every test: within animal, far
+  from vessels, no αSMA-type cell within 20 µm, deep WM, reactive astrocytes only, within lesion states. Controls ~0
+  (DAPI, neurons/oligos, sharpness, smooth-muscle/pericyte/fibroblast RNA in the astrocytes) → not technical, not αSMA.
+- VSMC calibrator also higher in the milder group for MILD16 vs SEVERE16 (+1.16) and chronic vs RR PEAK1 (+0.91):
+  piece-level channel brightness may contribute there; within-animal contrast removes it (MILD16/SEVERE16 +1.10;
+  chronic vs RR +0.40 = weakest). MILD30/SEVERE30 and MONOPHASIC/REMISSION1 calibrators are flat.
+- **Edge ring:** MILD and MONOPHASIC animals have a sharp vimentin peak in the first ~10 µm inside the lesion edge
+  (tissue vimentin z ≈ 1.6 / 3.3), absent in SEVERE, REMISSION1 and PEAK; core vimentin also highest in MILD/MONOPHASIC.

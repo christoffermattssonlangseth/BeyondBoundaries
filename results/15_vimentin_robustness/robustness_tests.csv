@@ -1,0 +1,97 @@
+test,contrast,diff,n_milder,n_severe,p
+"baseline: lesion astrocytes, vimentin z",MILD16 vs SEVERE16,1.0490320188411753,3,3,0.4
+"baseline: lesion astrocytes, vimentin z",MILD30 vs SEVERE30,0.9451839981612502,5,2,0.09523809523809523
+"baseline: lesion astrocytes, vimentin z",MONOPHASIC vs REMISSION1,3.3422573826513378,4,5,0.031746031746031744
+"baseline: lesion astrocytes, vimentin z",chronic vs RR PEAK1,1.0336675102544404,6,4,0.2571428571428571
+within animal: lesion − non-lesion astrocytes,MILD16 vs SEVERE16,1.1037093229852841,3,3,0.4
+within animal: lesion − non-lesion astrocytes,MILD30 vs SEVERE30,1.0858826471045182,5,2,0.09523809523809523
+within animal: lesion − non-lesion astrocytes,MONOPHASIC vs REMISSION1,3.307086960148583,4,5,0.015873015873015872
+within animal: lesion − non-lesion astrocytes,chronic vs RR PEAK1,0.4038433074674125,6,3,1.0
+control channel DAPI: lesion − non-lesion astrocytes,MILD16 vs SEVERE16,-0.18225206678693445,3,3,0.4
+control channel DAPI: lesion − non-lesion astrocytes,MILD30 vs SEVERE30,-0.20581078731055594,5,2,0.09523809523809523
+control channel DAPI: lesion − non-lesion astrocytes,MONOPHASIC vs REMISSION1,0.0042427805805487495,4,5,1.0
+control channel DAPI: lesion − non-lesion astrocytes,chronic vs RR PEAK1,-0.008993814448844645,6,3,1.0
+control channel 18S rRNA: lesion − non-lesion astrocytes,MILD16 vs SEVERE16,0.35300878437393846,3,3,0.1
+control channel 18S rRNA: lesion − non-lesion astrocytes,MILD30 vs SEVERE30,0.13479594710621878,5,2,0.38095238095238093
+control channel 18S rRNA: lesion − non-lesion astrocytes,MONOPHASIC vs REMISSION1,0.15109935484133358,4,5,0.19047619047619047
+control channel 18S rRNA: lesion − non-lesion astrocytes,chronic vs RR PEAK1,-0.16976394983607762,6,3,0.26190476190476186
+control channel ATP1A1/CD45/E-Cad: lesion − non-lesion astrocytes,MILD16 vs SEVERE16,0.19253491981345033,3,3,0.7
+control channel ATP1A1/CD45/E-Cad: lesion − non-lesion astrocytes,MILD30 vs SEVERE30,-0.3453154167737945,5,2,0.19047619047619047
+control channel ATP1A1/CD45/E-Cad: lesion − non-lesion astrocytes,MONOPHASIC vs REMISSION1,0.5977343765296839,4,5,0.031746031746031744
+control channel ATP1A1/CD45/E-Cad: lesion − non-lesion astrocytes,chronic vs RR PEAK1,-0.12195462530998047,6,3,0.38095238095238093
+astrocytes > 20 µm from any vessel cell,MILD16 vs SEVERE16,0.9812183026578543,3,3,0.4
+astrocytes > 20 µm from any vessel cell,MILD30 vs SEVERE30,0.7314598813660473,5,2,0.38095238095238093
+astrocytes > 20 µm from any vessel cell,MONOPHASIC vs REMISSION1,3.0672871774533492,4,5,0.031746031746031744
+astrocytes > 20 µm from any vessel cell,chronic vs RR PEAK1,1.0444117780778555,6,4,0.2571428571428571
+"white matter, > 50 µm from tissue edge",MILD16 vs SEVERE16,2.3640175856909718,3,3,0.4
+"white matter, > 50 µm from tissue edge",MILD30 vs SEVERE30,1.2352501141981342,5,2,0.38095238095238093
+"white matter, > 50 µm from tissue edge",MONOPHASIC vs REMISSION1,2.4305148446846783,4,5,0.1111111111111111
+"white matter, > 50 µm from tissue edge",chronic vs RR PEAK1,1.611392546391702,6,4,0.06666666666666667
+reactive astrocytes (Reactive_AST) only,MILD16 vs SEVERE16,1.1695446269065044,3,3,0.4
+reactive astrocytes (Reactive_AST) only,MILD30 vs SEVERE30,1.070720699452583,5,2,0.09523809523809523
+reactive astrocytes (Reactive_AST) only,MONOPHASIC vs REMISSION1,3.3018996306517696,4,5,0.015873015873015872
+reactive astrocytes (Reactive_AST) only,chronic vs RR PEAK1,0.9361336755204575,6,4,0.35238095238095235
+within state S0,MILD16 vs SEVERE16,0.563477002926343,3,3,0.2
+within state S0,MILD30 vs SEVERE30,0.6186768973953516,5,2,0.8571428571428571
+within state S0,MONOPHASIC vs REMISSION1,1.674431167013886,4,5,0.015873015873015872
+within state S0,chronic vs RR PEAK1,0.658661841243755,6,4,0.0380952380952381
+within state S1,MILD16 vs SEVERE16,3.4469761358765325,1,3,
+within state S1,MILD30 vs SEVERE30,4.629139924696521,2,2,0.3333333333333333
+within state S1,MONOPHASIC vs REMISSION1,2.7242530601034263,3,5,0.39285714285714285
+within state S1,chronic vs RR PEAK1,1.0206000660128456,6,4,0.11428571428571428
+within state S2,MILD16 vs SEVERE16,1.8420293271978885,3,3,0.4
+within state S2,MILD30 vs SEVERE30,1.669364048046527,5,2,0.09523809523809523
+within state S2,MONOPHASIC vs REMISSION1,2.3790104639441982,4,5,0.015873015873015872
+within state S2,chronic vs RR PEAK1,1.9777072874539265,6,4,0.35238095238095235
+within state S3,MILD16 vs SEVERE16,0.1282300851686033,3,3,1.0
+within state S3,MILD30 vs SEVERE30,0.3479406552344606,5,2,0.19047619047619047
+within state S3,MONOPHASIC vs REMISSION1,0.7653437910840786,4,5,0.5555555555555556
+within state S3,chronic vs RR PEAK1,0.3269674199896311,6,4,0.11428571428571428
+within state S4,MILD16 vs SEVERE16,0.982590014180813,2,3,0.8
+within state S4,MILD30 vs SEVERE30,2.4773341171159977,5,2,0.38095238095238093
+within state S4,MONOPHASIC vs REMISSION1,2.7312207242014352,3,5,0.25
+within state S4,chronic vs RR PEAK1,2.239237153311313,6,4,0.11428571428571428
+within state S5,MILD16 vs SEVERE16,1.588236381576631,2,3,0.2
+within state S5,MILD30 vs SEVERE30,-0.5836720814844029,5,2,0.5714285714285714
+within state S5,MONOPHASIC vs REMISSION1,-0.23376318002541518,4,5,0.5555555555555556
+within state S5,chronic vs RR PEAK1,1.1564756693157061,1,1,
+negative control: lesion neurons,MILD16 vs SEVERE16,-0.08993650592065693,3,3,0.7
+negative control: lesion neurons,MILD30 vs SEVERE30,0.18520219243725838,5,2,0.19047619047619047
+negative control: lesion neurons,MONOPHASIC vs REMISSION1,0.2735300638479158,4,5,0.2857142857142857
+negative control: lesion neurons,chronic vs RR PEAK1,0.22825699970369445,6,4,0.11428571428571428
+negative control: lesion oligodendrocytes,MILD16 vs SEVERE16,-0.13848089610425685,3,3,0.2
+negative control: lesion oligodendrocytes,MILD30 vs SEVERE30,0.2969351802465788,5,2,0.09523809523809523
+negative control: lesion oligodendrocytes,MONOPHASIC vs REMISSION1,0.1464640049693915,4,5,0.2857142857142857
+negative control: lesion oligodendrocytes,chronic vs RR PEAK1,0.16109277669563132,6,4,0.0380952380952381
+CALIBRATOR: VSMC αSMA/Vim (all VSMC),MILD16 vs SEVERE16,1.1590892740679104,3,3,0.2
+CALIBRATOR: VSMC αSMA/Vim (all VSMC),MILD30 vs SEVERE30,0.2518980924758185,5,2,0.5714285714285714
+CALIBRATOR: VSMC αSMA/Vim (all VSMC),MONOPHASIC vs REMISSION1,0.05505826163032346,4,5,1.0
+CALIBRATOR: VSMC αSMA/Vim (all VSMC),chronic vs RR PEAK1,0.9110730565661778,6,4,0.06666666666666667
+piece sharpness (DAPI Laplacian; NOT vimentin),MILD16 vs SEVERE16,0.02854837477207184,3,3,0.7
+piece sharpness (DAPI Laplacian; NOT vimentin),MILD30 vs SEVERE30,-0.13208824396133423,5,2,0.09523809523809523
+piece sharpness (DAPI Laplacian; NOT vimentin),MONOPHASIC vs REMISSION1,-0.007802268490195274,4,5,0.5555555555555556
+piece sharpness (DAPI Laplacian; NOT vimentin),chronic vs RR PEAK1,0.04671967774629593,6,4,0.9142857142857143
+αSMA test: astrocytes > 20 µm from any VSMC/endothelial/fibroblast,MILD16 vs SEVERE16,0.7777219688155173,3,3,0.4
+αSMA test: astrocytes > 20 µm from any VSMC/endothelial/fibroblast,MILD30 vs SEVERE30,1.2143866225656055,5,2,0.38095238095238093
+αSMA test: astrocytes > 20 µm from any VSMC/endothelial/fibroblast,MONOPHASIC vs REMISSION1,2.215516727082819,4,5,0.06349206349206349
+αSMA test: astrocytes > 20 µm from any VSMC/endothelial/fibroblast,chronic vs RR PEAK1,0.9583377985047368,6,4,0.2571428571428571
+RNA in lesion astrocytes: smooth muscle / contractile (log-norm; NOT protein),MILD16 vs SEVERE16,0.02455592155456543,3,3,0.1
+RNA in lesion astrocytes: smooth muscle / contractile (log-norm; NOT protein),MILD30 vs SEVERE30,-0.006376907229423523,5,2,1.0
+RNA in lesion astrocytes: smooth muscle / contractile (log-norm; NOT protein),MONOPHASIC vs REMISSION1,0.03352360427379608,4,5,0.5555555555555556
+RNA in lesion astrocytes: smooth muscle / contractile (log-norm; NOT protein),chronic vs RR PEAK1,0.009721383452415466,6,4,1.0
+RNA in lesion astrocytes: pericyte (log-norm; NOT protein),MILD16 vs SEVERE16,0.025360509753227234,3,3,0.2
+RNA in lesion astrocytes: pericyte (log-norm; NOT protein),MILD30 vs SEVERE30,-0.0148104727268219,5,2,0.38095238095238093
+RNA in lesion astrocytes: pericyte (log-norm; NOT protein),MONOPHASIC vs REMISSION1,0.01497890055179596,4,5,0.015873015873015872
+RNA in lesion astrocytes: pericyte (log-norm; NOT protein),chronic vs RR PEAK1,-0.016519859433174133,6,4,0.0380952380952381
+RNA in lesion astrocytes: fibroblast (log-norm; NOT protein),MILD16 vs SEVERE16,0.01808440312743187,3,3,0.2
+RNA in lesion astrocytes: fibroblast (log-norm; NOT protein),MILD30 vs SEVERE30,0.012915953993797302,5,2,0.38095238095238093
+RNA in lesion astrocytes: fibroblast (log-norm; NOT protein),MONOPHASIC vs REMISSION1,0.009153582155704498,4,5,0.19047619047619047
+RNA in lesion astrocytes: fibroblast (log-norm; NOT protein),chronic vs RR PEAK1,0.025348827242851257,6,4,0.06666666666666667
+RNA in lesion astrocytes: astrocyte reactivity (reference) (log-norm; NOT protein),MILD16 vs SEVERE16,0.03642714023590088,3,3,0.7
+RNA in lesion astrocytes: astrocyte reactivity (reference) (log-norm; NOT protein),MILD30 vs SEVERE30,0.03622567653656006,5,2,0.8571428571428571
+RNA in lesion astrocytes: astrocyte reactivity (reference) (log-norm; NOT protein),MONOPHASIC vs REMISSION1,0.1961829662322998,4,5,0.1111111111111111
+RNA in lesion astrocytes: astrocyte reactivity (reference) (log-norm; NOT protein),chronic vs RR PEAK1,-0.03584647178649902,6,4,1.0
+αSMA-type cells within 50 µm of lesion astrocytes (count; NOT vimentin),MILD16 vs SEVERE16,1.0,3,3,0.47950012218695337
+αSMA-type cells within 50 µm of lesion astrocytes (count; NOT vimentin),MILD30 vs SEVERE30,-3.0,5,2,0.23672357063785732
+αSMA-type cells within 50 µm of lesion astrocytes (count; NOT vimentin),MONOPHASIC vs REMISSION1,3.0,4,5,0.08116692350944611
+αSMA-type cells within 50 µm of lesion astrocytes (count; NOT vimentin),chronic vs RR PEAK1,0.0,6,4,0.2838764745722945
