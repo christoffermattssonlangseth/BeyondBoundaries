@@ -68,6 +68,7 @@ obs = obs.join(pd.read_parquet(ROOT / "data" / "lesion10" / "lesion_calls.parque
 obs = obs.join(pd.read_parquet(ROOT / "data" / "lesion16" / "regions.parquet"))
 cols = ["section_id", "segmentation_method", "terr_npx", "centroid_x_px", "centroid_y_px"]
 cols += [f"{c}_terr_mean" for c in CH] + [f"{c}_scale" for c in CH] + [f"{c}_bg_local" for c in CH]
+cols += ["bnd_terr_p50", "bnd_terr_p90"]
 fa = pd.read_parquet(ROOT / "data" / "features_norm_all.parquet", columns=cols)
 fa = fa[fa.segmentation_method == "Segmented by interior stain (18S)"].join(obs, how="inner")
 fa["run"] = fa.section_id.str.split("_").str[0]
@@ -99,6 +100,10 @@ fa = fa[other >= 20]
 key = fa.meta_sample_id.astype(str) + "|" + fa.rclass
 for c in CH:
     fa[f"{c}_index"] = fa[f"{c}_terr_raw"] / fa[f"{c}_terr_raw"].groupby(key).transform("median")
+# ATP1A1 territory: diffuse background (median pixel) vs bright spots (90th percentile pixel)
+for q in ["p50", "p90"]:
+    raw = fa[f"bnd_terr_{q}"] * fa.bnd_scale + fa.bnd_bg_local
+    fa[f"bnd{q}_index"] = raw / raw.groupby(key).transform("median")
 fa["les_curated"] = fa.Curated_niche_state.astype(str).str.startswith("Lesion")
 fa["phys_curated"] = fa.Curated_niche_state.astype(str) == "Physiological"
 fa["les_ctrl"] = fa.lesion_state.str.startswith("S")
@@ -449,3 +454,119 @@ plotting.save_fig(fig, "surface_confound", OUT, SRC)
 # > average shift that varies between pieces, so it is **not obvious by eye in single random crops**; the per-piece
 # > paired comparisons are the evidence. The boundary channel also contains E-cadherin and CD45, but CD45 is undetectable
 # > in mouse cord (notebook 03) and E-cadherin is not expected in WM neuropil.
+
+# %% [markdown]
+# ## 7. Anatomy confound: lesion vs *nearby* healthy white matter
+# WM tracts differ in ATP1A1 density (axon calibre and packing), and EAE lesions sit preferentially in some places
+# (sub-pial, ventral/lateral columns). Comparing lesion WM with *all* healthy WM of a piece could therefore partly
+# compare tracts. Local test: each WM lesion cell against the healthy WM cells of the same piece within 150 µm (median),
+# so the comparison stays within the same neighbourhood of white matter; lesion cells with ≥ 20 healthy WM cells in
+# that ring. Per piece: median of the per-cell local ratios. Also for deep cells only (> 100 µm from the surface).
+
+# %%
+def local_ratio(df, les, phys, radius=150, min_n=20, ch="bnd"):
+    rows = []
+    for pc, g in df[df.rclass == "WM"].groupby("meta_sample_id", observed=True):
+        Lc, Hc = g[g[les]], g[g[phys]]
+        if len(Lc) < 50 or len(Hc) < 50:
+            continue
+        t = cKDTree(Hc[["x_centroid", "y_centroid"]].to_numpy())
+        nbrs = t.query_ball_point(Lc[["x_centroid", "y_centroid"]].to_numpy(), radius)
+        hv = Hc[f"{ch}_index"].to_numpy()
+        r = [lv / np.median(hv[n]) for lv, n in zip(Lc[f"{ch}_index"].to_numpy(), nbrs) if len(n) >= min_n]
+        r = np.asarray(r)
+        r = r[np.isfinite(r) & (r > 0)]
+        if len(r) >= 30:
+            rows.append(dict(piece=pc, cells=len(r), local_ratio=np.median(r)))
+    d = pd.DataFrame(rows)
+    return d, dict(pieces=len(d), median_local_ratio=d.local_ratio.median(), share_below_1=(d.local_ratio < 1).mean(),
+                   p=wilcoxon(np.log(d.local_ratio)).pvalue if len(d) >= 6 else np.nan)
+
+
+rows = []
+for les, phys, lab in [("les_curated", "phys_curated", "curated niches"), ("les_ctrl", "phys_ctrl", "control-referenced")]:
+    for depth in [0, 100]:
+        d = fa[fa.edge_um > depth]
+        for c in ["bnd", "dapi"]:
+            _, s = local_ratio(d, les, phys, ch=c)
+            rows.append(dict(lesions=lab, deeper_than_um=depth, channel=plotting.CHANNEL_LABELS[c], **s))
+loc_tab = pd.DataFrame(rows)
+loc_tab.to_csv(OUT / "local_vs_piecewide.csv", index=False)
+loc_tab.round(3)
+
+# %% [markdown]
+# **Fair crops.** In the piece whose local ATP1A1 ratio is closest to the median: a deep WM lesion field and a healthy
+# WM field 150–300 µm away in the same white matter (both > 100 µm from the surface), ATP1A1 alone and DAPI, same
+# contrast; three such pairs from that piece.
+
+# %%
+dloc, _ = local_ratio(fa[fa.edge_um > 100], "les_curated", "phys_curated")
+pcm = dloc.iloc[(dloc.local_ratio - dloc.local_ratio.median()).abs().argsort().iloc[0]].piece
+g = fa[(fa.meta_sample_id == pcm) & (fa.rclass == "WM") & (fa.edge_um > 100)]
+Lc, Hc = g[g.les_curated], g[g.phys_curated]
+tH = cKDTree(Hc[["x_centroid", "y_centroid"]].to_numpy())
+b = XeniumBundle(bundles[str(g.section_id.iloc[0])])
+pairs = []
+for _, r in Lc.sample(min(200, len(Lc)), random_state=0).iterrows():
+    cand = tH.query_ball_point([r.x_centroid, r.y_centroid], 300)
+    cand = [i for i in cand if np.hypot(Hc.x_centroid.iloc[i] - r.x_centroid, Hc.y_centroid.iloc[i] - r.y_centroid) >= 150]
+    if cand:
+        pairs.append((r, Hc.iloc[cand[0]]))
+    if len(pairs) == 3:
+        break
+fig, axs = plt.subplots(2, 6, figsize=(17, 6))
+half = 50
+for k, (rl, rh) in enumerate(pairs):
+    ims = []
+    for r in (rl, rh):
+        h = int(half / PX)
+        img, _, _ = b.read_window(int(r.centroid_y_px) - h, int(r.centroid_x_px) - h, 2 * h, 2 * h)
+        ims.append(img)
+    hb = np.percentile(np.concatenate([i[1].ravel() for i in ims]), 99.5)
+    hd = np.percentile(np.concatenate([i[0].ravel() for i in ims]), 99.5)
+    for j, (img, lab) in enumerate(zip(ims, ["lesion WM", "nearby healthy WM"])):
+        c = 2 * k + j
+        axs[0, c].imshow(np.clip(img[1] / hb, 0, 1), cmap="magma"); axs[1, c].imshow(np.clip(img[0] / hd, 0, 1), cmap="gray")
+        axs[0, c].set_title(f"pair {k + 1}: {lab}", fontsize=8)
+        axs[0, c].axis("off"); axs[1, c].axis("off")
+fig.suptitle(f"{pcm} (piece with the median local effect): deep lesion WM vs healthy WM 150–300 µm away, 100 µm crops, "
+             "ATP1A1 (top) and DAPI (bottom), same contrast within each pair", fontsize=9)
+fig.tight_layout()
+plotting.save_fig(fig, "fair_crops_local_pairs", OUT, SRC)
+
+# %% [markdown]
+# ## 8. Loss or redistribution? Diffuse background vs bright spots
+# In the crops, lesion WM often shows bright ATP1A1 spots on a dimmer background. The territory *mean* mixes both.
+# Same local comparison for the territory's median pixel (diffuse neuropil mesh) and 90th-percentile pixel (bright
+# spots). Loss of diffuse neuropil with brighter spots = redistribution (e.g. Na⁺/K⁺-ATPase redistributed along
+# damaged/demyelinated axons, or membrane debris), not simple loss.
+
+# %%
+rows = []
+for les, phys, lab in [("les_curated", "phys_curated", "curated niches"), ("les_ctrl", "phys_ctrl", "control-referenced")]:
+    d = fa[fa.edge_um > 100]
+    for ch, nm in [("bnd", "ATP1A1 territory mean"), ("bndp50", "ATP1A1 diffuse (median pixel)"),
+                   ("bndp90", "ATP1A1 bright spots (90th pct pixel)"), ("dapi", "DAPI territory mean")]:
+        _, s_ = local_ratio(d, les, phys, ch=ch)
+        _, s2 = paired(d, f"{ch}_index", les, phys, "WM", min_n=50)
+        rows.append(dict(lesions=lab, readout=nm, local_ratio=s_.get("median_local_ratio"), local_share_below_1=s_.get("share_below_1"),
+                         local_p=s_.get("p"), piecewide_ratio=s2.get("median_ratio"), pieces=s_.get("pieces")))
+redis = pd.DataFrame(rows)
+redis.to_csv(OUT / "loss_or_redistribution.csv", index=False)
+redis.round(3)
+
+# %% [markdown]
+# ## Findings (revised after sections 7–8)
+#
+# > **Correction — part of the piece-wide effect was anatomy.** Comparing lesion WM with *all* healthy WM of a piece
+# > mixes tracts that differ in ATP1A1 density. Against healthy WM **within 150 µm** the loss is ×0.83 (curated lesions,
+# > 98 % of 102–105 pieces below 1, deep cells the same; DAPI ×1.00), versus ×0.73 piece-wide. About 40 % of the first
+# > estimate was location; a ~17 % local loss remains and is very consistent. With the broader control-referenced
+# > lesion calls the local loss is only ~3 % (×0.97), so it belongs to the dense lesion cores.
+# >
+# > **Loss, with clumps.** The diffuse neuropil mesh (median pixel) is ×0.82 locally and the bright spots (90th
+# > percentile) ×0.85, so both are lower on average. Crops show a dimmer mesh, sometimes with bright clumps on top
+# > (possibly swollen axons or debris), which is why lesions can *look* bright in places.
+# >
+# > **Overall:** a real, local, ATP1A1-specific loss of ~17 % in dense white-matter lesion cores, robust to crowding,
+# > composition and the tissue surface; smaller than first reported (×0.73) and not visible in every field.

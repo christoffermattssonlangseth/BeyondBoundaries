@@ -228,7 +228,9 @@ ATP1A1 territory index (raw territory mean ÷ median of the same piece × WM/GM)
 the same piece (≥ 100 / ≥ 50 cells), with both lesion definitions; the same index for DAPI, 18S and αSMA/vimentin as
 channel controls; density-matched (within-piece quintiles of cells within 20 µm, ≥ 30 cells per bin per group);
 regression on log density and log territory pixel count; same-cell-type comparisons; restriction to cells > 30–200 µm
-from the tissue-mask edge; per-piece Spearman with the MOL-share ratio; profiles across lesion-region edges.
+from the tissue-mask edge; per-piece Spearman with the MOL-share ratio; profiles across lesion-region edges; a local
+comparison (each lesion cell ÷ median of healthy WM cells within 150 µm, ≥ 20 cells); territory median vs 90th-percentile
+pixel (diffuse mesh vs bright spots).
 
 ### 13b. Strength of the vimentin–outcome association (notebook 18)
 
@@ -278,7 +280,9 @@ accuracy [08, 09, 13].
 - *Neuropil-loss stress test* [20]: robust to local cell density (×0.73 density-matched), lesion composition (same cell
   type ×0.67–0.77), the tissue surface (cells > 200 µm deep ×0.72, 92 % of 99 pieces) and channel (DAPI/18S territory do
   not drop); tracks myelinating-oligodendrocyte loss (ρ +0.25); deepest in active/glial lesion states, absent in late
-  fibrotic tissue. Size depends on the lesion definition (−12 to −28 %).
+  fibrotic tissue. **Correction:** part of the piece-wide contrast is tract anatomy; against healthy WM within 150 µm
+  the loss is ×0.83 (curated lesions, 98 % of pieces; DAPI ×1.00), and ~3 % with the broader control-referenced lesions,
+  so it belongs to dense lesion cores. Diffuse mesh (×0.82) and bright spots (×0.85) are both lower.
 - *Astrocyte reactive RNA precedes vimentin protein*: protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
   more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
 - ~~*Perivascular T cells orient their 18S-rich cytoplasm towards the vessel*~~ — **withdrawn** [19]. The measure

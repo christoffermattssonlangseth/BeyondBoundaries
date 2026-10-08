@@ -397,3 +397,7 @@ from surface ×0.72, 92 % of 99 pieces), channel specificity (DAPI/18S territory
 loss across pieces (ρ +0.25, p = 0.01); deepest in active/glial lesion states (×0.86), absent in late fibrotic (×1.01).
 The region-edge dip is a surface artefact on top. Not obvious by eye in random crops (average shift, varies by piece).
 **Holds.**
+- **Correction (local comparison):** against healthy WM within 150 µm (same tracts) the loss is ×0.83 (curated lesions,
+  98 % of ~103 pieces; deep cells same; DAPI ×1.00) vs ×0.73 piece-wide → ~40 % of the first estimate was anatomy.
+  Control-referenced lesions: ×0.97 locally → the loss belongs to dense lesion cores. Diffuse mesh ×0.82 and bright
+  spots ×0.85 both lower (loss, with clumps visible in places). Net: real, local, ATP1A1-specific ~17 % loss.

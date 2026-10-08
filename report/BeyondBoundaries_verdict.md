@@ -13,7 +13,7 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
 | Readout | Evidence | Use |
 |---|---|---|
 | **Segmentation** (the kit's purpose) | 18S interior stain draws ~95 % of cell masks | real; not benchmarked against alternatives here |
-| **White-matter neuropil loss** (ATP1A1 around each cell; *Atp1a1* not on the panel) | lesion WM ×0.79 (runs 5/6) and ×0.72 (runs 1–3, p < 10⁻⁴) vs healthy WM of the same piece | tissue damage the RNA can't show; **survives crowding, composition and tissue-surface controls** (notebook 20; deep cells ×0.72); −12 to −28 % depending on lesion definition; an average shift, not obvious by eye in single crops |
+| **White-matter neuropil loss** (ATP1A1 around each cell; *Atp1a1* not on the panel) | ~17 % less ATP1A1 around dense WM lesion cells than in nearby healthy WM, all five runs | tissue damage the RNA can't show; **survives crowding, composition, tissue-surface and anatomy controls** (notebook 20): vs nearby healthy WM ×0.83 in 98 % of pieces (piece-wide ×0.73 partly reflected tract anatomy); only in dense lesion cores (~3 % with broader lesion calls); not visible in every field |
 | **Astrocyte reactive RNA comes before vimentin protein** (*Vim* not on the panel) | protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes enriched in active disease in both run sets | the clearest protein-vs-RNA insight |
 | **Images alone map lesions and cell types on unseen runs** | lesion AUROC 0.85–0.91, cell type 0.42–0.47 (chance 0.07), leave-one-run-out over 5 runs | QC and annotation cross-check; redundant with RNA for biology |
 
