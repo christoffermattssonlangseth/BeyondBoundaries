@@ -23,6 +23,7 @@ def section_background(b: XeniumBundle, level: int = 3, cell_margin_um: float = 
     tissue   : smoothed DAPI+18S > Otsu (log), holes filled, small specks removed
     cellfree : tissue pixels further than cell_margin_um from any segmented cell
     af       : cell-free AND low transcript density (< af_tx_quantile of tissue) -> autofluorescence proxy
+               (QC only; all-False when the bundle has no transcripts.parquet, as for runs 1-3)
     bg_<ch>  : local background = Gaussian-weighted mean of cell-free pixels (normalised convolution)
     edge_um  : distance to tissue edge
     """
@@ -37,8 +38,11 @@ def section_background(b: XeniumBundle, level: int = 3, cell_margin_um: float = 
     cells = b.cell_mask_lowres(f)[:shape[0], :shape[1]]
     near_cell = ndi.binary_dilation(cells, iterations=max(1, int(round(cell_margin_um / px))))
     cellfree = tissue & ~near_cell
-    tx = ndi.gaussian_filter(b.transcript_density(f)[:shape[0], :shape[1]].astype(np.float32), 5.0 / px)
-    af = cellfree & (tx < np.quantile(tx[tissue], af_tx_quantile))
+    if (b.path / "transcripts.parquet").exists():
+        tx = ndi.gaussian_filter(b.transcript_density(f)[:shape[0], :shape[1]].astype(np.float32), 5.0 / px)
+        af = cellfree & (tx < np.quantile(tx[tissue], af_tx_quantile))
+    else:
+        tx, af = np.full(shape, np.nan, np.float32), np.zeros(shape, bool)
     w = ndi.gaussian_filter(cellfree.astype(np.float32), smooth_um / px)
     out = {"px_um": px, "tissue": tissue, "cellfree": cellfree, "af": af, "tx_density": tx, "cells": cells,
            "edge_um": ndi.distance_transform_edt(tissue) * px, "img": imgs}
