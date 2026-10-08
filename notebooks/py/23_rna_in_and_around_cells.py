@@ -88,11 +88,12 @@ MYELIN = ["mbp", "myelin_ctrl", "cnp"]
 a = ad.read_h5ad(ROOT / "data" / "RRMAP2_all_runs.h5ad", backed="r")
 obs = a.obs[a.obs.run_id.isin(["run5", "run6"])][
     ["sample_name", "meta_sample_id", "sample_id", "stage", "model", "Anno_L1_curated", "Curated_niche_state",
-     "Global_anatomical_region", "x_centroid", "y_centroid", "cell_area", "nucleus_area"]].copy()
+     "Global_anatomical_region", "x_centroid", "y_centroid", "cell_area", "nucleus_area", "segmentation_method",
+     "run_id"]].copy()
 genes = a.var_names.copy()
 del a
 for c in ["sample_name", "meta_sample_id", "sample_id", "stage", "model", "Anno_L1_curated", "Curated_niche_state",
-          "Global_anatomical_region"]:
+          "Global_anatomical_region", "segmentation_method", "run_id"]:
     obs[c] = obs[c].astype(str)
 obs["arm"] = np.where(obs.model.str.startswith("CHRONIC"), "chronic", "RR")
 obs = obs.join(pd.read_parquet(ROOT / "data" / "lesion10" / "lesion_calls.parquet")[["lesion_state", "ctype"]])
@@ -102,6 +103,11 @@ obs["zone"] = np.select(
     [rd >= 30, rd >= -30, rd >= -150, ((rd < -150) | rd.isna()) & (obs.lesion_state == "no lesion")],
     ["core", "edge", "near", "healthy"], default="other")
 obs["wm"] = obs.Global_anatomical_region.isin(WM)
+# second lesion definition for the robustness checks: curated lesion niches vs physiological niche
+obs["zone_cur"] = np.select([obs.Curated_niche_state.str.startswith("Lesion"), obs.Curated_niche_state == "Physiological"],
+                            ["core", "healthy"], default="other")
+obs["seg"] = obs.segmentation_method.str.replace("Segmented by ", "", regex=False)
+ARM = obs.drop_duplicates("sample_name").set_index("sample_name").arm
 clin = pd.read_csv(ROOT / "data" / "clinical" / "animal_course_metrics.csv", index_col=0)
 print(obs.zone.value_counts().to_string())
 print(pd.crosstab(obs.drop_duplicates("sample_name").stage, obs.drop_duplicates("sample_name").arm).to_string())
@@ -144,13 +150,17 @@ for sid in sorted(obs.sample_id.unique()):
     # pooled counts per animal x cell type x zone (healthy / core), for the gene-level nuclear screen
     o = obs.loc[names]
     keep = o.zone.isin(["healthy", "core"]).to_numpy()
-    key = (o.sample_name + "|" + o.Anno_L1_curated + "|" + o.zone).to_numpy()
+    key = (o.sample_name + "|" + o.ctype.astype(str) + "|" + o.zone).to_numpy()
     codes, uniq = pd.factorize(key[keep])
     ind = sp.csr_matrix((np.ones(len(codes)), (codes, np.flatnonzero(keep))), shape=(len(uniq), n))
     pool_keys += list(uniq)
     pool_tot.append((ind @ tot).toarray().astype(np.float32))
     pool_nuc.append((ind @ nuc).toarray().astype(np.float32))
 cells = obs.join(pd.concat(parts).fillna(0), how="inner")
+cells["size_third"] = cells.groupby("Anno_L1_curated").cell_area.transform(
+    lambda x: pd.qcut(x.rank(method="first"), 3, labels=["small", "mid", "large"])).astype(str)
+cells.drop(columns=[c for c in cells if cells[c].dtype == object and c not in obs]).to_parquet(
+    SUB / "cells_compartments.parquet")
 # an animal can have pieces on several sections: sum its pools across sections
 codes, uniq = pd.factorize(np.array(pool_keys))
 agg = sp.csr_matrix((np.ones(len(codes)), (codes, np.arange(len(codes)))), shape=(len(uniq), len(codes)))
@@ -198,6 +208,126 @@ def profile(ax, v, label, color, ref="healthy"):
 def report(rows):
     t = pd.DataFrame(rows)
     return t.round(3)
+
+
+def robust(d, vfn, label):
+    """The same core-vs-healthy contrast under each confound check. vfn(cells, by) -> value per (animal, zone)."""
+    z = ("sample_name", "zone")
+    checks = [("main: lesion-region zones", d, z), ("curated lesion niches vs physiological", d, ("sample_name", "zone_cur"))]
+    checks += [(f"{r} only", d[d.run_id == r], z) for r in ["run5", "run6"]]
+    checks += [(f"segmented by {m}", s, z) for m, s in d.groupby("seg") if len(s) > 2000]
+    checks += [(f"{k} cells (size third)", s, z) for k, s in d.groupby("size_third")]
+    rows = []
+    for name, s, by in checks:
+        try:
+            rows.append(dict(readout=label, check=name, **contrast(vfn(s, by))))
+        except (KeyError, ValueError, ZeroDivisionError):
+            rows.append(dict(readout=label, check=name, animals=0))
+    return pd.DataFrame(rows)
+
+
+def paired_plot(ax, v, title, a="healthy", b="core", log=True):
+    w = v.unstack()
+    if a not in w or b not in w:
+        return
+    w = w[[a, b]].replace([np.inf, -np.inf], np.nan).dropna()
+    for an_, r in w.iterrows():
+        ax.plot([0, 1], [r[a], r[b]], color=COL[0] if ARM.get(an_) == "chronic" else COL[1], alpha=0.6, marker="o", ms=3,
+                lw=1)
+    if log:
+        ax.set_yscale("log")
+    ax.set_xticks([0, 1], [a, b])
+    ax.set_xlim(-0.3, 1.3)
+    ax.set_title(f"{title}\n{(w[b] < w[a]).sum()} of {len(w)} animals lower in {b}", fontsize=8)
+
+
+def zf(fn):
+    """per-zone value function for robust(): fn applied to pooled cells."""
+    return lambda s, by: per_zone(s, fn, by=by)
+
+
+def fmt(t):
+    """one cell per check x readout: '×ratio (k/n animals lower, p)'."""
+    t = t.copy()
+    order = list(dict.fromkeys(t.check))
+    def cell(r):
+        if not r.get("animals") or pd.isna(r.get("core_over_healthy")):
+            return "n/a"
+        k = int(round(r.share_lower * r.animals))
+        return f"×{r.core_over_healthy:.2f} ({k}/{int(r.animals)} lower, p={r.p:.2g})"
+    t["result"] = t.apply(cell, axis=1)
+    return t.pivot(index="check", columns="readout", values="result").reindex(order)
+
+
+# %%
+# image helpers: crops with outlines, nuclei and transcripts; random galleries
+cfg = data.load_config()
+cfg["runs"] = {k: v for k, v in cfg["runs"].items() if k in ("run5", "run6")}
+bundles = find_bundles(cfg)
+
+
+def crop_points(sid, x0, y0, w):
+    t = pq.read_table(SUB / f"{sid}_points.parquet", columns=["x", "y", "gene", "in_cell"],
+                      filters=[("x", ">=", x0), ("x", "<", x0 + w), ("y", ">=", y0), ("y", "<", y0 + w)])
+    return t.to_pandas()
+
+
+_LAB, _BUN = {}, {}
+
+
+def cell_labels(sid):
+    """cell_id -> mask label (cells.parquet row + 1; order checked against cells.zarr in io.XeniumBundle.cells)."""
+    if sid not in _LAB:
+        c = pd.read_parquet(bundles[sid] / "cells.parquet", columns=["cell_id"]).cell_id
+        _LAB[sid] = pd.Series(np.arange(1, len(c) + 1), index=c.to_numpy())
+    return _LAB[sid]
+
+
+def show_crop(ax, row, w_um, layers, cell_hl=None, hl_color="#f1c40f", title=""):
+    if row.sample_id not in _BUN:
+        _BUN[row.sample_id] = XeniumBundle(bundles[row.sample_id])
+    b = _BUN[row.sample_id]
+    px = b.pixel_size
+    x0, y0 = row.x_centroid - w_um / 2, row.y_centroid - w_um / 2
+    img, lab, nucl = b.read_window(int(y0 / px), int(x0 / px), int(w_um / px), int(w_um / px))
+    bnd = img[1]
+    ax.imshow(np.clip(bnd / np.percentile(bnd, 99.5), 0, 1), cmap="gray", extent=(0, w_um, w_um, 0))
+    edges = find_boundaries(lab, mode="inner")
+    ov = np.zeros((*lab.shape, 4))
+    ov[edges] = (0.55, 0.55, 0.55, 0.5)
+    ov[find_boundaries(nucl, mode="inner")] = (0.35, 0.55, 1.0, 0.6)
+    if cell_hl is not None:
+        ids = cell_labels(row.sample_id)
+        hl = ids.reindex(cell_hl).dropna().astype(int).to_numpy()
+        ov[edges & np.isin(lab, hl)] = (*plt.matplotlib.colors.to_rgb(hl_color), 1)
+    ax.imshow(ov, extent=(0, w_um, w_um, 0))
+    p = crop_points(row.sample_id, x0, y0, w_um)
+    for genes_, inside, color, sz in layers:
+        q = p[p.gene.astype(str).isin(genes_)]
+        if inside is not None:
+            q = q[q.in_cell == inside]
+        ax.scatter(q.x - x0, q.y - y0, s=sz, c=color, lw=0, alpha=0.8)
+    ax.set_title(title, fontsize=8)
+    ax.axis("off")
+
+
+def gallery(groups, w_um, layers, n=6, seed=0, suptitle="", name=None):
+    """n random cells per group, one per animal (random animals), same layers; rows = groups."""
+    rng_ = np.random.default_rng(seed)
+    fig, axs = plt.subplots(len(groups), n, figsize=(2.6 * n, 2.8 * len(groups)), squeeze=False)
+    for i, (lab_, s) in enumerate(groups):
+        an_ = rng_.permutation(s.sample_name.unique())[:n]
+        for j, a_ in enumerate(an_):
+            sa = s[s.sample_name == a_]
+            r = sa.iloc[rng_.integers(len(sa))]
+            show_crop(axs[i, j], r, w_um, layers, cell_hl=[r.name.split(":")[1]],
+                      title=f"{lab_} · {a_} ({r.stage})")
+        for j in range(len(an_), n):
+            axs[i, j].axis("off")
+    fig.suptitle(suptitle, fontsize=9)
+    fig.tight_layout()
+    if name:
+        plotting.save_fig(fig, name, OUT, SRC)
 
 
 # %% [markdown]
@@ -291,47 +421,69 @@ fig.tight_layout()
 plotting.save_fig(fig, "q1_mbp_zone_profiles", OUT, SRC)
 
 # %% [markdown]
+# ### Is it real? Section 1 under the confound checks
+# Each row repeats the core-vs-healthy contrast: the other lesion definition (curated niches), each run alone, each
+# segmentation method alone (outlines from 18S, the boundary stain or nucleus expansion capture the soma differently),
+# and each size third of the cells (small lesion oligodendrocytes could simply capture less perinuclear *Mbp*). Cells:
+# ×ratio core ÷ healthy (median over animals), animals lower, Wilcoxon p.
+
+# %%
+def olz(fn, states=None):
+    def f(s, by):
+        o_ = s[s.Anno_L1_curated == "Oligodendrocyte"]
+        if states:
+            o_ = o_[o_.ctype.isin(states)]
+        return per_zone(o_, fn, by=by)
+    return f
+
+
+def amb(s, by):
+    return per_zone(s[~s.Anno_L1_curated.isin(["Oligodendrocyte", "OPC"])], ratio("halo_mbp", "halo_area"), by=by)
+
+
+def own_halo(states=None):
+    return lambda s, by: (olz(ratio("halo_mbp", "halo_area"), states)(s, by) / amb(s, by)).dropna()
+
+
+r1 = pd.concat([robust(wm, olz(ratio("mbp_cell", "myelin_ctrl_cell")), "Mbp ÷ control, soma (all oligos)"),
+                robust(wm, olz(ratio("mbp_cell", "myelin_ctrl_cell"), ["MOL"]), "Mbp ÷ control, soma (MOL only)"),
+                robust(wm, own_halo(["NFOL"]), "own Mbp halo ÷ ambient (NFOL)"),
+                robust(wm, amb, "ambient Mbp around other WM cells")])
+r1.round(4).to_csv(OUT / "q1_robustness.csv", index=False)
+fmt(r1)
+
+# %% [markdown]
+# **Per animal.** One line per animal from its healthy white matter to its lesion core (blue chronic, orange RR).
+
+# %%
+fig, axs = plt.subplots(1, 4, figsize=(15, 3.8))
+paired_plot(axs[0], r_soma, "Mbp ÷ control myelin genes, soma\n(all WM oligodendrocytes)")
+paired_plot(axs[1], olz(ratio("mbp_cell", "myelin_ctrl_cell"), ["MOL"])(wm, ("sample_name", "zone")),
+            "same, mature oligodendrocytes (MOL)")
+paired_plot(axs[2], own_halo(["NFOL"])(wm, ("sample_name", "zone")), "own Mbp halo ÷ ambient\n(newly formed, NFOL)")
+paired_plot(axs[3], r_amb, "ambient Mbp per µm² free space\n(around non-oligodendrocyte WM cells)")
+fig.tight_layout()
+plotting.save_fig(fig, "q1_per_animal", OUT, SRC)
+
+# %% [markdown]
+# **Random oligodendrocytes, healthy vs lesion core.** Six random white-matter oligodendrocytes per row, one per random
+# animal (seed 0; not selected for the effect), 25 µm crops: the cell outlined in yellow, nuclei in blue, *Mbp* inside
+# outlines (red) and outside (cyan), control myelin genes (yellow dots).
+
+# %%
+L1 = [(["Mbp"], False, "#3fd0f0", 4), (["Mbp"], True, "#e74c3c", 7), (SETS["myelin_ctrl"], None, "#f1c40f", 9)]
+for st_ in ["MOL", "NFOL"]:
+    o_ = ol[ol.ctype == st_]
+    gallery([(f"healthy {st_}", o_[o_.zone == "healthy"]), (f"core {st_}", o_[o_.zone == "core"])], 25, L1,
+            suptitle=f"random white-matter {st_} oligodendrocytes: Mbp inside (red) / outside (cyan), control myelin "
+                     f"genes (yellow)", name=f"q1_gallery_{st_}")
+
+# %% [markdown]
 # **Seeing it.** Healthy vs lesion-core white matter of the same piece (the animal with the most core-zone
 # oligodendrocytes): ATP1A1/CD45/E-cad channel (grey), cell outlines (thin), oligodendrocytes outlined in yellow, *Mbp*
 # transcripts inside an outline (red) and outside (cyan), control myelin genes (yellow dots).
 
 # %%
-cfg = data.load_config()
-cfg["runs"] = {k: v for k, v in cfg["runs"].items() if k in ("run5", "run6")}
-bundles = find_bundles(cfg)
-
-
-def crop_points(sid, x0, y0, w):
-    t = pq.read_table(SUB / f"{sid}_points.parquet", columns=["x", "y", "gene", "in_cell"],
-                      filters=[("x", ">=", x0), ("x", "<", x0 + w), ("y", ">=", y0), ("y", "<", y0 + w)])
-    return t.to_pandas()
-
-
-def show_crop(ax, row, w_um, layers, cell_hl=None, hl_color="#f1c40f", title=""):
-    b = XeniumBundle(bundles[row.sample_id])
-    px = b.pixel_size
-    x0, y0 = row.x_centroid - w_um / 2, row.y_centroid - w_um / 2
-    img, lab, _ = b.read_window(int(y0 / px), int(x0 / px), int(w_um / px), int(w_um / px))
-    bnd = img[1]
-    ax.imshow(np.clip(bnd / np.percentile(bnd, 99.5), 0, 1), cmap="gray", extent=(0, w_um, w_um, 0))
-    edges = find_boundaries(lab, mode="inner")
-    ov = np.zeros((*lab.shape, 4))
-    ov[edges] = (0.55, 0.55, 0.55, 0.5)
-    if cell_hl is not None:
-        ids = b.cells().set_index("cell_id").label
-        hl = ids.reindex(cell_hl).dropna().astype(int).to_numpy()
-        ov[edges & np.isin(lab, hl)] = (*plt.matplotlib.colors.to_rgb(hl_color), 1)
-    ax.imshow(ov, extent=(0, w_um, w_um, 0))
-    p = crop_points(row.sample_id, x0, y0, w_um)
-    for genes_, inside, color, sz in layers:
-        q = p[p.gene.astype(str).isin(genes_)]
-        if inside is not None:
-            q = q[q.in_cell == inside]
-        ax.scatter(q.x - x0, q.y - y0, s=sz, c=color, lw=0, alpha=0.8)
-    ax.set_title(title, fontsize=8)
-    ax.axis("off")
-
-
 cnt = ol[ol.zone == "core"].groupby("meta_sample_id").size()
 pc = cnt.idxmax()
 g = ol[ol.meta_sample_id == pc]
@@ -451,6 +603,70 @@ q2d = report(rows)
 q2d.to_csv(OUT / "q2_depth_index.csv", index=False)
 q2d
 
+# %% [markdown]
+# ### Is it real? Section 2 under the confound checks
+# Here the claim is about the *level* in lesion cores, so each row compares myeloid cells with astrocytes **within the
+# core** (ratio = myeloid ÷ astrocyte; "lower" = myeloid lower), under the same checks. Then the *Cd68* result: are
+# *Cd68*-high myeloid cells simply bigger (so less RNA per µm²)? Per tertile: cell area, and myelin RNA per transcript
+# instead of per µm².
+
+# %%
+def vs_astro(mat):
+    def f(s, by):
+        s = s[s[by[1]] == "core"]
+        m_ = per_zone(s[s.grp == "myeloid"], uptake(mat), by=("sample_name",))
+        a_ = per_zone(s[s.grp == "astrocyte"], uptake(mat), by=("sample_name",))
+        return pd.concat({"healthy": a_, "core": m_}).swaplevel().sort_index()
+    return f
+
+
+r2 = pd.concat([robust(cells, vs_astro("myelin"), "myelin uptake: myeloid ÷ astrocyte (core)"),
+                robust(cells, vs_astro("axon"), "axonal uptake: myeloid ÷ astrocyte (core)")])
+r2.round(4).to_csv(OUT / "q2_robustness.csv", index=False)
+fmt(r2)
+
+# %%
+rows = []
+for zn in ["healthy", "core"]:
+    s = my[my.zone == zn]
+    g = s.groupby(["sample_name", "cd68_tertile"], observed=True)
+    t = pd.DataFrame({"area": g.cell_area.median(), "myelin_per_transcript": g.myelin_cell.sum() / g.n_total.sum(),
+                      "transcripts": g.n_total.median()}).unstack()
+    for c in ["area", "myelin_per_transcript", "transcripts"]:
+        lf = np.log2(t[c]["high"] / t[c]["low"]).replace([np.inf, -np.inf], np.nan).dropna()
+        rows.append(dict(zone=zn, measure=c, animals=len(lf), high_over_low_Cd68=2 ** lf.median(),
+                         share_above=(lf > 0).mean(), p=wilcoxon(lf).pvalue if len(lf) >= 5 else np.nan))
+q2e = report(rows)
+q2e.to_csv(OUT / "q2_cd68_confounds.csv", index=False)
+q2e
+
+# %%
+fig, axs = plt.subplots(1, 3, figsize=(12, 3.8))
+paired_plot(axs[0], vs_astro("myelin")(cells, ("sample_name", "zone")).rename(lambda x: x, level=1),
+            "lesion core: myelin uptake\nastrocytes (left) vs myeloid (right)")
+axs[0].set_xticks([0, 1], ["astrocyte", "myeloid"])
+paired_plot(axs[1], vs_astro("axon")(cells, ("sample_name", "zone")), "lesion core: axonal uptake\nastrocytes vs myeloid")
+axs[1].set_xticks([0, 1], ["astrocyte", "myeloid"])
+v = per_zone(my[my.zone == "core"], uptake("myelin"), by=("sample_name", "cd68_tertile"), min_cells=10)
+v = v.unstack()[["low", "high"]].stack().rename_axis(["sample_name", "zone"])
+paired_plot(axs[2], v, "core myeloid: myelin uptake\nCd68-low vs Cd68-high", a="low", b="high")
+fig.tight_layout()
+plotting.save_fig(fig, "q2_per_animal", OUT, SRC)
+
+# %% [markdown]
+# **Random cells, lesion core.** Six random core myeloid cells and six random core astrocytes (one per random animal,
+# seed 0), 30 µm crops: the cell outlined in yellow, nuclei blue, myelin RNA inside outlines (red) and outside (cyan),
+# phagocyte genes (green), astrocyte genes (violet).
+
+# %%
+myel = [g for k in MYELIN for g in SETS[k]]
+L2 = [(myel, False, "#3fd0f0", 4), (myel, True, "#e74c3c", 8), (SETS["phago"] + ["Cd68"], None, "#2ecc71", 8),
+      (SETS["astro"], None, "#b07cff", 6)]
+gallery([("core myeloid", cells[(cells.grp == "myeloid") & (cells.zone == "core")]),
+         ("core astrocyte", cells[(cells.grp == "astrocyte") & (cells.zone == "core")])], 30, L2,
+        suptitle="random lesion-core cells: is myelin RNA inside myeloid cells (red) more than in astrocytes?",
+        name="q2_gallery_random")
+
 # %%
 fig, axs = plt.subplots(1, 3, figsize=(15, 3.9))
 for ax, mat in zip(axs[:2], ["myelin", "axon"]):
@@ -491,7 +707,8 @@ for ax, (_, r) in zip(np.atleast_1d(axs), top.iterrows()):
                                                                                     "#2ecc71", 9)],
               cell_hl=[r.name.split(":")[1]], title=f"{r.sample_name} ({r.stage}) · {r.ctype}\n"
                                                     f"{int(r.myelin_cell)} myelin transcripts inside")
-fig.suptitle("lesion-core myeloid cells with the most myelin RNA inside relative to around (30 µm crops)", fontsize=9)
+fig.suptitle("SELECTED, not representative: the lesion-core myeloid cell with the highest myelin uptake ratio in each of "
+             "the top 4 animals (30 µm crops)", fontsize=9)
 fig.tight_layout()
 plotting.save_fig(fig, "q2_myeloid_crops", OUT, SRC)
 
@@ -523,8 +740,10 @@ q3
 # %%
 pk = pool.key.str.split("|", expand=True)
 pk.columns = ["animal", "type", "zone"]
+SCREEN_TYPES = ["MOL", "NFOL", "DAO", "OPC/COP", "Microglia", "MDM", "Reactive astro", "Homeostatic astro",
+                "Endothelial", "Fibroblast", "Exc neuron", "Inh neuron"]
 rows = []
-for t in TYPES:
+for t in SCREEN_TYPES:
     res = {}
     for zn in ["healthy", "core"]:
         m = ((pk.type == t) & (pk.zone == zn)).to_numpy()
@@ -560,7 +779,7 @@ for t, colr in zip(TYPES, COL):
 axs[0].set_ylabel("nuclear RNA ÷ nuclear area share,\n÷ the animal's healthy value")
 axs[0].set_title("nuclear RNA concentration across lesion zones")
 axs[0].legend(fontsize=6, ncol=2)
-for i, t in enumerate(TYPES):
+for i, t in enumerate(SCREEN_TYPES):
     d = scr[scr.cell_type == t]
     if len(d):
         axs[1].scatter(np.log2(d.core_over_healthy), -np.log10(d.p), s=4, color=COL[i], alpha=0.5, label=t)
@@ -592,12 +811,51 @@ q3c.to_csv(OUT / "q3_vs_clinical.csv", index=False)
 q3c
 
 # %% [markdown]
+# ### Is it real? Section 3 under the confound checks
+# Nuclear share depends on how the outline was drawn (18S, boundary stain, nucleus expansion) and on cell size, so
+# each is checked alone; MOL only removes the shift in oligodendrocyte state between zones.
+
+# %%
+nucx = lambda g: (g.n_nuc.sum() / g.n_total.sum()) / (g.nucleus_area.sum() / g.cell_area.sum())
+r3 = pd.concat([robust(cells[cells.Anno_L1_curated == t], zf(nucx), t) for t in ["Oligodendrocyte", "OPC", "Myeloid",
+                                                                                 "Astrocyte"]]
+               + [robust(cells[cells.ctype == "MOL"], zf(nucx), "MOL only")])
+r3.round(4).to_csv(OUT / "q3_robustness.csv", index=False)
+fmt(r3)
+
+# %% [markdown]
+# **Per animal and per cell.** Left: one line per animal (nuclear RNA share ÷ nuclear area share). Right: per-cell
+# distribution of the same quantity (log odds of a transcript being nuclear minus log odds of nuclear area), healthy vs
+# core oligodendrocytes, pooled over animals: a small shift of the whole distribution, or a subset of cells?
+
+# %%
+fig, axs = plt.subplots(1, 3, figsize=(13, 3.8))
+paired_plot(axs[0], nucz["Oligodendrocyte"], "oligodendrocytes", log=False)
+paired_plot(axs[1], nucz["OPC"], "OPC", log=False)
+o_ = cells[(cells.Anno_L1_curated == "Oligodendrocyte") & cells.zone.isin(["healthy", "core"]) & (cells.n_total >= 50)]
+fr = ((o_.n_nuc + 0.5) / (o_.n_total + 1)).clip(1e-3, 1 - 1e-3)
+ar = (o_.nucleus_area / o_.cell_area).clip(1e-3, 1 - 1e-3)
+ex = np.log(fr / (1 - fr)) - np.log(ar / (1 - ar))
+for zn, colr in [("healthy", ZCOL["healthy"]), ("core", ZCOL["core"])]:
+    x = ex[o_.zone == zn]
+    axs[2].hist(x, bins=80, range=(-3, 3), density=True, histtype="step", color=colr, lw=1.5,
+                label=f"{zn} (n={len(x):,}, median {x.median():+.2f})")
+axs[2].set_xlabel("per-cell nuclear excess (log odds)")
+axs[2].legend(fontsize=7)
+axs[2].set_title("oligodendrocytes, cells with >= 50 transcripts", fontsize=8)
+fig.tight_layout()
+plotting.save_fig(fig, "q3_per_animal", OUT, SRC)
+
+# %% [markdown]
 # ## 4. What does the space between cells lose in white-matter lesions?
 # RNA outside cell outlines in white matter, per µm² of free space within 10 µm of a cell: myelin RNA (*Mbp* and the
 # other myelin genes), axonal RNA (neurofilaments, *Stmn2*, *Gap43*), astrocyte RNA (*Gfap*, *Aqp4*, …) and all genes.
-# **Local comparison as in notebook 20:** within each piece, core-zone WM cells against healthy WM cells within 150 µm
-# of them, so tract anatomy can't drive the difference. Next to it, the ATP1A1 neuropil index of the same cells
-# (notebook 20 definition), so protein and RNA loss can be compared piece by piece.
+# **Local comparison as in notebook 20:** within each piece, white-matter cells of curated lesion niches against
+# physiological-niche WM cells within 150 µm of them (the comparison behind the ×0.83 ATP1A1 neuropil loss), so tract
+# anatomy can't drive the difference. Next to it, the ATP1A1 neuropil index of the same cells (notebook 20 definition),
+# so protein and RNA loss can be compared piece by piece. Checks: the lesion-region zones instead (core vs healthy WM,
+# which by definition lies > 150 µm away, so within 400 µm), and each run alone. "Free space" = area within 10 µm of a
+# cell that lies outside every outline; less of it in crowded lesions is why densities are per µm² of free space.
 
 # %%
 fa = pd.read_parquet(ROOT / "data" / "features_norm_all.parquet",
@@ -608,31 +866,54 @@ w4 = cells[cells.wm].join(raw.rename("atp_raw"))
 w4["atp_index"] = w4.atp_raw / w4.groupby("meta_sample_id").atp_raw.transform("median")
 w4["halo_myelin"] = w4[[f"halo_{k}" for k in MYELIN]].sum(1)
 MATS = {"myelin RNA": "halo_myelin", "axonal RNA": "halo_axon", "astrocyte RNA": "halo_astro", "all RNA": "halo_all"}
-rows = []
-for pc, g in w4.groupby("meta_sample_id"):
-    L, H = g[g.zone == "core"], g[g.zone == "healthy"]
-    if len(L) < 30 or len(H) < 30:
-        continue
-    dist, _ = cKDTree(L[["x_centroid", "y_centroid"]].to_numpy()).query(H[["x_centroid", "y_centroid"]].to_numpy())
-    Hn = H[dist <= 150]
-    if len(Hn) < 30:
-        continue
-    r = dict(piece=pc, animal=g.sample_name.iloc[0], stage=g.stage.iloc[0], arm=g.arm.iloc[0], core_cells=len(L),
-             healthy_cells=len(Hn), ATP1A1=L.atp_index.median() / Hn.atp_index.median())
-    for lab_, c in MATS.items():
-        r[lab_] = (L[c].sum() / L.halo_area.sum()) / (Hn[c].sum() / Hn.halo_area.sum())
-    r["myelin share of outside RNA"] = (L.halo_myelin.sum() / L.halo_all.sum()) / (Hn.halo_myelin.sum() / Hn.halo_all.sum())
-    r["axonal share of outside RNA"] = (L.halo_axon.sum() / L.halo_all.sum()) / (Hn.halo_axon.sum() / Hn.halo_all.sum())
-    rows.append(r)
-q4p = pd.DataFrame(rows)
-q4p.to_csv(OUT / "q4_pieces_core_vs_local_healthy.csv", index=False)
-vals = ["ATP1A1"] + list(MATS) + ["myelin share of outside RNA", "axonal share of outside RNA"]
-an = q4p.groupby("animal")[vals].apply(lambda d: np.exp(np.log(d).mean()))
-q4 = pd.DataFrame([dict(readout=v, pieces=q4p[v].notna().sum(), animals=an[v].notna().sum(),
-                        core_over_local_healthy=np.exp(np.log(an[v]).median()), share_lower=(an[v] < 1).mean(),
-                        p=wilcoxon(np.log(an[v].dropna())).pvalue) for v in vals]).round(4)
-q4.to_csv(OUT / "q4_summary.csv", index=False)
-q4
+vals = ["ATP1A1"] + list(MATS) + ["myelin share of outside RNA", "axonal share of outside RNA", "free space per cell"]
+
+
+def q4_pieces(d, zcol="zone_cur", radius=150, min_n=30):
+    rows = []
+    for pc, g in d.groupby("meta_sample_id"):
+        L, H = g[g[zcol] == "core"], g[g[zcol] == "healthy"]
+        if len(L) < min_n or len(H) < min_n:
+            continue
+        dist, _ = cKDTree(L[["x_centroid", "y_centroid"]].to_numpy()).query(H[["x_centroid", "y_centroid"]].to_numpy())
+        Hn = H[dist <= radius]
+        if len(Hn) < min_n:
+            continue
+        r = dict(piece=pc, animal=g.sample_name.iloc[0], stage=g.stage.iloc[0], arm=g.arm.iloc[0], lesion_cells=len(L),
+                 healthy_cells=len(Hn), ATP1A1=L.atp_index.median() / Hn.atp_index.median())
+        for lab_, c in MATS.items():
+            r[lab_] = (L[c].sum() / L.halo_area.sum()) / (Hn[c].sum() / Hn.halo_area.sum())
+        r["myelin share of outside RNA"] = (L.halo_myelin.sum() / L.halo_all.sum()) / (Hn.halo_myelin.sum() / Hn.halo_all.sum())
+        r["axonal share of outside RNA"] = (L.halo_axon.sum() / L.halo_all.sum()) / (Hn.halo_axon.sum() / Hn.halo_all.sum())
+        r["free space per cell"] = L.halo_area.mean() / Hn.halo_area.mean()
+        rows.append(r)
+    return pd.DataFrame(rows)
+
+
+def q4_summary(pp, label):
+    if pp.empty:
+        return pd.DataFrame([dict(check=label, readout=v, animals=0) for v in vals]), None
+    an_ = pp.groupby("animal")[vals].apply(lambda d: np.exp(np.log(d).mean()))
+    rows = []
+    for v in vals:
+        x = np.log(an_[v]).replace([np.inf, -np.inf], np.nan).dropna()
+        rows.append(dict(check=label, readout=v, pieces=pp[v].notna().sum(), animals=len(x),
+                         core_over_healthy=np.exp(x.median()), share_lower=(x < 0).mean(),
+                         p=wilcoxon(x).pvalue if len(x) >= 5 else np.nan))
+    return pd.DataFrame(rows), an_
+
+
+q4p = q4_pieces(w4)
+q4p.to_csv(OUT / "q4_pieces_lesion_vs_local_healthy.csv", index=False)
+q4, an = q4_summary(q4p, "main: curated lesion niches vs physiological WM within 150 µm")
+checks = [q4]
+checks.append(q4_summary(q4_pieces(w4, "zone", 400), "lesion-region core vs healthy WM within 400 µm")[0])
+for r_ in ["run5", "run6"]:
+    checks.append(q4_summary(q4_pieces(w4[w4.run_id == r_]), f"{r_} only")[0])
+r4 = pd.concat(checks)
+r4.round(4).to_csv(OUT / "q4_summary_and_robustness.csv", index=False)
+print(f"{len(q4p)} pieces, {q4p.animal.nunique()} animals")
+fmt(r4)
 
 # %%
 cor = pd.DataFrame([dict(x="ATP1A1", y=v, **dict(zip(["rho", "p"], spearmanr(np.log(q4p.ATP1A1), np.log(q4p[v]))))) for v in
@@ -650,33 +931,30 @@ for i, v in enumerate(vv):
                    s=12, color="0.3", zorder=3)
 axs[0].set_xticks(range(1, len(vv) + 1), vv, rotation=20)
 axs[0].axhline(0, color="0.6", ls="--", lw=0.8)
-axs[0].set_ylabel("log2 lesion core ÷ nearby healthy WM")
+axs[0].set_ylabel("log2 lesion ÷ nearby healthy WM")
 axs[0].set_title("per animal: what is lost from the space between cells")
 for ax, v in zip(axs[1:], ["myelin RNA", "axonal RNA"]):
     ax.scatter(np.log2(q4p.ATP1A1), np.log2(q4p[v]), s=18, c=[COL[0] if a_ == "chronic" else COL[1] for a_ in q4p.arm])
     ax.axhline(0, color="0.6", ls="--", lw=0.8)
     ax.axvline(0, color="0.6", ls="--", lw=0.8)
     r = cor.set_index("y").loc[v]
-    ax.set_xlabel("log2 ATP1A1 neuropil, core ÷ local healthy")
-    ax.set_ylabel(f"log2 {v} outside cells, core ÷ local healthy")
+    ax.set_xlabel("log2 ATP1A1 neuropil, lesion ÷ local healthy")
+    ax.set_ylabel(f"log2 {v} outside cells, lesion ÷ local healthy")
     ax.set_title(f"pieces: ρ = {r.rho:+.2f} (p = {r.p:.2g}); blue chronic, orange RR", fontsize=9)
 fig.tight_layout()
 plotting.save_fig(fig, "q4_neuropil_rna", OUT, SRC)
 
 # %% [markdown]
-# **Seeing it.** The same healthy and lesion-core WM fields as in section 1, now with myelin RNA (cyan) and axonal RNA
-# (magenta) outside cell outlines.
+# **Seeing it.** Random 40 µm white-matter fields centred on a random cell, one per random animal (seed 0): curated
+# lesion niche vs physiological WM. Myelin RNA outside outlines (cyan), axonal RNA outside outlines (magenta), cell
+# outlines grey, nuclei blue. The claim to check by eye: less cyan between cells in lesions, with magenta (axonal) RNA
+# behaving differently or not.
 
 # %%
-fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-rng = np.random.default_rng(0)
-for ax, (lab_, s) in zip(axs, picks):
-    r = s.iloc[rng.integers(len(s))]
-    show_crop(ax, r, W, [([g for k in MYELIN for g in SETS[k]], False, "#3fd0f0", 3),
-                         (SETS["axon"], False, "#ff4fd8", 7)], title=f"{pc} · {lab_} · {W} µm")
-fig.suptitle("RNA outside cell outlines: myelin genes (cyan) and axonal genes (magenta)", fontsize=9)
-fig.tight_layout()
-plotting.save_fig(fig, "q4_neuropil_crops", OUT, SRC)
+L4 = [([g for k in MYELIN for g in SETS[k]], False, "#3fd0f0", 3), (SETS["axon"], False, "#ff4fd8", 7)]
+gallery([("physiological WM", w4[w4.zone_cur == "healthy"]), ("lesion WM", w4[w4.zone_cur == "core"])], 40, L4,
+        suptitle="random white-matter fields: myelin RNA (cyan) and axonal RNA (magenta) outside cell outlines",
+        name="q4_gallery_random")
 
 # %% [markdown]
 # ## 5. Across the disease course
