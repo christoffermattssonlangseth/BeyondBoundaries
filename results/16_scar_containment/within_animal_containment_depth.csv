@@ -1,0 +1,7 @@
+border,analysis,animals,median_rho,share_negative,wilcoxon_p
+edge spike,"deep lesions only (adj. size, activity)",30,0.23571428571428577,0.36666666666666664,0.2699392619332731
+edge spike,"all lesions, adj. size, activity, depth",37,0.1929824561403509,0.35135135135135137,0.45101817482571327
+border tissue vimentin,"deep lesions only (adj. size, activity)",30,0.3116883116883117,0.26666666666666666,0.03135184715812945
+border tissue vimentin,"all lesions, adj. size, activity, depth",37,0.25274725274725274,0.24324324324324326,0.0032940581392582485
+border astro vimentin,"deep lesions only (adj. size, activity)",30,0.4464285714285715,0.23333333333333334,0.040919121695396826
+border astro vimentin,"all lesions, adj. size, activity, depth",37,0.25357142857142856,0.32432432432432434,0.1538393744750757

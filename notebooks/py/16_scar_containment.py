@@ -300,3 +300,134 @@ fig.suptitle(f"{piece} · {objs.loc[hi_o, 'sample_name']} ({objs.loc[hi_o, 'stag
              fontsize=10)
 fig.tight_layout()
 plotting.save_fig(fig, "best_vs_worst_bordered_lesion", OUT, SRC)
+
+# %% [markdown]
+# ## 2b. A fairer containment test
+# The leakage ratio (outside ÷ inside immune share) rises when a lesion empties of immune cells while resolving, even
+# if nothing escapes, and vimentin is highest in resolving lesions; so the ratio confounds "leaky" with "resolving".
+# Three better measures:
+#
+# - **Escape**: immune share 0–50 µm outside the lesion relative to the same animal's distant healthy tissue
+#   (> 150 µm from any lesion): log2 ratio; 0 = no excess immune cells around the lesion.
+# - **Edge spike** (vimentin ring, notebook 15): tissue vimentin 0–10 µm inside the edge minus the mean of
+#   −30…−10 µm (outside) and +20…+45 µm (inside).
+# - **Immune profile across the edge**, for each animal's lesions split at its median edge spike.
+
+# %%
+far = obs[obs.edge_um < -150].groupby("sample_name", observed=True).immune.mean()
+objs["escape"] = np.log2((objs["immune outside (0–50 µm)"] + 0.002) / (objs.sample_name.map(far) + 0.002))
+o = obs[obs.obj != -1]
+z0 = o[o.edge_um.between(0, 10, inclusive="right")].groupby("obj").terr_vim_z.median()
+zo = o[o.edge_um.between(-30, -10)].groupby("obj").terr_vim_z.median()
+zi = o[o.edge_um.between(20, 45)].groupby("obj").terr_vim_z.median()
+objs["edge spike"] = z0 - (zo + zi) / 2
+objs.to_csv(OUT / "lesion_objects.csv")
+
+rows = []
+for x in ["edge spike", "border tissue vimentin", "border astro vimentin"]:
+    for y in ["escape", "immune outside (0–50 µm)"]:
+        for adj in (False, True):
+            r = within_animal(objs, x, y, adj).dropna()
+            rows.append(dict(border=x, outcome=y, adjusted=adj, animals=len(r), median_rho=r.median(),
+                             share_negative=(r < 0).mean(), wilcoxon_p=wilcoxon(r).pvalue if len(r) >= 6 else np.nan))
+cont2 = pd.DataFrame(rows)
+cont2.to_csv(OUT / "within_animal_containment_v2.csv", index=False)
+cont2.round(3)
+
+# %%
+# per animal: edge spike (size-weighted) by group
+pa["edge spike"] = objs.groupby("sample_name").apply(
+    lambda g: np.average(g["edge spike"].fillna(0), weights=g["size"]), include_groups=False)
+pa["escape"] = objs.groupby("sample_name").apply(lambda g: np.average(g.escape, weights=g["size"]),
+                                                 include_groups=False)
+pd.DataFrame({gname: pa[f(pa)][["edge spike", "escape"]].median() for gname, f in GROUP30.items()}).T.round(2)
+
+# %%
+EB = [-150, -100, -70, -50, -30, -15, 0, 15, 30, 60, 100, 200]
+o = obs[obs.obj.isin(objs.index)].copy()
+o["edge_bin"] = pd.cut(o.edge_um, EB)
+o = o.join(objs[["edge spike", "sample_name"]].rename(columns={"sample_name": "_an"}), on="obj")
+o["spike_hi"] = o.groupby("_an")["edge spike"].transform(lambda s: s > s.median())
+prof = o.groupby(["_an", "spike_hi", "edge_bin"], observed=True).immune.mean().unstack("edge_bin").reindex(
+    columns=o.edge_bin.cat.categories)
+mids = [(a_ + b_) / 2 for a_, b_ in zip(EB[:-1], EB[1:])]
+fig, axs = plt.subplots(1, 2, figsize=(13, 4))
+for k, (lab, c) in enumerate([("weak edge vimentin (below the animal's median)", COL[1]),
+                              ("strong edge vimentin (above)", COL[2])]):
+    p = prof.xs(k == 1, level="spike_hi")
+    axs[0].errorbar(mids, p.median(), yerr=p.sem(), marker="o", color=c, label=lab)
+axs[0].axvline(0, color="#888888", ls="--", lw=0.8)
+axs[0].set(xlabel="distance to lesion edge (µm; negative = outside)", ylabel="immune share of cells\n(median over animals)")
+axs[0].legend(fontsize=7)
+diff = (prof.xs(True, level="spike_hi") - prof.xs(False, level="spike_hi"))
+axs[1].errorbar(mids, diff.median(), yerr=diff.sem(), marker="o", color=COL[0])
+axs[1].axhline(0, color="#888888", lw=0.8); axs[1].axvline(0, color="#888888", ls="--", lw=0.8)
+axs[1].set(xlabel="distance to lesion edge (µm)", ylabel="strong − weak edge vimentin\n(within animal)")
+fig.tight_layout()
+plotting.save_fig(fig, "immune_profile_by_edge_vimentin", OUT, SRC)
+
+# %% [markdown]
+# ## 2c. Surface confound: deep lesions only
+# The best-bordered lesion above runs along the cord surface, where vimentin is naturally high (glia limitans,
+# astrocyte end-feet at the pia) and immune cells enter from the meninges. So border vimentin and immune cells around a
+# lesion can both just reflect closeness to the surface. Repeat the within-animal tests (i) on lesions whose cells
+# lie a median > 100 µm from the tissue edge, and (ii) on all lesions with that depth as an extra covariate.
+
+# %%
+pia = pd.read_parquet(ROOT / "data" / "features_norm_all.parquet", columns=["edge_um"]).edge_um.rename("pia_um")
+obs = obs.join(pia)
+objs["lesion depth from surface (µm)"] = obs[obs.les & (obs.obj != -1)].groupby("obj").pia_um.median()
+
+
+def within_animal_depth(df, x, y, min_obj=5):
+    out = {}
+    for an_, g in df.groupby("sample_name"):
+        g = g[[x, y, "size", "active share", "lesion depth from surface (µm)"]].dropna()
+        if len(g) < min_obj:
+            continue
+        Z = np.c_[np.ones(len(g)), np.log(g["size"]), g["active share"], np.log1p(g["lesion depth from surface (µm)"])]
+        xx = g[x].to_numpy() - Z @ np.linalg.lstsq(Z, g[x].to_numpy(), rcond=None)[0]
+        yy = g[y].to_numpy() - Z @ np.linalg.lstsq(Z, g[y].to_numpy(), rcond=None)[0]
+        out[an_] = spearmanr(xx, yy).statistic
+    return pd.Series(out)
+
+
+deep = objs[objs["lesion depth from surface (µm)"] > 100]
+print(f"deep lesions: {len(deep)} of {len(objs)}")
+rows = []
+for x in ["edge spike", "border tissue vimentin", "border astro vimentin"]:
+    for lab, r in [("deep lesions only (adj. size, activity)", within_animal(deep, x, "escape", True, min_obj=4)),
+                   ("all lesions, adj. size, activity, depth", within_animal_depth(objs, x, "escape"))]:
+        r = r.dropna()
+        rows.append(dict(border=x, analysis=lab, animals=len(r), median_rho=r.median(), share_negative=(r < 0).mean(),
+                         wilcoxon_p=wilcoxon(r).pvalue if len(r) >= 6 else np.nan))
+cont3 = pd.DataFrame(rows)
+cont3.to_csv(OUT / "within_animal_containment_depth.csv", index=False)
+cont3.round(3)
+
+# %%
+print("does depth drive both? across all lesions:",
+      {c: round(spearmanr(np.log1p(objs['lesion depth from surface (µm)']), objs[c], nan_policy='omit').statistic, 2)
+       for c in ["border tissue vimentin", "edge spike", "escape"]})
+
+# %% [markdown]
+# ## Findings
+#
+# > **Finding — the vimentin border builds between the chronic peak and day ~30, but only in milder animals.** Border
+# > tissue vimentin per animal: chronic PEAK1 0.04 → MILD16 0.97 (p = 0.02) but SEVERE16 0.02 (no change); border
+# > astrocyte vimentin 0.58 → 2.65 (MILD16) vs 0.76 (SEVERE16). At d31–33 never-relapsing MONOPHASIC animals have the
+# > strongest borders (tissue 2.91, astrocyte 5.04) vs PEAK2 0.30 / 1.22 and PEAK2_MILD 0.63 / 3.84; RR PEAK1 → MONOPHASIC
+# > rises (p = 0.03). So a scar-like vimentin border forms by d30 in animals that do well, and not in those that stay
+# > severe or relapse. Small groups (2–6 animals).
+# >
+# > **Finding — but in a snapshot it does not look like containment.** Comparing lesions *within the same animal*,
+# > better vimentin-bordered lesions have **more**, not fewer, infiltrating immune cells just outside them (escape vs the
+# > animal's distant healthy tissue: ρ +0.3 to +0.45, p < 0.01; immune profile across the edge slightly higher for
+# > strong-border lesions). Lesions near the cord surface have both more vimentin (glia limitans) and more immune cells
+# > (meningeal entry), but on deep lesions only (> 100 µm from the surface) and with depth as a covariate, border tissue
+# > vimentin still goes with more immune cells around the lesion (ρ +0.25 to +0.31, p = 0.003–0.03). The best reading:
+# > reactive astrocytes build their vimentin border **where immune cells are active at the lesion edge**, a response
+# > to the infiltrate. Whether that border then restricts further spread can't be decided from single time points:
+# > the animal-level pattern (borders form in milder animals) fits a protective role, the lesion-level pattern fits a
+# > response. Testing it would need time-resolved data (e.g. serial imaging, or an intervention on astrocyte
+# > reactivity).

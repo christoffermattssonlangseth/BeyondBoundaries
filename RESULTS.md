@@ -327,3 +327,14 @@ First attack (10 animals) vs relapse peaks (9):
   chronic vs RR +0.40 = weakest). MILD30/SEVERE30 and MONOPHASIC/REMISSION1 calibrators are flat.
 - **Edge ring:** MILD and MONOPHASIC animals have a sharp vimentin peak in the first ~10 µm inside the lesion edge
   (tissue vimentin z ≈ 1.6 / 3.3), absent in SEVERE, REMISSION1 and PEAK; core vimentin also highest in MILD/MONOPHASIC.
+
+## 2026-10-08 — Scar and containment; day ~30 vs chronic peak (`notebooks/16_scar_containment.ipynb`)
+Collaborator's hypothesis: a successful astrocyte scar restricts immune infiltration. 419 lesion objects in 53 animals.
+- **Border forms by d30 in milder animals only:** border tissue vimentin chronic PEAK1 0.04 → MILD16 0.97 (p = 0.02),
+  SEVERE16 0.02; MONOPHASIC strongest at d31–33 (2.91 vs PEAK2 0.30); RR PEAK1 → MONOPHASIC p = 0.03.
+- **Within animals, not containment-like:** better-bordered lesions have *more* immune cells just outside (escape
+  ρ +0.3–0.45, p < 0.01). Surface lesions confound (glia limitans + meningeal entry; depth ρ −0.44 / −0.34), but deep
+  lesions only and depth-adjusted: still ρ +0.25–0.31 (p 0.003–0.03). Reading: the vimentin border forms where immune
+  cells are active at the lesion edge (a response); whether it later restricts spread needs time-resolved data.
+- First leakage measure (outside ÷ inside) was confounded by lesions emptying while resolving — replaced by escape vs
+  the animal's distant tissue.
