@@ -12,7 +12,7 @@ the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 1–6: 54 sections, 67 ani
 | ✅ What it adds | ❌ What it does not add |
 |---|---|
 | **Protein the panel can't measure:** *Vim*, *Acta2*, *Atp1a1* aren't on the 5K panel. Example: reactive astrocyte RNA *without* vimentin protein is enriched in active disease ("RNA-only" astrocytes 20 % at peak vs 3.5 % in CFA), consistent with RNA preceding protein (inferred from animals sacrificed at successive stages) | **CD45:** undetectable in mouse spinal cord; the boundary channel is ATP1A1 only |
-| **Tissue context:** dense white-matter lesions have ~17 % less ATP1A1 neuropil around each cell than nearby healthy white matter (×0.83, 98 % of ~103 pieces, all runs; piece-wide ×0.79 in runs 5/6, 38 pieces, ×0.72 in runs 1–3, 58 pieces). Images add anatomy to the transcriptome (0.68 → 0.73; pooled within-run CV, optimistic, no cross-run estimate) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
+| **Tissue context:** at the lesion's grey/white-matter border, ATP1A1 neuropil is ~15–20 % lower than in healthy white matter at the same distance from grey matter (×0.78 runs 1–3, 25/31 animals; ×0.83 runs 5/6, 13/18), with lower neuron-derived RNA between cells at the same place; deeper white-matter lesions show none (the earlier ×0.72–0.83 'white-matter loss' mixed this with the ATP1A1 gradient away from grey matter; notebook 20, section 9). Images add anatomy to the transcriptome (0.68 → 0.73; pooled within-run CV, optimistic, no cross-run estimate) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
 | **Images alone, on an unseen run** (trained on the other runs, leave-one-run-out over 5 runs): cell type 42–47 % (14 types, chance 7 %); lesion maps AUROC 0.88–0.89. *Optimistic pooled within-run CV (runs 5/6, grouped by animal; animals are nested in runs, so run is not held out): 46 % and 0.90* | **Better lesion calls or severity than RNA:** images are informative but redundant (clinical score ρ 0.62 vs 0.79; pooled per-animal CV across runs 5/6, optimistic) |
 
 Animals are nested within imaging runs (each animal in exactly one run; `scripts/02_nesting_audit.py`), so headline
@@ -48,7 +48,10 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `17_local_barrier` | within-lesion barrier tests: edge stretches vs immune escape; do scarred old lesions stay quiet at relapse |
 | `18_vimentin_outcome` | how strong is the vimentin–outcome link: adjusted models, leave-one-run-out, within lesion states, beyond RNA, within-image pairs |
 | `19_tcell_polarity` | T-cell 18S "orientation towards vessels" tested with outline-free and brightness-matched controls: **an imaging artefact (withdrawn)** |
-| `20_neuropil_loss` | white-matter neuropil loss stress test: crowding, composition, tissue surface, channel controls; microscopy — **holds** |
+| `20_neuropil_loss` | white-matter neuropil loss stress test: crowding, composition, tissue surface, channel, distance to grey matter — **holds only at the grey/white-matter border** |
+| `21_nonlinear_orthogonality` | review: gradient-boosted (nonlinear) image ↔ transcriptome test per cell type; joint tests (residual clusters, reverse prediction, lesion and score) |
+| `22_neuropil_drivers` | which neighbouring cells and programs go with neuropil loss in WM lesions — none found; weak link to oligodendrocyte state (exploratory) |
+| `23_rna_in_and_around_cells` | where transcripts sit relative to the stain outlines: *Mbp* handling by oligodendrocytes, no engulfed-RNA trace in myeloid cells, RNA between cells at the grey/white border; nuclear retention withdrawn |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.

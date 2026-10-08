@@ -298,7 +298,7 @@ plotting.save_fig(fig, "conclusions_figure", OUT, SRC)
 #
 # **4. Biology only the images show.**
 # - **Neuropil loss:** white-matter lesion tissue has 25 % less ATP1A1 around each cell than healthy white matter of the
-#   same piece (p = 8e-6) — tissue damage the cell's own transcriptome cannot carry.
+#   same piece (p = 8e-6) — tissue damage the cell's own transcriptome cannot carry. (**Corrected 8 Oct:** confined to the grey/white-matter border once matched for distance to grey matter, notebook 20 §9.)
 # - **Timing of astrocyte reactivity:** reactive transcription (*C3*, *Gfap*, *Serpina3n*…) precedes vimentin protein —
 #   "RNA-only" astrocytes peak in active disease (20 % vs 3.5 % in CFA).
 # - **Ribosomal RNA:** 18S rises in activated cells in lesions beyond their RNA content (Schwann +0.8, endothelium +0.4

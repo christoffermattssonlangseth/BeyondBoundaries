@@ -594,7 +594,8 @@ show("11_disease_courses/image_readouts_by_state_all_runs.png")
 # > (active S1 0.79 → 1.03; lymphocytic S5 0.88 → 0.99, p = 0.02) while vimentin rises (glial S0/S3 tissue vimentin
 # > p = 0.009/0.005; best q = 0.13). Lesions that persist into recovery look repaired in neuropil but scarred in
 # > vimentin: a tissue memory the stains show and the lesion label doesn't. (Neuropil index here pools WM and GM;
-# > in white matter alone lesions stay below 1, notebook 13.)
+# > in white matter alone lesions stay below 1, notebook 13. Not yet checked for distance to grey matter, which drives
+# > most of the WM neuropil contrast (notebook 20, section 9): treat the neuropil half as unconfirmed.)
 
 # %% [markdown]
 # ## 9. Does a vimentin scar contain lesions? (notebook 16)
@@ -631,7 +632,7 @@ show("17_local_barrier/immune_gradient_by_local_vimentin.png", 700)
 #
 # | finding (notebooks 05–09) | runs 1–3 |
 # |---|---|
-# | white-matter neuropil loss in lesions | **replicated**: ×0.72 (58 pieces, p < 1e-4) vs ×0.79 |
+# | white-matter neuropil loss in lesions | **replicated**: ×0.72 (58 pieces, p < 1e-4) vs ×0.79; **Corrected 8 Oct:** confined to the grey/white-matter border once matched for distance to grey matter, notebook 20 §9 |
 # | astrocyte reactive RNA before vimentin protein | **replicated**: ρ 0.51–0.58 per run; RNA-only astrocytes more common in active disease |
 # | T cells orient 18S-rich cytoplasm towards vessels | **withdrawn**: the measure replicates, but a brightness-matched control shows bleed from bright neighbours + outline geometry (notebook 19) |
 # | image-only models on an unseen run | **yes, every run**: lesion AUROC 0.85–0.91, cell type 0.42–0.47 |

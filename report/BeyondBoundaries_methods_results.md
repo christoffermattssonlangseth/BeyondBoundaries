@@ -240,7 +240,25 @@ channel controls; density-matched (within-piece quintiles of cells within 20 µm
 regression on log density and log territory pixel count; same-cell-type comparisons; restriction to cells > 30–200 µm
 from the tissue-mask edge; per-piece Spearman with the MOL-share ratio; profiles across lesion-region edges; a local
 comparison (each lesion cell ÷ median of healthy WM cells within 150 µm, ≥ 20 cells); territory median vs 90th-percentile
-pixel (diffuse mesh vs bright spots).
+pixel (diffuse mesh vs bright spots). **Distance to grey matter** (section 9, added 8 October): distance from each WM
+cell to the nearest GM / dorsal-horn / ventral-horn cell of the same piece; lesion ÷ healthy WM per animal within
+distance bands (10–25 µm wide up to 100 µm, then 100–400 µm; ≥ 20 cells per animal × zone × band), both run sets,
+DAPI as control; the local comparison with a reference matched in distance (± 15 µm); and per animal
+log ATP1A1 ~ lesion + B-spline(distance, 4 df) (+ piece), cells within 150 µm of grey matter.
+
+### 13c. Transcripts relative to the cell outlines (notebook 23, runs 5/6)
+
+`scripts/04_transcript_compartments.py`: every decoded gene transcript with qv ≥ 20 in the 18 run-5/6 sections is
+placed relative to the Xenium cell and nucleus masks: assigned cell (Xenium assignment) and nucleus overlap; depth
+inside the cell (distance to the outline on the 2× downsampled mask, 0.425 µm); for transcripts outside cells, the
+nearest cell outline and distance. Per cell: counts in the cell and nucleus (all genes, sparse), counts outside cells
+within 10 µm whose nearest cell it is ("halo") and the free area of that halo, and rim (< 1 µm) vs deep (≥ 2 µm) counts
+for focus gene sets (myelin: *Mbp*; control myelin genes *Mag*, *Mog*, *Cldn11*, *Mal*, *Opalin*, *Enpp6*;
+oligodendrocyte soma genes; neuron-derived *Nefl/m/h*, *Stmn2*, *Gap43*; phagocyte genes; astrocyte genes; stress genes).
+Lesion zones from the lesion regions (core ≥ 30 µm inside; healthy > 150 µm outside and not called lesion); counts pooled
+per animal × zone; core vs healthy across animals (Wilcoxon). Each readout repeated with curated lesion niches, each run,
+each segmentation method, each cell-size third, WM and GM separately, MOL only and (WM) the same distance band from grey
+matter; random-cell galleries (one cell per random animal) for every claim.
 
 ### 13b. Strength of the vimentin–outcome association (notebook 18)
 
@@ -296,6 +314,14 @@ cells poor without CD45), subtypes (microglia 0.72, reactive astrocytes 0.68), a
   fibrotic tissue. **Correction:** part of the piece-wide contrast is tract anatomy; against healthy WM within 150 µm
   the loss is ×0.83 (curated lesions, 98 % of pieces; DAPI ×1.00), and ~3 % with the broader control-referenced lesions,
   so it belongs to dense lesion cores. Diffuse mesh (×0.82) and bright spots (×0.85) are both lower.
+  **Correction 2 (8 October; notebook 20, section 9) — the loss is confined to the grey/white-matter border.** ATP1A1
+  in healthy WM roughly halves over the first ~150 µm away from grey matter, and WM lesion cells lie much further from
+  grey matter (median ~200 µm) than the healthy WM they were compared with (47–83 µm), even within 150 µm. At the same
+  distance from grey matter, lesions have ×0.80–0.92 ATP1A1 within ~75 µm of grey matter in both run sets (per-animal
+  spline model, cells within 150 µm: ×0.78, 25/31 animals, runs 1–3; ×0.83, 13/18, runs 5/6; DAPI unchanged) and **no
+  loss beyond ~75 µm**, where most lesion WM lies. The ×0.72–0.83 above therefore mixed a border effect with the
+  ATP1A1 gradient; there is no general white-matter neuropil loss. Notebook 23 finds lower neuron-derived RNA between
+  cells at the same place (×0.4–0.6 within ~150 µm of grey matter).
 - *Astrocyte reactive RNA without vimentin protein in active disease, consistent with RNA preceding protein* (ordering
   inferred from animals sacrificed at successive stages, not a within-animal time course): protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
   more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
@@ -432,9 +458,28 @@ are descriptive [11].
 Within the same lesion state, from peak (19 animals) to recovery (13), neuropil trends back towards normal (S1 0.79 →
 1.03; S5 0.88 → 0.99, p = 0.02) while vimentin rises (glial S0/S3 tissue vimentin p = 0.009/0.005; best q = 0.13).
 Lesions that persist into recovery look repaired in neuropil but scarred in vimentin [11]. (This readout pools WM and
-GM; WM lesions alone stay below 1 [13].)
+GM; WM lesions alone stay below 1 [13]. Not yet checked for distance to grey matter, which notebook 20, section 9
+showed drives most of the WM neuropil contrast; treat the neuropil half of this pattern as unconfirmed.)
 
 ---
+
+### I. RNA in and around cells (notebook 23, runs 5/6)
+
+- *Localisation biology (check)*: in healthy tissue 22 % of *Mbp* lies inside cell outlines (it is transported into
+  myelin) against ~75 % for the control myelin genes; *Neat1* is the most nuclear transcript; *Gfap* lies mostly in
+  astrocyte processes.
+- *Oligodendrocytes in lesions keep less Mbp in the soma relative to their other myelin genes* (modest): ×0.91 (12/15
+  animals), ×0.88 in MOL only, also with curated lesions (×0.94), every size third and at matched distance from grey
+  matter (×0.92–0.94, weaker). No accumulation in soma or nucleus, so not a transport block.
+- *No RNA trace of engulfed myelin* (robust negative): lesion-core myeloid cells carry less myelin RNA relative to
+  their surroundings than astrocytes (×0.88, 18/20; WM ×0.91, GM ×0.99); *Cd68*-high cells less than *Cd68*-low ones.
+  Lead only: in grey-matter cores myeloid cells hold more neuron-derived RNA than astrocytes (×1.35, 16/16), which
+  engulfment and spillover from touched neurons would both produce.
+- *Between cells in WM lesions, at matched distance from grey matter*: astrocyte RNA up everywhere (×1.14–1.50);
+  neuron-derived RNA down within ~150 µm of grey matter (×0.38–0.64); myelin RNA ~10 % down only beyond ~75 µm.
+- *Withdrawn*: nuclear RNA retention in lesion oligodendrocytes/OPC (+3 % pooled; ×1.00 within WM and within GM:
+  Simpson's paradox from region mix); "newly formed oligodendrocytes export less *Mbp*" (not robust to the lesion
+  definition). No readout tracks clinical score.
 
 ## Limitations
 

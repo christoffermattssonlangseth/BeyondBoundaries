@@ -13,7 +13,9 @@
 # > conclusions: **withdrawn** — perivascular T cells orienting 18S towards vessels (notebook 19: bleed from bright
 # > neighbours + outline geometry), a vimentin "ring" at lesion edges and vimentin-border containment (notebooks 16–17);
 # > **downgraded** — 18S texture as a severity marker (replicates only in glia/myeloid, notebook 13); **replicated** —
-# > white-matter neuropil loss, astrocyte RNA before vimentin protein, image-only models on unseen runs (notebook 13).
+# > white-matter neuropil loss (**narrowed 8 Oct:** only at the grey/white-matter border, notebook 20 §9), astrocyte RNA
+# > before vimentin protein, image-only models on unseen runs (notebook 13). **Withdrawn 8 Oct:** nuclear RNA retention
+# > in lesion oligodendrocytes (notebook 23).
 # > Current overall verdict: `report/BeyondBoundaries_verdict.pdf`; disease biology: `report/BeyondBoundaries_lesion_story.pdf`.
 
 # %% [markdown]
@@ -72,7 +74,7 @@ def fig(path, width=900):
 # | Do images add to the transcriptome for lesion identity? | **No** (≤ +0.015 AUROC; niches are transcriptome-defined) | 04 |
 # | …for clinical score per animal? | Images alone ρ = 0.46 (p = 0.04) vs transcriptome 0.86; combined not better | 05 |
 # | What can images predict *alone*? | Cell type 46 % (14 types, chance 7 %), subtypes (microglia 0.72, reactive astro 0.68), anatomy 63 % (10 regions), **lesion maps AUROC 0.90**, clinical score ρ 0.62 — always ≤ transcriptome, but images add to it for anatomy (0.68 → 0.73) | 08 |
-# | What *do* they add? | Measurements of genes **not on the panel** (*Vim*, *Acta2*, *Atp1a1*): vimentin reactivity timing (replicated), **WM neuropil loss (−21 to −28 %, replicated)**, 18S gain in activated lesion cells; an 18S-texture severity marker only partly replicated (glia/myeloid). ~~T-cell 18S polarity towards vessels~~ withdrawn (artefact) | 05–07, 13, 19 |
+# | What *do* they add? | Measurements of genes **not on the panel** (*Vim*, *Acta2*, *Atp1a1*): vimentin reactivity timing (replicated), **neuropil loss at the grey/white-matter border (~15–20 % at matched distance; the earlier −21 to −28 % WM figure was mostly anatomy, notebook 20 §9)**, 18S gain in activated lesion cells; an 18S-texture severity marker only partly replicated (glia/myeloid). ~~T-cell 18S polarity towards vessels~~ withdrawn (artefact) | 05–07, 13, 19 |
 
 # %% [markdown]
 # ## 1. Features look right (notebook 01)
@@ -190,7 +192,9 @@ fig("07_visual_checks/tcell_perivascular_polarity.png", 900)
 fig("06_targeted_readouts/r18s_lesion_by_type.png", 700)
 
 # %% [markdown]
-# ### Neuropil loss: −25 % surrounding ATP1A1 in white-matter lesions (within piece)
+# ### Neuropil loss in white-matter lesions (within piece)
+# The −25 % shown here is superseded: matched for distance to grey matter the loss is ~15–20 % and only within
+# ~75 µm of grey matter (notebook 20, section 9).
 
 # %%
 fig("06_targeted_readouts/neuropil_index_map.png", 900)

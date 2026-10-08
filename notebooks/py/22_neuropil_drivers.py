@@ -350,3 +350,20 @@ for ax_ in axs:
 fig.suptitle(f"{cell.meta_sample_id} · {cell.sample_name} ({cell.stage}) · deep white-matter lesion, 220 µm field", fontsize=10)
 fig.tight_layout()
 plotting.save_fig(fig, "lesion_field_candidates", OUT, SRC)
+
+# %% [markdown]
+# ## Findings
+#
+# > **No driver found; weak link to oligodendrocyte state (exploratory).** Within WM lesions, adjusted for cellularity,
+# > depth and distance to grey matter, no immune cell type or damaging program tracks the local neuropil index: shares
+# > of macrophages, microglia, T and B cells and the NOX2, cytokine, MMP and cytotoxic programs all have |ρ| < 0.04, and
+# > neuropil does not change with distance to the nearest MDM, T cell, NOX2-high myeloid cell or reactive astrocyte
+# > (near ÷ far ×0.99–1.06). The only consistent associations are small: more mature oligodendrocytes (MOL) go with
+# > more neuropil (ρ +0.10, p = 0.009; multivariable β +0.07) and more disease-associated oligodendrocytes (DAO) and a
+# > higher interferon program with less (ρ −0.08 and −0.09). DAPI does not show these, so they are ATP1A1-specific,
+# > but at |ρ| ≈ 0.1 they explain ~1 % of the variation.
+# >
+# > **Context.** Notebook 20, section 9 later showed the WM neuropil loss is confined to lesions within ~75 µm of grey
+# > matter; most WM lesion cells analysed here lie deeper, where there is no loss to explain. A driver analysis
+# > restricted to the border would have few cells per piece. The answer for now: the loss is not explained by any
+# > particular infiltrating cell type in its neighbourhood.

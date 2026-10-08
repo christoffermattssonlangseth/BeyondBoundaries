@@ -404,3 +404,35 @@ The region-edge dip is a surface artefact on top. Not obvious by eye in random c
   98 % of ~103 pieces; deep cells same; DAPI ×1.00) vs ×0.73 piece-wide → ~40 % of the first estimate was anatomy.
   Control-referenced lesions: ×0.97 locally → the loss belongs to dense lesion cores. Diffuse mesh ×0.82 and bright
   spots ×0.85 both lower (loss, with clumps visible in places). Net: real, local, ATP1A1-specific ~17 % loss.
+
+## 2026-10-08 — Neuropil loss narrowed to the grey/white border; RNA in and around cells (notebooks 20 §9, 22, 23)
+
+- **Correction 2, WM neuropil loss (`20_neuropil_loss` §9).** Found while checking notebook 23. ATP1A1 in healthy WM
+  falls with distance from grey matter (index ~1.4–1.7 within 25 µm, ~0.8 at 200–400 µm). WM lesion cells lie
+  further from grey matter (median 199–214 µm) than the healthy WM they were compared with (47–83 µm), even within
+  150 µm. At the same distance from grey matter: ×0.80–0.92 within ~75 µm in both run sets (per-animal spline model,
+  cells within 150 µm: ×0.78, 25/31 animals, runs 1–3, p = 2 × 10⁻⁵; ×0.83, 13/18, runs 5/6, p = 0.005; DAPI flat);
+  **no loss beyond ~75 µm** (×0.95–1.19), where most lesion WM lies. Local comparison with a distance-matched reference:
+  ×0.91 (87 % of 61 pieces), but only ~2 % of lesion cells have such a reference. The earlier ×0.73 / ×0.79 / ×0.83 mixed
+  a border effect with the gradient. README, verdict and methods/results corrected; damage-memory neuropil trend
+  (notebooks 11/12) is not yet distance-checked.
+- **Neuropil drivers (`22_neuropil_drivers`, now adjusted for distance to grey matter).** No immune cell type or
+  damaging program tracks local neuropil (|ρ| < 0.04; no distance dose–response to MDM, T cells, NOX2-high myeloid,
+  reactive astrocytes). Small ATP1A1-specific associations with oligodendrocyte state: MOL share ρ +0.10 (p = 0.009),
+  DAO −0.08, interferon program −0.09. Exploratory.
+- **RNA relative to the cell outlines (`scripts/04_transcript_compartments.py`, `23_rna_in_and_around_cells`, runs 5/6).**
+  Per transcript (qv ≥ 20): in a cell or not, in the nucleus or not, depth in the cell, nearest cell and distance.
+  Checks per claim: curated lesion definition, each run, segmentation method, size third, WM / GM separately, MOL only,
+  distance band from grey matter; per-animal plots; random galleries.
+  - Localisation check: *Mbp* 22 % inside outlines vs ~75 % for *Mag*/*Mog*/*Cldn11*; *Neat1* most nuclear.
+  - *Mbp* ÷ control myelin genes in the oligodendrocyte soma, lesion core ÷ healthy WM: ×0.91 (12/15, p = 0.007); MOL
+    ×0.88 (13/14); curated ×0.94; matched distance ×0.92–0.94 (weaker). Not a transport block (no soma/nuclear pile-up).
+  - Myeloid ÷ astrocyte myelin "uptake" in lesion cores: ×0.88 (18/20); WM ×0.91, GM ×0.99; *Cd68*-high < *Cd68*-low
+    (per µm² ×0.73, per transcript ×0.60): no RNA trace of engulfed myelin. Lead: GM cores, neuron-derived RNA ×1.35
+    (16/16) in myeloid vs astrocytes (engulfment or spillover; untested).
+  - RNA between WM cells, lesion ÷ healthy at matched distance from grey matter: astrocyte RNA ×1.14–1.50; neuron-derived
+    RNA ×0.38–0.64 within ~150 µm; myelin RNA ×0.86–0.92 beyond 75 µm only. Unmatched "axonal RNA ×0.17" was anatomy.
+  - **Withdrawn:** nuclear retention in lesion oligodendrocytes/OPC (pooled ×1.03; WM ×1.00, GM ×1.00 — Simpson's
+    paradox, healthy WM cells have higher nuclear excess and lesion cores hold more WM cells); NFOL "less exported
+    *Mbp*" (curated ×0.99, p = 0.13). Gene-level nuclear screen pools regions, not interpreted.
+  - No readout tracks clinical score or first-attack peak (15–20 animals).
