@@ -15,6 +15,7 @@ the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 1–6: 54 sections, 67 ani
 | **Tissue context:** white-matter lesions have 25 % less ATP1A1 neuropil around each cell (p = 8e-6); images add anatomy to the transcriptome (0.68 → 0.73) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
 | **Images alone, held-out animals:** cell type 46 % (14 types, chance 7 %); lesion maps AUROC 0.90, and **0.87–0.90 when trained on one run and tested on the other** | **Better lesion calls or severity than RNA:** images are informative but redundant (clinical score ρ 0.62 vs 0.79) |
 
+**Verdict (one page):** `report/BeyondBoundaries_verdict.pdf` — do the segmentation images add anything, what holds, what was withdrawn.
 **Start here:** `report/BeyondBoundaries_conclusions.pdf` — what the kit adds (9 pages) · `report/BeyondBoundaries_lesion_story.pdf`
 — disease biology across all five runs (9 pages) · `report/BeyondBoundaries_methods_results.{md,pdf}` — full Methods and
 Results (editable Markdown).

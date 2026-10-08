@@ -9,6 +9,14 @@
 # ---
 
 # %% [markdown]
+# > **Status update (8 October 2026).** This summary covers notebooks 01–09 (runs 5/6). Later work changed some
+# > conclusions: **withdrawn** — perivascular T cells orienting 18S towards vessels (notebook 19: bleed from bright
+# > neighbours + outline geometry), a vimentin "ring" at lesion edges and vimentin-border containment (notebooks 16–17);
+# > **downgraded** — 18S texture as a severity marker (replicates only in glia/myeloid, notebook 13); **replicated** —
+# > white-matter neuropil loss, astrocyte RNA before vimentin protein, image-only models on unseen runs (notebook 13).
+# > Current overall verdict: `report/BeyondBoundaries_verdict.pdf`; disease biology: `report/BeyondBoundaries_lesion_story.pdf`.
+
+# %% [markdown]
 # # Beyond Boundaries — what do the Xenium multimodal segmentation stains add to the transcriptome?
 #
 # **Data.** Mouse EAE spinal cord (RRMAP2 runs 5 and 6): 18 annotated Xenium 5K sections, 25 animals (chronic and
@@ -64,7 +72,7 @@ def fig(path, width=900):
 # | Do images add to the transcriptome for lesion identity? | **No** (≤ +0.015 AUROC; niches are transcriptome-defined) | 04 |
 # | …for clinical score per animal? | Images alone ρ = 0.46 (p = 0.04) vs transcriptome 0.86; combined not better | 05 |
 # | What can images predict *alone*? | Cell type 46 % (14 types, chance 7 %), subtypes (microglia 0.72, reactive astro 0.68), anatomy 63 % (10 regions), **lesion maps AUROC 0.90**, clinical score ρ 0.62 — always ≤ transcriptome, but images add to it for anatomy (0.68 → 0.73) | 08 |
-| What *do* they add? | Measurements of genes **not on the panel** (*Vim*, *Acta2*, *Atp1a1*): vimentin reactivity timing, **WM neuropil loss (−25 %)**, **18S gain in activated lesion cells**, **T-cell 18S polarity towards vessels**, a candidate **18S-texture severity marker** (holds within section and after a crowding adjustment) | 05–07 |
+# | What *do* they add? | Measurements of genes **not on the panel** (*Vim*, *Acta2*, *Atp1a1*): vimentin reactivity timing (replicated), **WM neuropil loss (−21 to −28 %, replicated)**, 18S gain in activated lesion cells; an 18S-texture severity marker only partly replicated (glia/myeloid). ~~T-cell 18S polarity towards vessels~~ withdrawn (artefact) | 05–07, 13, 19 |
 
 # %% [markdown]
 # ## 1. Features look right (notebook 01)
@@ -140,7 +148,7 @@ display(pd.read_csv(RES / "05_field_and_animal/lesion_shift_by_part.csv").groupb
         .apply(lambda d: pd.Series({"tests": len(d), "q<0.05": int((d.q < 0.05).sum())}), include_groups=False))
 
 # %% [markdown]
-# ## 6. Per animal: images carry real but weaker disease information; 18S texture stands out (notebooks 05, 07)
+# ## 6. Per animal: images carry real but weaker disease information; 18S texture (later only partly replicated, notebook 13)
 
 # %%
 display(pd.read_csv(RES / "05_field_and_animal/animal_score_prediction.csv", index_col=0).round(3))
@@ -167,7 +175,9 @@ display(pd.read_csv(RES / "06_targeted_readouts/astro_quadrants.csv", index_col=
 fig("07_visual_checks/astro_protein_only_vsmc_gallery.png", 800)
 
 # %% [markdown]
-# ### Leukocyte polarity — WITHDRAWN (notebook 19): the 18S "towards vessels" signal is bleed from 18S-bright neighbours plus outline geometry
+# ### Leukocyte polarity — WITHDRAWN (notebook 19)
+# The 18S "towards vessels" signal below is bleed from 18S-bright neighbours plus outline geometry (a brightness-matched
+# control removes it). The figures are kept for the record only.
 
 # %%
 fig("06_targeted_readouts/polarity_vessel_direction.png", 550)
@@ -224,11 +234,11 @@ fig("08_image_only_prediction/animal_metadata_prediction.png", 800)
 # - CD45 component undetectable → no immune-membrane readout from ch1.
 # - αSMA and vimentin share a channel; 18S drew ~95 % of masks (18S distribution features partly by construction).
 # - Lesion niches are transcriptome-defined, favouring the transcriptome in lesion comparisons.
-# - 25 animals; only 2 CFA control pieces in runs 5/6; runs 1–3 have no accessible raw images.
+# - 25 animals; only 2 CFA control pieces in runs 5/6 (runs 1–3 were added later, notebooks 10–19).
 #
 # ## Next steps
-# 1. Validate the 18S-texture severity marker on runs 1–3 (raw images on the P drive) or a new run.
-# 2. Disentangle vimentin vs αSMA in "protein-only" astrocytes (VSMC proximity, notebook 07; ideally separate channels).
-# 3. Perivascular T-cell 18S polarity: relate to cuff position / migration state.
+# 1. ~~Validate the 18S-texture severity marker on runs 1–3~~ done (notebook 13): partly replicated.
+# 2. Disentangle vimentin vs αSMA: post-Xenium immunofluorescence with separate antibodies (see the verdict document).
+# 3. ~~Perivascular T-cell 18S polarity~~ withdrawn (notebook 19).
 # 4. Use the neuropil-loss index and 18S per cell as covariates in the RRMAP2 lesion analyses.
 # 5. Runs 1–3: image features carry a strong run signature — compare within run / batch-correct before pooling.

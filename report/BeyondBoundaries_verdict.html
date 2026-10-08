@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Beyond Boundaries — verdict</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* Written report, rendered to A4 PDF with headless Chrome (see README in report/).
+   Same typography/palette as the lab-meeting deck (Notebook Tabs). */
+:root {
+    --ink: #1a1a1a; --muted: #5b5852; --rule: #d9d4c7; --paper: #ffffff; --accent: #b4462f;
+    --tab-1: #98d4bb; --tab-2: #c7b8ea; --tab-3: #f4b8c5; --tab-4: #a8d8ea; --tab-5: #ffe6a7; --tab-6: #f2c5a0;
+}
+@page { size: A4; margin: 18mm 17mm 18mm 17mm;
+        @bottom-right { content: counter(page); font: 8pt 'DM Sans', sans-serif; color: #9a958a; } }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: 'DM Sans', sans-serif; font-size: 9.6pt; line-height: 1.5; color: var(--ink); background: var(--paper); }
+main { max-width: 176mm; margin: 0 auto; }
+
+h1, h2, h3 { font-family: 'Bodoni Moda', Georgia, serif; font-weight: 400; line-height: 1.15; margin: 0; }
+h1 { font-size: 25pt; letter-spacing: -0.01em; }
+h1 em, h2 em { color: var(--accent); }
+h2 { font-size: 16pt; margin: 0 0 3mm; padding-top: 2mm; display: flex; align-items: baseline; gap: 3mm; }
+h2 .no { font-size: 9pt; font-family: 'DM Sans', sans-serif; padding: 0.5mm 2mm; border-radius: 2px; }
+h3 { font-size: 11.5pt; margin: 4mm 0 1.5mm; break-after: avoid; }
+p { margin: 0 0 2.4mm; }
+ul { margin: 0 0 2.4mm; padding-left: 4.5mm; }
+li { margin-bottom: 1mm; }
+.muted { color: var(--muted); }
+.small { font-size: 8.2pt; }
+b.n, .n { color: var(--accent); font-weight: 700; }
+
+.cover { border-top: 6px solid var(--ink); padding-top: 6mm; margin-bottom: 6mm; }
+.kicker { font-size: 7.8pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 3mm; }
+.meta { margin-top: 3mm; color: var(--muted); font-size: 8.8pt; }
+.tabsbar { display: flex; gap: 1.5mm; margin-top: 4mm; }
+.tabsbar span { height: 2.2mm; flex: 1; border-radius: 1px; }
+
+.answer { background: #faf7f0; border-left: 4px solid var(--accent); padding: 4mm 5mm; margin: 4mm 0 5mm; }
+.answer p:last-child { margin-bottom: 0; }
+.answer .big { font-family: 'Bodoni Moda', serif; font-size: 12.5pt; line-height: 1.35; margin-bottom: 2.5mm; }
+
+section { margin-top: 7mm; }
+section.newpage { break-before: page; }
+.finding { border-left: 3px solid var(--rule); padding-left: 3.5mm; margin: 2.5mm 0 3mm; }
+.finding b:first-child { font-weight: 700; }
+
+figure { margin: 3mm 0 4mm; break-inside: avoid; }
+figure img { width: 100%; display: block; border: 1px solid #eee; }
+figure img.h50 { max-height: 50mm; width: auto; max-width: 100%; margin: 0 auto; }
+figure img.h65 { max-height: 65mm; width: auto; max-width: 100%; margin: 0 auto; }
+figure img.h80 { max-height: 80mm; width: auto; max-width: 100%; margin: 0 auto; }
+figure img.h110 { max-height: 110mm; width: auto; max-width: 100%; margin: 0 auto; }
+figcaption { font-size: 8pt; color: var(--muted); margin-top: 1.5mm; line-height: 1.4; }
+figcaption b { color: var(--ink); }
+.two { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 5mm; align-items: start; }
+
+table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 8.2pt; break-inside: avoid; }
+th { text-align: left; font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 10pt; border-bottom: 1.5px solid var(--ink); padding: 1.2mm 2mm; }
+td { border-bottom: 1px solid var(--rule); padding: 0.8mm 2mm; vertical-align: top; }
+td.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.no td { color: var(--muted); }
+code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; }
+</style>
+<style>
+@page { size: A4; margin: 9mm 11mm; }
+body { font-size: 7.7pt; line-height: 1.32; }
+h1 { font-size: 16pt; border-top: 5px solid var(--ink); padding-top: 4mm; margin-bottom: 2mm; }
+h2 { font-size: 10.5pt; margin: 2.6mm 0 1mm; }
+blockquote { margin: 2mm 0; background:#faf7f0; border-left:4px solid var(--accent); padding: 2.5mm 4mm; font-family:'Bodoni Moda',serif; font-size: 9.4pt; }
+blockquote p { margin: 0; }
+table { font-size: 7.2pt; margin: 1mm 0 2mm; } td, th { padding: 0.8mm 1.6mm; }
+ul, ol { margin: 0 0 1.6mm; } li { margin-bottom: 0.6mm; } p { margin: 0 0 1.6mm; }
+</style></head><body><main><h1>Beyond Boundaries — verdict</h1>
+<p><strong>Do the Xenium Multimodal Cell Segmentation images add anything beyond segmentation?</strong>
+Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. Status 8 October 2026; details in
+<code>BeyondBoundaries_methods_results.pdf</code> (methods + all numbers) and <code>BeyondBoundaries_lesion_story.pdf</code> (biology).</p>
+<blockquote>
+<p><strong>A modest yes.</strong> The images are first of all a segmentation aid. Beyond that they give a small number of robust
+readouts the 5K panel cannot. Their pooled channels and optical bleed limit them as a protein assay, so specific
+protein questions need dedicated stains.</p>
+</blockquote>
+<h2>What holds (replicated across runs, with controls)</h2>
+<table>
+<thead>
+<tr>
+<th>Readout</th>
+<th>Evidence</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Segmentation</strong> (the kit's purpose)</td>
+<td>18S interior stain draws ~95 % of cell masks</td>
+<td>real; not benchmarked against alternatives here</td>
+</tr>
+<tr>
+<td><strong>White-matter neuropil loss</strong> (ATP1A1 around each cell; <em>Atp1a1</em> not on the panel)</td>
+<td>lesion WM ×0.79 (runs 5/6) and ×0.72 (runs 1–3, p &lt; 10⁻⁴) vs healthy WM of the same piece</td>
+<td>tissue damage the RNA can't show; weaker with stricter lesion calls (×0.93); crowding control still to do</td>
+</tr>
+<tr>
+<td><strong>Astrocyte reactive RNA comes before vimentin protein</strong> (<em>Vim</em> not on the panel)</td>
+<td>protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes enriched in active disease in both run sets</td>
+<td>the clearest protein-vs-RNA insight</td>
+</tr>
+<tr>
+<td><strong>Images alone map lesions and cell types on unseen runs</strong></td>
+<td>lesion AUROC 0.85–0.91, cell type 0.42–0.47 (chance 0.07), leave-one-run-out over 5 runs</td>
+<td>QC and annotation cross-check; redundant with RNA for biology</td>
+</tr>
+</tbody>
+</table>
+<h2>What is weak or partial</h2>
+<ul>
+<li><strong>Lesion vimentin and outcome:</strong> low at peak, fills lesion interiors, tends to be higher in animals that do well
+  (ρ ≈ −0.45 after time adjustment). But part of it is shared with VSMCs in the same channel (astrocyte-specific
+  ρ ≈ −0.33), it is entangled with disease burden, and the same-image test is weak (12/19 pairs). <strong>Weak to moderate.</strong></li>
+<li><strong>18S texture as a severity marker:</strong> replicates in astrocytes, myeloid cells and oligodendrocytes only.</li>
+<li><strong>18S gain in activated lesion cells beyond RNA content:</strong> plausible, not stress-tested.</li>
+</ul>
+<h2>What does not work, or was withdrawn after controls</h2>
+<ul>
+<li><strong>CD45</strong> is undetectable in mouse spinal cord; the boundary channel reports ATP1A1 only.</li>
+<li><strong>No hidden cell states:</strong> ~85 % of image variance isn't explained by RNA, but it is mostly a local optical/staining field.</li>
+<li><strong>Images don't improve lesion identity or severity prediction</strong> over the transcriptome.</li>
+<li><strong>Withdrawn:</strong> T cells orienting 18S towards vessels (bleed from bright neighbours + outline geometry); a vimentin
+  ring at lesion edges and vimentin-border containment (artefacts of a lesion-object definition). No evidence that
+  vimentin is a barrier to immune cells (within-lesion test ρ +0.035, 95 % CI −0.016 to +0.073).</li>
+</ul>
+<h2>Why: three structural limits</h2>
+<ol>
+<li><strong>Pooled channels</strong> (αSMA + vimentin; ATP1A1 + CD45 + E-cadherin): every protein claim carries "or the other one".</li>
+<li><strong>Optical bleed and outline geometry:</strong> small cells next to bright neighbours borrow their signal; polarity and
+   "around the cell" measures need brightness-matched and nucleus-relative controls.</li>
+<li><strong>The stains were chosen to draw cell boundaries</strong>, not to answer biological questions.</li>
+</ol>
+<h2>Recommendations</h2>
+<ul>
+<li><strong>Keep the kit</strong> for segmentation; use neuropil loss and astrocyte vimentin state as add-on readouts, with the caveats above.</li>
+<li><strong>For protein biology:</strong> post-Xenium immunofluorescence on the same sections with single-target antibodies (vimentin,
+  αSMA, GFAP; a mouse-reactive CD45). The most informative sections: MILD16 vs SEVERE16 (they share images) and
+  MONOPHASIC vs REMISSION1.</li>
+<li><strong>Future panels:</strong> add <em>Vim</em>, <em>Acta2</em>, <em>Gfap</em>, <em>Atp1a1</em> as custom genes.</li>
+<li><strong>Worth writing up as methods:</strong> control-referenced lesion definitions; lesion regions instead of linked cells;
+  brightness-matched and nucleus-relative controls for polarity.</li>
+</ul>
+<h2>The bigger contribution may be the disease biology (transcriptome-led, all five runs)</h2>
+<p>Lesions defined against controls (controls ~1 %, not 4–20 %) resolve along a clear course: active monocyte-derived
+infiltrate → fibrotic, demyelinated and glial-reactive tissue. Chronic severity is set at the first attack and means
+lesions that stayed active. Relapse can't be predicted clinically; B cells accumulate after the first attack in
+meningeal aggregates (fewer in never-relapsing animals), and relapses are mostly new lesions.</p>
+<p><strong>For discussion:</strong> (1) the paper's framing, disease biology or kit evaluation; (2) whether the slides are available
+for post-Xenium immunofluorescence; (3) which open threads to close first (neuropil-loss crowding control; B cells and
+relapse with more REMISSION1-stage animals).</p></main></body></html>
