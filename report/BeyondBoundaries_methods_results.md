@@ -202,7 +202,19 @@ size, active share and log depth; Wilcoxon signed-rank of per-animal ρ against 
 A first version used cell-linkage objects (lesion cells < 30 µm apart); many were diffuse scatters without a real
 outline and its tissue-mask depth was wrong next to roots and meninges, so its results are withdrawn.
 
-### 12. Software and statistics
+### 12. Local barrier tests (notebook 17)
+
+**Border segments**: the ±30 µm edge band of each lesion region cut into 100 µm × 100 µm segments with ≥ 5 cells just
+inside (0–30 µm) and just outside (0–30 µm); regions with ≥ 3 segments (3,188 segments, 392 regions, 53 animals). Per
+segment: astrocyte vimentin (primary; cell-intrinsic) and territory vimentin (secondary; also includes leukocyte
+vimentin), immune share inside, 0–30 µm and 30–60 µm outside, active share inside, log depth. Variables centred within
+each region (region fixed effect); per animal, partial Spearman ρ between vimentin and outside immune share adjusting
+for inside immune share, active share and depth (≥ 6 segments); Wilcoxon of per-animal ρ; bootstrap 95 % CI of the
+median (animals resampled, 5000×). **Old lesions at relapse** (PEAK2, PEAK2_MILD, PEAK3): 100 µm patches with ≥ 10 old
+(S2) cells; vimentin of the old tissue (S2 astrocytes; S2 territory) vs the active (S1/S4) share among cells within
+60 µm, centred within region, per-animal partial ρ adjusting for log depth and log old-cell count.
+
+### 13. Software and statistics
 
 Python 3.12.14; numpy 2.2.6, pandas 2.2.3, scipy 1.15.2, scikit-learn 1.7.2, anndata 0.12.19, scanpy 1.11.5,
 scikit-image 0.25.2, tifffile 2025.10.16, zarr 2.18.7, matplotlib 3.10.9 (`environment.yml`). Notebooks are paired
@@ -306,6 +318,17 @@ artefacts of diffuse objects and are withdrawn.
 ![Random lesion regions](../results/16_scar_containment/random_lesion_regions.png)
 *Eight random lesion regions from day ~30 animals: αSMA/vimentin (magma), region outline (cyan), infiltrating immune
 cells (red).*
+
+**Sharper within-lesion tests find no barrier** [17]. Lesion edges cut into 100 µm stretches (3,188 stretches, 392
+lesions, 53 animals) and compared within the same lesion: astrocyte vimentin of a stretch vs immune cells just outside,
+adjusted for the immune load inside, activity and depth, gives median per-animal ρ +0.035 (95 % CI −0.016 to +0.073; a
+barrier would give ρ < 0). Vimentin-rich stretches have more immune cells inside the edge and the same outside. In
+relapse animals, vimentin-rich old fibrotic tissue has as much new active tissue next to it as vimentin-poor old tissue
+of the same lesion (ρ −0.02, p = 0.36). **At this resolution vimentin is a marker of the resolution phase, not a
+measurable barrier to infiltrating immune cells.**
+
+![Immune gradient](../results/17_local_barrier/immune_gradient_by_local_vimentin.png)
+*Immune share across the lesion edge for vimentin-rich vs vimentin-poor stretches of the same lesions.*
 
 ### E. Chronic severity: lesions that stayed active
 

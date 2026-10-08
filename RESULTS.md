@@ -353,3 +353,13 @@ regions, median 96 % lesion cells inside; depth from the cord outline):
 - **Holds, now with regions:** astrocyte vimentin inside lesions minus outside: PEAK1 0.60; MILD16 2.27 vs SEVERE16 1.01;
   MILD30 3.30 vs SEVERE30 2.07; MONOPHASIC 4.28 vs REMISSION1 1.26 → a lesion-wide astrocyte response, low at peak,
   strongest in animals that recover.
+
+## 2026-10-08 — Local barrier tests (`notebooks/17_local_barrier.ipynb`)
+- **Border segments** (100 µm stretches of lesion-region edges, 3,188 in 392 lesions, 53 animals; within-lesion, adjusted
+  for immune load inside, activity, depth): astrocyte vimentin vs immune share just outside, median per-animal ρ +0.035
+  (95 % CI −0.016 to +0.073, p = 0.12); 30–60 µm outside +0.018. Territory vimentin +0.069 (p = 0.05; contaminated by
+  leukocyte vimentin). Vimentin-rich stretches have more immune cells inside the edge, same outside.
+- **Old lesions at relapse** (685 S2 patches, 51 lesions, 9 animals): astrocyte vimentin vs nearby active tissue ρ −0.02
+  (p = 0.36); territory +0.16 (n.s.).
+- **Answer:** no measurable barrier; vimentin is a marker of the resolution phase (lesion-wide, highest in animals that
+  recover), not a physical restriction of infiltrating immune cells at this resolution.

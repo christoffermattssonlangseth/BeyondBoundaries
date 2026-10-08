@@ -510,6 +510,8 @@ regs = regs[(regs.cells >= 100) & (regs["n outside"] >= 30)]
 regs["size"] = regs.cells
 regs["lesion depth from surface (µm)"] = regs["depth (µm)"]
 regs.to_csv(OUT / "lesion_regions.csv")
+(ROOT / "data" / "lesion16").mkdir(exist_ok=True)
+obs[["reg", "reg_dist", "depth_um"]].astype({"reg": str}).to_parquet(ROOT / "data" / "lesion16" / "regions.parquet")
 print(f"{len(regs)} lesion regions in {regs.sample_name.nunique()} animals; median lesion share inside "
       f"{regs['lesion share inside'].median():.2f}; deep (> 100 µm): {(regs['depth (µm)'] > 100).sum()}")
 

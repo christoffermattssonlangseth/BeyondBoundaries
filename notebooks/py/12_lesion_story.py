@@ -599,6 +599,21 @@ show("16_scar_containment/random_lesion_regions.png")
 # > restriction would need time-resolved data or an intervention on astrocyte reactivity.
 
 # %% [markdown]
+# **Sharper, within-lesion tests (notebook 17).** Lesion edges cut into 100 µm stretches (3,188 stretches, 392 lesions,
+# 53 animals), compared within the same lesion. Vimentin-rich stretches have more immune cells *inside* the edge but
+# the same outside, so there is no steeper drop-off across them:
+
+# %%
+show("17_local_barrier/immune_gradient_by_local_vimentin.png", 700)
+
+# %% [markdown]
+# > **Finding — no measurable barrier.** Astrocyte vimentin of an edge stretch vs immune cells just outside it, adjusted
+# > for the immune load inside, activity and depth: median per-animal ρ +0.035 (95 % CI −0.016 to +0.073; a barrier
+# > would give ρ < 0). Old fibrotic tissue at relapse with more astrocyte vimentin has as much new active tissue next to
+# > it (ρ −0.02, p = 0.36). At this resolution vimentin behaves as a **marker of the resolution phase**, not a
+# > physical barrier to infiltrating immune cells.
+
+# %% [markdown]
 # ## 10. Do the earlier image findings replicate in runs 1–3? (notebook 13)
 #
 # | finding (notebooks 05–09) | runs 1–3 |

@@ -40,7 +40,8 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `13_replication_runs123` | do the earlier image findings replicate in runs 1–3 (and leave-one-run-out models) |
 | `14_relapse_lesion_origin` | relapse: new lesions or reactivated old ones; B-cell aggregates |
 | `15_vimentin_robustness` | vimentin effect vs batch, brightness, focus, αSMA; vimentin ring at the lesion edge |
-| `16_scar_containment` | does the vimentin scar contain lesions; day ~30 vs chronic peak |
+| `16_scar_containment` | lesion regions (real outlines); where vimentin sits; does the scar contain lesions (lesion level) |
+| `17_local_barrier` | within-lesion barrier tests: edge stretches vs immune escape; do scarred old lesions stay quiet at relapse |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.
