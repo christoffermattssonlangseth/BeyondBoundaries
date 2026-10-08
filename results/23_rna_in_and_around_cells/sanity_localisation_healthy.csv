@@ -1,0 +1,11 @@
+gene_set,genes,in_cells,nuclear_of_in_cell,nuclear_of_in_cell (all genes)
+mbp,Mbp,0.22,0.41,0.5
+myelin_ctrl,"Mag, Mog, Cldn11, Mal, Opalin, Enpp6",0.75,0.6,0.5
+cnp,Cnp,0.64,0.52,0.5
+oligo_soma,"Sox10, Olig1, Olig2, Nkx6-2, Myrf, St18",0.64,0.6,0.5
+axon,"Nefl, Nefm, Nefh, Stmn2, Gap43",0.38,0.3,0.5
+neuron_soma,"Snap25, Camk2a, Rbfox3, Syt1",0.47,0.35,0.5
+cd68,Cd68,0.63,0.57,0.5
+phago,"Trem2, Lpl, Cd36, Gpnmb, Axl",0.47,0.52,0.5
+astro,"Gfap, Aqp4, Slc1a2, Slc1a3",0.32,0.4,0.5
+stress,"Neat1, Hspa1a, Hspa1b, Ddit3, Fos, Jun, Atf4, Hsph1",0.64,0.59,0.5

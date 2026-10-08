@@ -1,0 +1,43 @@
+readout,check,animals,core_over_healthy,share_lower,p
+Oligodendrocyte,main: lesion-region zones,15,1.0299,0.0667,0.0001
+Oligodendrocyte,curated lesion niches vs physiological,23,1.0331,0.087,0.0
+Oligodendrocyte,run5 only,11,1.0335,0.0909,0.002
+Oligodendrocyte,run6 only,4,1.0286,0.0,
+Oligodendrocyte,segmented by interior stain (18S),15,1.0311,0.0667,0.0001
+Oligodendrocyte,segmented by nucleus expansion of 5.0µm,1,0.9838,1.0,
+Oligodendrocyte,large cells (size third),15,1.0154,0.2,0.0215
+Oligodendrocyte,mid cells (size third),15,1.033,0.0667,0.0003
+Oligodendrocyte,small cells (size third),15,1.0411,0.1333,0.0012
+OPC,main: lesion-region zones,15,1.0327,0.2,0.0067
+OPC,curated lesion niches vs physiological,18,1.0465,0.0556,0.0
+OPC,run5 only,11,1.02,0.2727,0.0674
+OPC,run6 only,4,1.0576,0.0,
+OPC,segmented by interior stain (18S),15,1.0423,0.1333,0.0004
+OPC,large cells (size third),11,1.0025,0.4545,0.2402
+OPC,mid cells (size third),10,1.0316,0.0,0.002
+OPC,small cells (size third),10,1.0391,0.4,0.1055
+Myeloid,main: lesion-region zones,15,1.0225,0.3333,0.1205
+Myeloid,curated lesion niches vs physiological,22,0.9735,0.7727,0.0032
+Myeloid,run5 only,11,1.0274,0.2727,0.1475
+Myeloid,run6 only,4,1.0022,0.5,
+Myeloid,segmented by interior stain (18S),15,1.0379,0.0667,0.0002
+Myeloid,segmented by nucleus expansion of 5.0µm,4,0.8846,0.75,
+Myeloid,large cells (size third),15,1.0169,0.4667,1.0
+Myeloid,mid cells (size third),15,1.0282,0.1333,0.0215
+Myeloid,small cells (size third),15,1.0039,0.4667,0.1876
+Astrocyte,main: lesion-region zones,15,1.0202,0.4,0.1688
+Astrocyte,curated lesion niches vs physiological,22,1.0382,0.1364,0.0001
+Astrocyte,run5 only,11,0.9988,0.5455,0.7646
+Astrocyte,run6 only,4,1.0597,0.0,
+Astrocyte,segmented by interior stain (18S),15,1.0254,0.2667,0.0151
+Astrocyte,large cells (size third),15,1.003,0.4667,0.978
+Astrocyte,mid cells (size third),15,1.0195,0.3333,0.0353
+Astrocyte,small cells (size third),14,1.0281,0.3571,0.058
+MOL only,main: lesion-region zones,15,1.0199,0.2,0.0151
+MOL only,curated lesion niches vs physiological,21,1.0257,0.0952,0.0
+MOL only,run5 only,11,1.0196,0.2727,0.123
+MOL only,run6 only,4,1.0399,0.0,
+MOL only,segmented by interior stain (18S),15,1.0208,0.1333,0.0067
+MOL only,large cells (size third),11,1.019,0.3636,0.1475
+MOL only,mid cells (size third),13,1.0285,0.1538,0.0017
+MOL only,small cells (size third),13,1.0204,0.3077,0.0574

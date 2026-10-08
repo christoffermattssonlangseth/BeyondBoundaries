@@ -1,0 +1,7 @@
+cells,zone,animals,depth_index_median
+myeloid,healthy,20,0.706
+myeloid,edge,21,0.68
+myeloid,core,20,0.628
+astrocyte,healthy,20,0.767
+astrocyte,edge,21,0.711
+astrocyte,core,20,0.721

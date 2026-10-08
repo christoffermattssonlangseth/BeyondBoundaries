@@ -1,0 +1,15 @@
+readout,clinical,animals,rho,p
+Mbp kept in soma (Q1),score,15,-0.094,0.74
+Mbp kept in soma (Q1),first_peak,15,-0.126,0.654
+own Mbp halo (Q1),score,15,0.105,0.71
+own Mbp halo (Q1),first_peak,15,-0.026,0.927
+myeloid myelin uptake ÷ astro (Q2),score,20,-0.344,0.138
+myeloid myelin uptake ÷ astro (Q2),first_peak,20,-0.126,0.597
+oligo nuclear retention (Q3),score,15,0.371,0.173
+oligo nuclear retention (Q3),first_peak,15,0.284,0.305
+myeloid nuclear retention (Q3),score,15,0.303,0.272
+myeloid nuclear retention (Q3),first_peak,15,0.208,0.457
+WM myelin RNA outside cells (Q4),score,18,-0.413,0.088
+WM myelin RNA outside cells (Q4),first_peak,18,-0.043,0.867
+WM axonal RNA outside cells (Q4),score,18,-0.452,0.059
+WM axonal RNA outside cells (Q4),first_peak,18,-0.148,0.558

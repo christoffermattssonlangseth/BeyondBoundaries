@@ -570,3 +570,148 @@ redis.round(3)
 # >
 # > **Overall:** a real, local, ATP1A1-specific loss of ~17 % in dense white-matter lesion cores, robust to crowding,
 # > composition and the tissue surface; smaller than first reported (×0.73) and not visible in every field.
+
+# %% [markdown]
+# ## 9. Anatomy confound 2: distance to grey matter
+# Found while checking notebook 23. ATP1A1 is very high in grey matter (neuronal Na⁺/K⁺-ATPase), and in healthy WM
+# the ATP1A1 index falls steeply with distance from grey matter. WM lesions sit deeper in the white matter (towards
+# the pia) than the healthy WM they are compared with, even within 150 µm (section 7). So part of the "loss" could be
+# position again. Test: compare lesion and healthy WM **at the same distance from grey matter** (distance from each WM
+# cell to the nearest GM / dorsal horn / ventral horn cell of the same piece):
+# 1. the distance distributions and the healthy-WM gradient;
+# 2. lesion ÷ healthy per animal within distance bins (both run sets, curated lesions; DAPI as the control channel);
+# 3. section 7's local comparison with a distance-matched reference (healthy WM within 150 µm **and** within ±15 µm
+#    of the lesion cell's distance to grey matter);
+# 4. per animal: log ATP1A1 ~ lesion + spline(distance to GM) (+ piece), cells within 150 µm of grey matter.
+
+# %%
+import statsmodels.formula.api as smf
+
+fa["d_gm"] = np.nan
+for pc, g in obs.groupby("meta_sample_id", observed=True):
+    gm = g[g.Global_anatomical_region.isin(GM)]
+    idx = fa.index[(fa.meta_sample_id == pc) & (fa.rclass == "WM")]
+    if len(gm) < 20 or len(idx) == 0:
+        continue
+    fa.loc[idx, "d_gm"] = cKDTree(gm[["x_centroid", "y_centroid"]].to_numpy()).query(
+        fa.loc[idx, ["x_centroid", "y_centroid"]].to_numpy())[0]
+wmd = fa[(fa.rclass == "WM") & fa.d_gm.notna()].copy()
+wmd["z"] = np.select([wmd.les_curated, wmd.phys_curated], ["lesion", "healthy"], "other")
+wmd = wmd[wmd.z != "other"]
+wmd["runs"] = np.where(wmd.run.isin(["run5", "run6"]), "runs 5/6", "runs 1-3")
+BINS = [0, 10, 20, 30, 40, 50, 75, 100, 150, 200, 300, 400]
+wmd["bin"] = pd.cut(wmd.d_gm, BINS)
+dist_tab = wmd.groupby(["runs", "z"]).d_gm.describe(percentiles=[0.25, 0.5, 0.75])[["count", "25%", "50%", "75%"]]
+dist_tab["share within 75 µm"] = wmd.groupby(["runs", "z"]).d_gm.apply(lambda x: (x <= 75).mean())
+dist_tab.round(2).to_csv(OUT / "distance_to_gm_by_zone.csv")
+dist_tab.round(2)
+
+# %%
+rows = []
+for rs, s in wmd.groupby("runs"):
+    for b, gb in s.groupby("bin", observed=True):
+        for ch in ["bnd", "dapi"]:
+            v = gb.groupby(["sample_name", "z"], observed=True)[f"{ch}_index"].agg(["median", "size"])
+            v = v["median"].where(v["size"] >= 20).unstack()
+            if not {"lesion", "healthy"} <= set(v.columns):
+                continue
+            lf = np.log2(v.lesion / v.healthy).dropna()
+            if len(lf) >= 5:
+                rows.append(dict(runs=rs, distance_to_gm=str(b), lo=b.left, channel=plotting.CHANNEL_LABELS[ch],
+                                 animals=len(lf), ratio=2 ** lf.median(), q25=2 ** lf.quantile(0.25),
+                                 q75=2 ** lf.quantile(0.75), share_lower=(lf < 0).mean(), p=wilcoxon(lf).pvalue))
+binned = pd.DataFrame(rows)
+binned.round(4).to_csv(OUT / "lesion_vs_healthy_by_distance_to_gm.csv", index=False)
+binned[binned.channel == plotting.CHANNEL_LABELS["bnd"]].round(3)
+
+# %%
+fig, axs = plt.subplots(1, 3, figsize=(16, 4.2))
+for k, (rs, s) in enumerate(wmd.groupby("runs")):
+    for zn, ls in [("healthy", "-"), ("lesion", "--")]:
+        m = s[s.z == zn].groupby("bin", observed=True).bnd_index.median()
+        axs[0].plot([b.mid for b in m.index], m.values, ls=ls, marker="o", ms=3, color=COL[k], label=f"{rs}, {zn} WM")
+    axs[1].hist([s[s.z == "healthy"].d_gm, s[s.z == "lesion"].d_gm], bins=np.arange(0, 600, 20), density=True,
+                histtype="step", color=[COL[k], COL[k]], ls="-", lw=1.4)
+axs[0].set_xscale("symlog", linthresh=50)
+axs[0].set_xlabel("distance to grey matter (µm)")
+axs[0].set_ylabel("ATP1A1 territory index (median)")
+axs[0].set_title("ATP1A1 falls with distance from grey matter")
+axs[0].legend(fontsize=7)
+axs[1].set_xlabel("distance to grey matter (µm)")
+axs[1].set_title("where the cells are (step lines: healthy and lesion WM;\nlesion WM is the distribution reaching further out)",
+                 fontsize=9)
+for k, rs in enumerate(["runs 5/6", "runs 1-3"]):
+    for ch, mk in [("bnd", "o"), ("dapi", "s")]:
+        t = binned[(binned.runs == rs) & (binned.channel == plotting.CHANNEL_LABELS[ch])]
+        x = [BINS[BINS.index(lo)] + (BINS[BINS.index(lo) + 1] - lo) / 2 for lo in t.lo]
+        axs[2].errorbar(x, t.ratio, yerr=[t.ratio - t.q25, t.q75 - t.ratio], marker=mk, ms=4, capsize=2, color=COL[k],
+                        alpha=1 if ch == "bnd" else 0.45, label=f"{rs}, {plotting.CHANNEL_LABELS[ch]}")
+axs[2].axhline(1, color="0.5", ls="--", lw=0.8)
+axs[2].set_xscale("symlog", linthresh=50)
+axs[2].set_xlabel("distance to grey matter (µm)")
+axs[2].set_ylabel("lesion ÷ healthy WM at the same distance\n(median over animals, IQR)")
+axs[2].set_title("distance-matched: loss only near grey matter")
+axs[2].legend(fontsize=6)
+fig.tight_layout()
+plotting.save_fig(fig, "distance_to_gm_confound", OUT, SRC)
+
+
+# %%
+def local_ratio_dm(df, les, phys, radius=150, tol=15, min_n=10, ch="bnd"):
+    """section 7 with a distance-matched reference: healthy WM within `radius` and within ±tol µm of distance to GM."""
+    rows = []
+    for pc, g in df[(df.rclass == "WM") & df.d_gm.notna()].groupby("meta_sample_id", observed=True):
+        Lc, Hc = g[g[les]], g[g[phys]]
+        if len(Lc) < 50 or len(Hc) < 50:
+            continue
+        nbrs = cKDTree(Hc[["x_centroid", "y_centroid"]].to_numpy()).query_ball_point(
+            Lc[["x_centroid", "y_centroid"]].to_numpy(), radius)
+        hv, hd = Hc[f"{ch}_index"].to_numpy(), Hc.d_gm.to_numpy()
+        r = []
+        for lv, ld, n in zip(Lc[f"{ch}_index"].to_numpy(), Lc.d_gm.to_numpy(), nbrs):
+            n = np.asarray(n, int)
+            n = n[np.abs(hd[n] - ld) <= tol]
+            if len(n) >= min_n:
+                r.append(lv / np.median(hv[n]))
+        r = np.asarray(r)
+        r = r[np.isfinite(r) & (r > 0)]
+        if len(r) >= 30:
+            rows.append(dict(piece=pc, cells=len(r), cells_tested_share=len(r) / len(Lc), local_ratio=np.median(r)))
+    d = pd.DataFrame(rows)
+    if d.empty:
+        return d, dict(pieces=0)
+    return d, dict(pieces=len(d), median_local_ratio=d.local_ratio.median(), share_below_1=(d.local_ratio < 1).mean(),
+                   median_share_of_lesion_cells_tested=d.cells_tested_share.median(),
+                   p=wilcoxon(np.log(d.local_ratio)).pvalue if len(d) >= 6 else np.nan)
+
+
+rows = []
+for les, phys, lab in [("les_curated", "phys_curated", "curated niches"), ("les_ctrl", "phys_ctrl", "control-referenced")]:
+    for c in ["bnd", "dapi"]:
+        _, s0 = local_ratio(fa[fa.d_gm.notna()], les, phys, ch=c)
+        _, s1 = local_ratio_dm(fa, les, phys, ch=c)
+        rows.append(dict(lesions=lab, channel=plotting.CHANNEL_LABELS[c], reference="within 150 µm (section 7)", **s0))
+        rows.append(dict(lesions=lab, channel=plotting.CHANNEL_LABELS[c],
+                         reference="within 150 µm and ±15 µm distance to GM", **s1))
+dm_tab = pd.DataFrame(rows)
+dm_tab.to_csv(OUT / "local_distance_matched.csv", index=False)
+dm_tab.round(3)
+
+# %%
+rows = []
+for rs, s in wmd[wmd.d_gm <= 150].groupby("runs"):
+    s = s.assign(lb=np.log(s.bnd_index.clip(lower=1e-3)), les=(s.z == "lesion").astype(int))
+    for a_, g in s.groupby("sample_name", observed=True):
+        if g.les.sum() < 30 or (1 - g.les).sum() < 30:
+            continue
+        f = "lb ~ les + bs(d_gm, df=4)" + (" + C(meta_sample_id)" if g.meta_sample_id.nunique() > 1 else "")
+        rows.append(dict(runs=rs, animal=a_, effect=smf.ols(f, data=g).fit().params["les"]))
+reg = pd.DataFrame(rows)
+reg_sum = reg.groupby("runs").effect.agg(animals="size", ratio=lambda x: np.exp(x.median()),
+                                         share_lower=lambda x: (x < 0).mean(), p=lambda x: wilcoxon(x).pvalue)
+reg.to_csv(OUT / "per_animal_regression_distance_to_gm.csv", index=False)
+reg_sum.round(4)
+
+# %% [markdown]
+# ## Findings (revised after section 9)
+# (filled in after the run)

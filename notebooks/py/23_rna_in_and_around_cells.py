@@ -27,7 +27,7 @@
 #    outline, relative to how much is around it, as a trace of engulfed material. Spillover from neighbours is the
 #    alternative, so non-phagocytic cells in the same place are the baseline.
 # 3. **Do lesion cells hold their RNA back in the nucleus?** Nuclear retention of mRNA is a stress response.
-# 4. **What does the space between cells lose in white-matter lesions: myelin RNA or axonal RNA?** The RNA counterpart
+# 4. **What does the space between cells lose in white-matter lesions: myelin RNA or neuron-derived RNA?** The RNA counterpart
 #    of the ~17 % ATP1A1 neuropil loss (notebooks 20, 22).
 #
 # **Design.** Input: `scripts/04_transcript_compartments.py` (every transcript with qv >= 20: in a cell or not, in the
@@ -157,6 +157,14 @@ for sid in sorted(obs.sample_id.unique()):
     pool_tot.append((ind @ tot).toarray().astype(np.float32))
     pool_nuc.append((ind @ nuc).toarray().astype(np.float32))
 cells = obs.join(pd.concat(parts).fillna(0), how="inner")
+# distance from each WM cell to the nearest grey-matter cell of the same piece (anatomy control, section 4)
+GMR = ["GM", "DorsalHorn", "VentralHorn"]
+cells["d_gm"] = np.nan
+for pc_, g in cells.groupby("meta_sample_id"):
+    gm, wmc = g[g.Global_anatomical_region.isin(GMR)], g[g.wm]
+    if len(gm) >= 20 and len(wmc):
+        cells.loc[wmc.index, "d_gm"] = cKDTree(gm[["x_centroid", "y_centroid"]].to_numpy()).query(
+            wmc[["x_centroid", "y_centroid"]].to_numpy())[0]
 cells["size_third"] = cells.groupby("Anno_L1_curated").cell_area.transform(
     lambda x: pd.qcut(x.rank(method="first"), 3, labels=["small", "mid", "large"])).astype(str)
 cells.drop(columns=[c for c in cells if cells[c].dtype == object and c not in obs]).to_parquet(
@@ -217,6 +225,9 @@ def robust(d, vfn, label):
     checks += [(f"{r} only", d[d.run_id == r], z) for r in ["run5", "run6"]]
     checks += [(f"segmented by {m}", s, z) for m, s in d.groupby("seg") if len(s) > 2000]
     checks += [(f"{k} cells (size third)", s, z) for k, s in d.groupby("size_third")]
+    if d.d_gm.notna().mean() > 0.5:  # white-matter analyses: same distance band from grey matter
+        checks += [("WM 0–100 µm from grey matter", d[d.d_gm <= 100], z),
+                   ("WM 100–400 µm from grey matter", d[d.d_gm.between(100, 400)], z)]
     rows = []
     for name, s, by in checks:
         try:
@@ -515,7 +526,7 @@ plotting.save_fig(fig, "q1_mbp_crops", OUT, SRC)
 #   (ratio near 1).
 #
 # Plus a dose test within myeloid cells: uptake by *Cd68* level (lysosomal/phagocytic marker), tertiles within each
-# animal × zone. The same is done for axonal RNA (neurofilaments, *Stmn2*, *Gap43*).
+# animal × zone. The same is done for neuron-derived RNA (neurofilaments, *Stmn2*, *Gap43*; mostly from grey matter, see the correction in section 4).
 
 # %%
 cells["myelin_cell"] = cells[[f"{k}_cell" for k in MYELIN]].sum(1)
@@ -621,7 +632,7 @@ def vs_astro(mat):
 
 
 r2 = pd.concat([robust(cells, vs_astro("myelin"), "myelin uptake: myeloid ÷ astrocyte (core)"),
-                robust(cells, vs_astro("axon"), "axonal uptake: myeloid ÷ astrocyte (core)")])
+                robust(cells, vs_astro("axon"), "neuron-derived RNA uptake: myeloid ÷ astrocyte (core)")])
 r2.round(4).to_csv(OUT / "q2_robustness.csv", index=False)
 fmt(r2)
 
@@ -645,7 +656,7 @@ fig, axs = plt.subplots(1, 3, figsize=(12, 3.8))
 paired_plot(axs[0], vs_astro("myelin")(cells, ("sample_name", "zone")).rename(lambda x: x, level=1),
             "lesion core: myelin uptake\nastrocytes (left) vs myeloid (right)")
 axs[0].set_xticks([0, 1], ["astrocyte", "myeloid"])
-paired_plot(axs[1], vs_astro("axon")(cells, ("sample_name", "zone")), "lesion core: axonal uptake\nastrocytes vs myeloid")
+paired_plot(axs[1], vs_astro("axon")(cells, ("sample_name", "zone")), "lesion core: neuron-derived RNA uptake\nastrocytes vs myeloid")
 axs[1].set_xticks([0, 1], ["astrocyte", "myeloid"])
 v = per_zone(my[my.zone == "core"], uptake("myelin"), by=("sample_name", "cd68_tertile"), min_cells=10)
 v = v.unstack()[["low", "high"]].stack().rename_axis(["sample_name", "zone"])
@@ -782,7 +793,7 @@ axs[0].legend(fontsize=6, ncol=2)
 for i, t in enumerate(SCREEN_TYPES):
     d = scr[scr.cell_type == t]
     if len(d):
-        axs[1].scatter(np.log2(d.core_over_healthy), -np.log10(d.p), s=4, color=COL[i], alpha=0.5, label=t)
+        axs[1].scatter(np.log2(d.core_over_healthy), -np.log10(d.p), s=4, color=plt.cm.tab20(i), alpha=0.5, label=t)
 axs[1].set_xlabel("log2 relative nuclear share, core ÷ healthy (median over animals)")
 axs[1].set_ylabel("-log10 p")
 axs[1].set_title("which genes are held in the nucleus in lesion cores?")
@@ -849,7 +860,7 @@ plotting.save_fig(fig, "q3_per_animal", OUT, SRC)
 # %% [markdown]
 # ## 4. What does the space between cells lose in white-matter lesions?
 # RNA outside cell outlines in white matter, per µm² of free space within 10 µm of a cell: myelin RNA (*Mbp* and the
-# other myelin genes), axonal RNA (neurofilaments, *Stmn2*, *Gap43*), astrocyte RNA (*Gfap*, *Aqp4*, …) and all genes.
+# other myelin genes), neuron-derived RNA (neurofilaments, *Stmn2*, *Gap43*; mostly from grey matter, see the correction in section 4), astrocyte RNA (*Gfap*, *Aqp4*, …) and all genes.
 # **Local comparison as in notebook 20:** within each piece, white-matter cells of curated lesion niches against
 # physiological-niche WM cells within 150 µm of them (the comparison behind the ×0.83 ATP1A1 neuropil loss), so tract
 # anatomy can't drive the difference. Next to it, the ATP1A1 neuropil index of the same cells (notebook 20 definition),
@@ -865,8 +876,8 @@ raw = fa.bnd_terr_mean * fa.bnd_scale + fa.bnd_bg_local
 w4 = cells[cells.wm].join(raw.rename("atp_raw"))
 w4["atp_index"] = w4.atp_raw / w4.groupby("meta_sample_id").atp_raw.transform("median")
 w4["halo_myelin"] = w4[[f"halo_{k}" for k in MYELIN]].sum(1)
-MATS = {"myelin RNA": "halo_myelin", "axonal RNA": "halo_axon", "astrocyte RNA": "halo_astro", "all RNA": "halo_all"}
-vals = ["ATP1A1"] + list(MATS) + ["myelin share of outside RNA", "axonal share of outside RNA", "free space per cell"]
+MATS = {"myelin RNA": "halo_myelin", "neuron-derived RNA": "halo_axon", "astrocyte RNA": "halo_astro", "all RNA": "halo_all"}
+vals = ["ATP1A1"] + list(MATS) + ["myelin share of outside RNA", "neuron-derived share of outside RNA", "free space per cell"]
 
 
 def q4_pieces(d, zcol="zone_cur", radius=150, min_n=30):
@@ -884,7 +895,7 @@ def q4_pieces(d, zcol="zone_cur", radius=150, min_n=30):
         for lab_, c in MATS.items():
             r[lab_] = (L[c].sum() / L.halo_area.sum()) / (Hn[c].sum() / Hn.halo_area.sum())
         r["myelin share of outside RNA"] = (L.halo_myelin.sum() / L.halo_all.sum()) / (Hn.halo_myelin.sum() / Hn.halo_all.sum())
-        r["axonal share of outside RNA"] = (L.halo_axon.sum() / L.halo_all.sum()) / (Hn.halo_axon.sum() / Hn.halo_all.sum())
+        r["neuron-derived share of outside RNA"] = (L.halo_axon.sum() / L.halo_all.sum()) / (Hn.halo_axon.sum() / Hn.halo_all.sum())
         r["free space per cell"] = L.halo_area.mean() / Hn.halo_area.mean()
         rows.append(r)
     return pd.DataFrame(rows)
@@ -915,6 +926,61 @@ r4.round(4).to_csv(OUT / "q4_summary_and_robustness.csv", index=False)
 print(f"{len(q4p)} pieces, {q4p.animal.nunique()} animals")
 fmt(r4)
 
+# %% [markdown]
+# ### Correction: distance to grey matter
+# Grey matter is rich in neuronal RNA and ATP1A1, and WM lesions lie further from grey matter than the healthy WM
+# they are compared with, even within 150 µm (notebook 20, section 9). So each readout again, **at the same distance
+# from grey matter**: lesion ÷ healthy WM per animal within distance bins (pooled counts per animal × zone × bin,
+# >= 20 cells each). Left panel: the healthy-WM gradients themselves.
+
+# %%
+DB = [0, 25, 50, 75, 100, 150, 200, 400]
+w4["dbin"] = pd.cut(w4.d_gm, DB)
+wz = w4[w4.zone_cur.isin(["core", "healthy"])]
+print(wz.groupby("zone_cur").d_gm.median().round(0).to_dict(), "µm median distance to grey matter")
+grad = wz[wz.zone_cur == "healthy"].groupby("dbin", observed=True).apply(
+    lambda g: pd.Series({k: 1000 * g[c].sum() / g.halo_area.sum() for k, c in MATS.items()} | {"ATP1A1": g.atp_index.median()}))
+grad.round(3).to_csv(OUT / "q4_healthy_wm_gradient_from_gm.csv")
+rows = []
+for b, gb in wz.groupby("dbin", observed=True):
+    g2 = gb.groupby(["sample_name", "zone_cur"])
+    n = g2.size()
+    vals_ = {"ATP1A1": g2.atp_index.median()} | {k: g2[c].sum() / g2.halo_area.sum() for k, c in MATS.items()}
+    for k, v in vals_.items():
+        v = v.where(n >= 20).unstack()
+        if not {"core", "healthy"} <= set(v.columns):
+            continue
+        lf = np.log2(v.core / v.healthy).replace([np.inf, -np.inf], np.nan).dropna()
+        if len(lf) >= 5:
+            rows.append(dict(distance_to_gm=str(b), lo=b.left, hi=b.right, readout=k, animals=len(lf), ratio=2 ** lf.median(),
+                             share_lower=(lf < 0).mean(), p=wilcoxon(lf).pvalue))
+q4d = pd.DataFrame(rows)
+q4d.round(4).to_csv(OUT / "q4_by_distance_to_gm.csv", index=False)
+q4d.pivot(index="distance_to_gm", columns="readout", values="ratio").reindex(
+    [str(i) for i in pd.IntervalIndex.from_breaks(DB)]).round(2)
+
+# %%
+fig, axs = plt.subplots(1, 2, figsize=(13, 4.2))
+gn = grad / grad.iloc[0]
+for i, k in enumerate(gn.columns):
+    axs[0].plot([b.mid for b in gn.index], gn[k], marker="o", ms=3, color=plt.cm.tab10(i), label=k)
+axs[0].set_yscale("log")
+axs[0].set_xlabel("distance to grey matter (µm)")
+axs[0].set_ylabel("healthy WM, relative to 0–25 µm")
+axs[0].set_title("healthy white matter: gradients away from grey matter")
+axs[0].legend(fontsize=7)
+for i, k in enumerate(gn.columns):
+    t = q4d[q4d.readout == k]
+    axs[1].plot((t.lo + t.hi) / 2, t.ratio, marker="o", ms=3, color=plt.cm.tab10(i), label=k)
+axs[1].axhline(1, color="0.5", ls="--", lw=0.8)
+axs[1].set_yscale("log")
+axs[1].set_xlabel("distance to grey matter (µm)")
+axs[1].set_ylabel("lesion ÷ healthy WM at the same distance\n(median over animals)")
+axs[1].set_title("distance-matched lesion effect")
+axs[1].legend(fontsize=7)
+fig.tight_layout()
+plotting.save_fig(fig, "q4_distance_to_gm", OUT, SRC)
+
 # %%
 cor = pd.DataFrame([dict(x="ATP1A1", y=v, **dict(zip(["rho", "p"], spearmanr(np.log(q4p.ATP1A1), np.log(q4p[v]))))) for v in
                     list(MATS)]).round(3)
@@ -923,7 +989,7 @@ cor
 
 # %%
 fig, axs = plt.subplots(1, 3, figsize=(15, 4.2))
-vv = ["ATP1A1", "myelin RNA", "axonal RNA", "astrocyte RNA", "all RNA"]
+vv = ["ATP1A1", "myelin RNA", "neuron-derived RNA", "astrocyte RNA", "all RNA"]
 lg = np.log2(an[vv])
 axs[0].boxplot([lg[v].dropna() for v in vv], showfliers=False)
 for i, v in enumerate(vv):
@@ -933,7 +999,7 @@ axs[0].set_xticks(range(1, len(vv) + 1), vv, rotation=20)
 axs[0].axhline(0, color="0.6", ls="--", lw=0.8)
 axs[0].set_ylabel("log2 lesion ÷ nearby healthy WM")
 axs[0].set_title("per animal: what is lost from the space between cells")
-for ax, v in zip(axs[1:], ["myelin RNA", "axonal RNA"]):
+for ax, v in zip(axs[1:], ["myelin RNA", "neuron-derived RNA"]):
     ax.scatter(np.log2(q4p.ATP1A1), np.log2(q4p[v]), s=18, c=[COL[0] if a_ == "chronic" else COL[1] for a_ in q4p.arm])
     ax.axhline(0, color="0.6", ls="--", lw=0.8)
     ax.axvline(0, color="0.6", ls="--", lw=0.8)
@@ -946,14 +1012,14 @@ plotting.save_fig(fig, "q4_neuropil_rna", OUT, SRC)
 
 # %% [markdown]
 # **Seeing it.** Random 40 µm white-matter fields centred on a random cell, one per random animal (seed 0): curated
-# lesion niche vs physiological WM. Myelin RNA outside outlines (cyan), axonal RNA outside outlines (magenta), cell
-# outlines grey, nuclei blue. The claim to check by eye: less cyan between cells in lesions, with magenta (axonal) RNA
+# lesion niche vs physiological WM. Myelin RNA outside outlines (cyan), neuron-derived RNA outside outlines (magenta), cell
+# outlines grey, nuclei blue. The claim to check by eye: less cyan between cells in lesions, with magenta (neuron-derived) RNA
 # behaving differently or not.
 
 # %%
 L4 = [([g for k in MYELIN for g in SETS[k]], False, "#3fd0f0", 3), (SETS["axon"], False, "#ff4fd8", 7)]
 gallery([("physiological WM", w4[w4.zone_cur == "healthy"]), ("lesion WM", w4[w4.zone_cur == "core"])], 40, L4,
-        suptitle="random white-matter fields: myelin RNA (cyan) and axonal RNA (magenta) outside cell outlines",
+        suptitle="random white-matter fields: myelin RNA (cyan) and neuron-derived RNA (magenta) outside cell outlines",
         name="q4_gallery_random")
 
 # %% [markdown]
@@ -969,7 +1035,7 @@ summ = pd.DataFrame({
     "oligo nuclear retention (Q3)": np.log2(nucz["Oligodendrocyte"].unstack().core / nucz["Oligodendrocyte"].unstack().healthy),
     "myeloid nuclear retention (Q3)": np.log2(nucz["Myeloid"].unstack().core / nucz["Myeloid"].unstack().healthy),
     "WM myelin RNA outside cells (Q4)": np.log2(an["myelin RNA"]),
-    "WM axonal RNA outside cells (Q4)": np.log2(an["axonal RNA"]),
+    "WM neuron-derived RNA outside cells (Q4)": np.log2(an["neuron-derived RNA"]),
 }).replace([np.inf, -np.inf], np.nan)
 st = obs.drop_duplicates("sample_name").set_index("sample_name")[["stage", "arm"]]
 summ = summ.join(st).join(clin[["score", "first_peak"]])

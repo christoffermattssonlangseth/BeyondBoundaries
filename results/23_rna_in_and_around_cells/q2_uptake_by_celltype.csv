@@ -1,0 +1,5 @@
+material,zone,T cell,astrocyte,endothelial,myeloid
+axon,core,0.836,1.055,0.685,1.09
+axon,healthy,0.738,1.077,0.958,1.416
+myelin,core,0.739,0.901,0.622,0.792
+myelin,healthy,0.843,0.906,0.83,1.045

@@ -1,0 +1,19 @@
+material,vs,zone,animals,myeloid_over_ref,share_above,p,core_over_healthy
+myelin,astrocyte,healthy,20,1.066,0.7,0.012,
+myelin,astrocyte,core,20,0.88,0.1,0.0,
+myelin,astrocyte,core ÷ healthy,15,,,0.0,0.848
+myelin,T cell,healthy,2,1.301,0.5,,
+myelin,T cell,core,20,1.113,0.7,0.004,
+myelin,T cell,core ÷ healthy,2,,,,0.799
+myelin,endothelial,healthy,20,1.214,0.9,0.0,
+myelin,endothelial,core,20,1.237,0.8,0.003,
+myelin,endothelial,core ÷ healthy,15,,,0.0,1.132
+axon,astrocyte,healthy,20,1.248,1.0,0.0,
+axon,astrocyte,core,20,0.97,0.4,0.522,
+axon,astrocyte,core ÷ healthy,15,,,0.0,0.846
+axon,T cell,healthy,2,1.794,1.0,,
+axon,T cell,core,20,1.248,0.75,0.011,
+axon,T cell,core ÷ healthy,2,,,,0.884
+axon,endothelial,healthy,20,1.386,1.0,0.0,
+axon,endothelial,core,20,1.561,0.9,0.0,
+axon,endothelial,core ÷ healthy,15,,,0.0,1.198
