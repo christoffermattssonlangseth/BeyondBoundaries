@@ -70,6 +70,7 @@ code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; 
 <!-- ============ COVER + ANSWER ============ -->
 <div class="cover">
   <div class="kicker">Beyond Boundaries · conclusions report · 7 October 2026</div>
+  <p style="font-size:8.5pt;border-left:3px solid #c0392b;padding-left:2mm;margin:2mm 0">Status 8 October 2026: written before later controls. Since then, the white-matter neuropil loss was narrowed to the grey/white-matter border, the T-cell 18S polarity was withdrawn, and headline prediction numbers are cross-run (leave-one-run-out). The current one-page summary is <code>BeyondBoundaries_verdict.pdf</code>.</p>
   <h1>What does the Xenium <em>multimodal segmentation kit</em> tell us that the transcriptome doesn't?</h1>
   <p class="meta">Mouse EAE spinal cord, RRMAP2 runs 5 + 6 · 18 Xenium 5K images · 51 tissue pieces · 25 animals · 500,379 annotated cells · 4 stain channels · 201 image features per cell. Analyses in <code>notebooks/01–09</code>; every number below comes from them.</p>
   <div class="tabsbar"><span style="background:var(--tab-1)"></span><span style="background:var(--tab-2)"></span><span style="background:var(--tab-3)"></span><span style="background:var(--tab-4)"></span><span style="background:var(--tab-5)"></span><span style="background:var(--tab-6)"></span></div>
@@ -79,7 +80,7 @@ code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; 
   <p class="big">The segmentation stains add <em>three kinds of information</em>: per-cell protein for genes the 5K panel doesn't contain, tissue context around each cell, and enough signal to recognise cells and map lesions from images alone, across imaging runs. They do not reveal hidden cell states.</p>
   <ul>
     <li><b>Protein the panel can't measure.</b> <i>Vim</i>, <i>Acta2</i> and <i>Atp1a1</i> are not on the panel. The stains recover known biology in every animal and show that astrocyte reactive transcription precedes vimentin protein.</li>
-    <li><b>Tissue context.</b> White-matter lesions have 25 % less ATP1A1 neuropil around each cell (p = 8×10⁻⁶). Images add anatomical information to the transcriptome (0.68 → 0.73).</li>
+    <li><b>Tissue context.</b> White-matter lesions have 25 % less ATP1A1 neuropil around each cell (p = 8×10⁻⁶). <i>Corrected 8 October: matched for distance to grey matter the loss is ~15–20 % and confined to lesions within ~75 µm of grey matter (notebook 20, section 9).</i> Images add anatomical information to the transcriptome (0.68 → 0.73).</li>
     <li><b>Images alone, held-out animals.</b> Cell type 46 % (14 types, chance 7 %). Lesion maps reach AUROC 0.90, and a model trained on one run maps lesions in the other at 0.87–0.90.</li>
     <li><b>Not added.</b> CD45 is undetectable in mouse cord. For lesion identity and clinical score the images are informative but redundant with RNA. ~85 % of image variance isn't explained by the transcriptome, but that part is mostly a local optical/staining field, not biology.</li>
   </ul>

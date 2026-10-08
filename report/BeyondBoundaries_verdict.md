@@ -13,7 +13,7 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
 | Readout | Evidence | Use |
 |---|---|---|
 | **Segmentation** (the kit's purpose) | 18S interior stain draws ~95 % of cell masks | real; not benchmarked against alternatives here |
-| **Neuropil loss at the lesion's grey/white-matter border** (ATP1A1 around each cell; *Atp1a1* not on the panel) | ~15–20 % less ATP1A1 in lesions within ~75 µm of grey matter than in healthy WM at the same distance, both run sets (×0.78, 25/31 animals; ×0.83, 13/18); **none deeper in white matter** | tissue damage the panel can't show directly; matched by lower neuron-derived RNA between cells at the same place (notebook 23). **Corrected 8 October:** the earlier "~17 % white-matter loss" was mostly the ATP1A1 gradient away from grey matter (lesions sit deeper in WM; notebook 20, section 9) |
+| **Neuropil loss at the lesion's grey/white-matter border** (ATP1A1 around each cell; *Atp1a1* not on the panel) | ~15–20 % less ATP1A1 in lesions within ~75 µm of grey matter than in healthy WM at the same distance, both run sets (×0.78, 25/31 animals; ×0.83, 13/18); **none deeper in white matter** | damage the panel can't show; neuron-derived RNA between cells is lower at the same place (nb 23). **Corrected 8 Oct:** the earlier "~17 % WM loss" was mostly the ATP1A1 gradient away from grey matter (nb 20 §9) |
 | **Astrocyte reactive RNA without vimentin protein in active disease**, consistent with RNA preceding protein (stages from different animals) (*Vim* not on the panel) | protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes enriched in active disease in both run sets | the clearest protein-vs-RNA insight |
 | **Images alone map lesions and cell types on unseen runs** | lesion AUROC 0.85–0.91, cell type 0.42–0.47 (chance 0.07), leave-one-run-out over 5 runs | QC and annotation cross-check; redundant with RNA for biology |
 
@@ -30,9 +30,7 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
 - **CD45** is undetectable in mouse spinal cord; the boundary channel reports ATP1A1 only.
 - **No hidden cell states:** ~85 % of image variance isn't explained by RNA, but it is mostly a local optical/staining field.
 - **Images don't improve lesion identity or severity prediction** over the transcriptome.
-- **Narrowed:** "white-matter neuropil loss" holds only at the grey/white-matter border (see above).
-- **Withdrawn (notebook 23):** nuclear RNA retention in lesion oligodendrocytes (a white/grey-matter mix effect).
-- **Withdrawn:** T cells orienting 18S towards vessels (bleed from bright neighbours + outline geometry); a vimentin
+- **Withdrawn:** nuclear RNA retention in lesion oligodendrocytes (white/grey-matter mix; notebook 23); T cells orienting 18S towards vessels (bleed from bright neighbours + outline geometry); a vimentin
   ring at lesion edges and vimentin-border containment (artefacts of a lesion-object definition). No evidence that
   vimentin is a barrier to immune cells (within-lesion test ρ +0.035, 95 % CI −0.016 to +0.073).
 

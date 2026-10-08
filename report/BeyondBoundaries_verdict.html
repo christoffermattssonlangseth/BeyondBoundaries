@@ -7,11 +7,11 @@
     --ink: #1a1a1a; --muted: #5b5852; --rule: #d9d4c7; --paper: #ffffff; --accent: #b4462f;
     --tab-1: #98d4bb; --tab-2: #c7b8ea; --tab-3: #f4b8c5; --tab-4: #a8d8ea; --tab-5: #ffe6a7; --tab-6: #f2c5a0;
 }
-@page { size: A4; margin: 18mm 17mm 18mm 17mm;
+@page { size: A4; margin: 10mm 13mm 9mm 13mm;
         @bottom-right { content: counter(page); font: 8pt 'DM Sans', sans-serif; color: #9a958a; } }
 * { box-sizing: border-box; }
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-body { margin: 0; font-family: 'DM Sans', sans-serif; font-size: 9.6pt; line-height: 1.5; color: var(--ink); background: var(--paper); }
+body { margin: 0; font-family: 'DM Sans', sans-serif; font-size: 8.7pt; line-height: 1.36; color: var(--ink); background: var(--paper); }
 main { max-width: 176mm; margin: 0 auto; }
 
 h1, h2, h3 { font-family: 'Bodoni Moda', Georgia, serif; font-weight: 400; line-height: 1.15; margin: 0; }
@@ -93,12 +93,12 @@ protein questions need dedicated stains.</p>
 <td>real; not benchmarked against alternatives here</td>
 </tr>
 <tr>
-<td><strong>White-matter neuropil loss</strong> (ATP1A1 around each cell; <em>Atp1a1</em> not on the panel)</td>
-<td>~17 % less ATP1A1 around dense WM lesion cells than in nearby healthy WM, all five runs</td>
-<td>tissue damage the RNA can't show; <strong>survives crowding, composition, tissue-surface and anatomy controls</strong> (notebook 20): vs nearby healthy WM ×0.83 in 98 % of pieces (piece-wide ×0.73 partly reflected tract anatomy); only in dense lesion cores (~3 % with broader lesion calls); not visible in every field</td>
+<td><strong>Neuropil loss at the lesion's grey/white-matter border</strong> (ATP1A1 around each cell; <em>Atp1a1</em> not on the panel)</td>
+<td>~15–20 % less ATP1A1 in lesions within ~75 µm of grey matter than in healthy WM at the same distance, both run sets (×0.78, 25/31 animals; ×0.83, 13/18); <strong>none deeper in white matter</strong></td>
+<td>damage the panel can't show; neuron-derived RNA between cells is lower at the same place (nb 23). <strong>Corrected 8 Oct:</strong> the earlier "~17 % WM loss" was mostly the ATP1A1 gradient away from grey matter (nb 20 §9)</td>
 </tr>
 <tr>
-<td><strong>Astrocyte reactive RNA comes before vimentin protein</strong> (<em>Vim</em> not on the panel)</td>
+<td><strong>Astrocyte reactive RNA without vimentin protein in active disease</strong>, consistent with RNA preceding protein (stages from different animals) (<em>Vim</em> not on the panel)</td>
 <td>protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes enriched in active disease in both run sets</td>
 <td>the clearest protein-vs-RNA insight</td>
 </tr>
@@ -122,7 +122,7 @@ protein questions need dedicated stains.</p>
 <li><strong>CD45</strong> is undetectable in mouse spinal cord; the boundary channel reports ATP1A1 only.</li>
 <li><strong>No hidden cell states:</strong> ~85 % of image variance isn't explained by RNA, but it is mostly a local optical/staining field.</li>
 <li><strong>Images don't improve lesion identity or severity prediction</strong> over the transcriptome.</li>
-<li><strong>Withdrawn:</strong> T cells orienting 18S towards vessels (bleed from bright neighbours + outline geometry); a vimentin
+<li><strong>Withdrawn:</strong> nuclear RNA retention in lesion oligodendrocytes (white/grey-matter mix; notebook 23); T cells orienting 18S towards vessels (bleed from bright neighbours + outline geometry); a vimentin
   ring at lesion edges and vimentin-border containment (artefacts of a lesion-object definition). No evidence that
   vimentin is a barrier to immune cells (within-lesion test ρ +0.035, 95 % CI −0.016 to +0.073).</li>
 </ul>
@@ -135,7 +135,7 @@ protein questions need dedicated stains.</p>
 </ol>
 <h2>Recommendations</h2>
 <ul>
-<li><strong>Keep the kit</strong> for segmentation; use neuropil loss and astrocyte vimentin state as add-on readouts, with the caveats above.</li>
+<li><strong>Keep the kit</strong> for segmentation; use border neuropil loss and astrocyte vimentin state as add-on readouts, with the caveats above.</li>
 <li><strong>For protein biology:</strong> post-Xenium immunofluorescence on the same sections with single-target antibodies (vimentin,
   αSMA, GFAP; a mouse-reactive CD45). The most informative sections: MILD16 vs SEVERE16 (they share images) and
   MONOPHASIC vs REMISSION1.</li>

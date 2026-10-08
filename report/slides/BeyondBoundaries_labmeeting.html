@@ -295,7 +295,7 @@ table.use td:first-child { border-right: 1px solid var(--rule); }
     <h2 class="reveal">Three kinds of added information. <em>No hidden cell states.</em></h2>
     <div class="grid reveal">
       <div class="card t2"><span class="big">Protein</span><h3>…for genes not on the panel</h3><p>Vimentin, αSMA, ATP1A1 per cell. Astrocyte vimentin lags reactive RNA in active disease.</p></div>
-      <div class="card t2"><span class="big">Tissue</span><h3>…context around each cell</h3><p>White-matter neuropil loss in lesions (−25 %). Anatomy that adds to the transcriptome (0.68 → 0.73).</p></div>
+      <div class="card t2"><span class="big">Tissue</span><h3>…context around each cell</h3><p>Neuropil loss at the lesion's grey/white-matter border (~15–20 %; the first −25 % was mostly distance to grey matter). Anatomy that adds to the transcriptome (0.68 → 0.73).</p></div>
       <div class="card t2"><span class="big">Images alone</span><h3>…recognise cells and map lesions</h3><p>Cell type 46 % (chance 7 %), lesion maps AUROC 0.90, and this holds <b>across imaging runs</b>.</p></div>
     </div>
     <p class="reveal muted">Not added: CD45 (undetectable in mouse cord); lesion identity and clinical score beyond what the transcriptome already gives. ~85 % of image variance is unexplained by RNA, but that's mostly optics.</p>
@@ -382,10 +382,10 @@ table.use td:first-child { border-right: 1px solid var(--rule); }
 <section class="slide" data-sec="5">
   <div class="page"><div class="slide-content">
     <div class="kicker reveal"><span class="chip" style="background:var(--tab-5)"></span>Biology only the images show · 1</div>
-    <h2 class="reveal">White-matter lesions lose <em>25 %</em> of the ATP1A1 around each cell</h2>
-    <figure class="reveal"><img src="assets/neuropil_map.png" alt="Neuropil index map next to curated niche states for one section"></figure>
-    <p class="reveal">Lesion vs healthy WM <b>within the same piece</b>: 38 pieces, p = 8×10⁻⁶. Grey matter: no change (p = 0.62). This is tissue damage the cell's own transcriptome can't carry. <span class="muted">Not related to clinical score.</span></p>
-  </div><span class="source">notebook 06</span><span class="slide-no">09</span></div>
+    <h2 class="reveal">Neuropil loss sits at the lesion's <em>grey/white-matter border</em></h2>
+    <figure class="reveal"><img src="assets/neuropil_distance.png" alt="ATP1A1 vs distance to grey matter; where lesion and healthy WM cells are; distance-matched lesion effect"></figure>
+    <p class="reveal">ATP1A1 halves over the first ~150 µm away from grey matter, and lesions sit deeper in white matter. <b>At the same distance</b>: ×0.80–0.92 within ~75 µm of grey matter in both run sets (×0.78, 25/31 animals; ×0.83, 13/18), <b>no loss deeper</b>. The first "−25 %" was mostly this gradient. <span class="muted">Neuron-derived RNA between cells drops at the same place (notebook 23).</span></p>
+  </div><span class="source">notebooks 06, 20 §9, 23</span><span class="slide-no">09</span></div>
 </section>
 
 <!-- 10 · Astrocytes -->

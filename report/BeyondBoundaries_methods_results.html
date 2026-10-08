@@ -99,7 +99,10 @@ and scoring were done upstream; descriptions here follow the study metadata).</p
   (chronic, XOA 3.2), runs 2–3 (RR, XOA 3.2), runs 5–6 (both arms, XOA 4.0). 54 annotated images (sections); each image
   holds 2–3 tissue pieces from different animals (<code>meta_sample_id</code> = piece, <code>sample_name</code> = animal; every piece is one
   animal, no piece spans images). In runs 5/6 pieces are ≥ 326 µm apart; in runs 1–3 they often touch (closest cells of
-  two pieces 6–30 µm apart in 8 images).</li>
+  two pieces 6–30 µm apart in 8 images). <strong>Animals are nested within runs:</strong> each of the 67 animals appears in exactly
+  one run (<code>scripts/02_nesting_audit.py</code>), and the disease arm is almost confounded with run (run 1 chronic only, runs
+  2, 3 and 6 RR only, run 5 both). Cross-validation grouped by animal therefore does not separate run from biology when
+  runs are pooled; only train-on-other-runs tests do.</li>
 <li><strong>Segmentation-kit stains</strong> (Xenium Multimodal Cell Segmentation): ch0 DAPI; ch1 ATP1A1/CD45/E-cadherin (one
   channel); ch2 18S rRNA; ch3 αSMA/vimentin (one channel). Channel identity was verified from OME metadata and image
   content. Xenium segmented ~93–97 % of cells with the interior (18S) stain, 0.5–4 % with the boundary stain and 2–3 % by
@@ -145,6 +148,13 @@ invariance tested exactly; 0 truncated cells). Mask areas equal Xenium <code>cel
   disease (notebook 02). The all-runs table reproduces the runs 5/6 table exactly (max difference 0 over 500,379 cells).</li>
 <li><strong>Robust within-image z</strong> (used for all cross-animal image readouts): z = (x − median) / (1.4826 × MAD) over all cells
   of that image (or of that cell type), so animals are compared only against cells stained and imaged with them.</li>
+<li><strong>Normalisation and the neuropil readout.</strong> The p90 scale comes from physiological reference cells in the same image,
+  so a section-wide depression of a stain shrinks the scale along with the signal and is partly absorbed: between-image
+  comparisons of normalised intensities are conservative. The neuropil index itself uses <em>raw</em> territory intensity
+  (normalised value × scale + background) divided by a within-piece reference; in notebooks 06 and 13 that reference is
+  the median of all WM cells of the piece, lesion cells included, so a lesion-associated depression also lowers the
+  reference. Both make the reported neuropil loss conservative rather than inflated (notebook 20's local comparison uses
+  healthy cells only as reference).</li>
 </ul>
 <h3>5. What the stains add to the transcriptome (notebooks 03–09)</h3>
 <ul>
@@ -275,7 +285,23 @@ channel controls; density-matched (within-piece quintiles of cells within 20 µm
 regression on log density and log territory pixel count; same-cell-type comparisons; restriction to cells &gt; 30–200 µm
 from the tissue-mask edge; per-piece Spearman with the MOL-share ratio; profiles across lesion-region edges; a local
 comparison (each lesion cell ÷ median of healthy WM cells within 150 µm, ≥ 20 cells); territory median vs 90th-percentile
-pixel (diffuse mesh vs bright spots).</p>
+pixel (diffuse mesh vs bright spots). <strong>Distance to grey matter</strong> (section 9, added 8 October): distance from each WM
+cell to the nearest GM / dorsal-horn / ventral-horn cell of the same piece; lesion ÷ healthy WM per animal within
+distance bands (10–25 µm wide up to 100 µm, then 100–400 µm; ≥ 20 cells per animal × zone × band), both run sets,
+DAPI as control; the local comparison with a reference matched in distance (± 15 µm); and per animal
+log ATP1A1 ~ lesion + B-spline(distance, 4 df) (+ piece), cells within 150 µm of grey matter.</p>
+<h3>13c. Transcripts relative to the cell outlines (notebook 23, runs 5/6)</h3>
+<p><code>scripts/04_transcript_compartments.py</code>: every decoded gene transcript with qv ≥ 20 in the 18 run-5/6 sections is
+placed relative to the Xenium cell and nucleus masks: assigned cell (Xenium assignment) and nucleus overlap; depth
+inside the cell (distance to the outline on the 2× downsampled mask, 0.425 µm); for transcripts outside cells, the
+nearest cell outline and distance. Per cell: counts in the cell and nucleus (all genes, sparse), counts outside cells
+within 10 µm whose nearest cell it is ("halo") and the free area of that halo, and rim (&lt; 1 µm) vs deep (≥ 2 µm) counts
+for focus gene sets (myelin: <em>Mbp</em>; control myelin genes <em>Mag</em>, <em>Mog</em>, <em>Cldn11</em>, <em>Mal</em>, <em>Opalin</em>, <em>Enpp6</em>;
+oligodendrocyte soma genes; neuron-derived <em>Nefl/m/h</em>, <em>Stmn2</em>, <em>Gap43</em>; phagocyte genes; astrocyte genes; stress genes).
+Lesion zones from the lesion regions (core ≥ 30 µm inside; healthy &gt; 150 µm outside and not called lesion); counts pooled
+per animal × zone; core vs healthy across animals (Wilcoxon). Each readout repeated with curated lesion niches, each run,
+each segmentation method, each cell-size third, WM and GM separately, MOL only and (WM) the same distance band from grey
+matter; random-cell galleries (one cell per random animal) for every claim.</p>
 <h3>13b. Strength of the vimentin–outcome association (notebook 18)</h3>
 <p>35 post-peak animals with ≥ 30 lesion astrocytes. Measure: median astrocyte vimentin (within-image z) inside lesion
 regions minus the same animal's astrocytes &gt; 60 µm outside. Partial Spearman ρ with the clinical score at sacrifice
@@ -302,22 +328,34 @@ morphology, nucleus:cell ratio ΔR² 0.40–0.47). The remainder is spatially co
 by all cell types (r ≈ 0.38 for rim/cytoplasm/nuclear intensity) that follows local background, not lesions; the
 cell-specific remainder shifts with lesion state in 19/924 tests (~0.1 SD); residual clustering finds no discrete
 hidden states [04–05].</p>
-<p><strong>Images alone recognise cells and map lesions, on unseen runs.</strong> Without transcripts, held-out animals: cell type 46 %
-balanced accuracy (14 types, chance 7 %; ependymal 0.86, neuron 0.81, immune cells poor without CD45), subtypes
-(microglia 72 %, reactive astrocytes 68 %), anatomy 63 % (images add to the transcriptome, 0.68 → 0.73), lesion maps
-AUROC 0.90. Models trained on other runs work on every held-out run (lesion AUROC 0.85–0.91, cell type 0.42–0.47),
-across five runs, three batches and two analysis-software versions, even though images identify their run with 100 %
-accuracy [08, 09, 13].</p>
+<p><strong>Images alone recognise cells and map lesions, on unseen runs.</strong> Without transcripts, trained on the other runs and
+tested on a held-out run (leave-one-run-out, five runs): cell type 0.42–0.47 balanced accuracy (14 types, chance 0.07),
+lesion maps AUROC 0.88–0.89 (curated niches; 0.85–0.91 control-referenced); train on run 5 → test run 6 and back:
+lesion 0.87–0.90, cell type 0.42–0.45 [09, 13]. These hold across three batches and two analysis-software versions
+even though images identify their run with 100 % accuracy. <em>Optimistic, pooled within-run CV</em> (runs 5/6, grouped by
+animal; animals are nested in runs, so run is not held out): cell type 0.46 (ependymal 0.86, neuron 0.81, immune
+cells poor without CD45), subtypes (microglia 0.72, reactive astrocytes 0.68), anatomy 0.63 (images + transcriptome
+0.68 → 0.73; no cross-run estimate exists for anatomy), lesion AUROC 0.90 [08].</p>
 <p><strong>Biology only the images show</strong> (replicated in runs 1–3 unless stated) [06, 07, 13]:
-- <em>White-matter neuropil loss</em>: lesion WM has less surrounding ATP1A1 than physiological WM of the same piece (×0.79 in
-  runs 5/6, ×0.72 in runs 1–3, 58 pieces, p &lt; 10⁻⁴); grey matter ~unchanged.
+- <em>White-matter neuropil loss</em>: lesion WM has less surrounding ATP1A1 than physiological WM of the same piece: ×0.79
+  in runs 5/6 (38 pieces, p = 8 × 10⁻⁶; notebook 06) and ×0.72 in runs 1–3 (58 pieces, p &lt; 10⁻⁴; notebook 13);
+  ×0.73 over all five runs (107 pieces, notebook 20); grey matter ~unchanged.
 - <em>Neuropil-loss stress test</em> [20]: robust to local cell density (×0.73 density-matched), lesion composition (same cell
   type ×0.67–0.77), the tissue surface (cells &gt; 200 µm deep ×0.72, 92 % of 99 pieces) and channel (DAPI/18S territory do
   not drop); tracks myelinating-oligodendrocyte loss (ρ +0.25); deepest in active/glial lesion states, absent in late
   fibrotic tissue. <strong>Correction:</strong> part of the piece-wide contrast is tract anatomy; against healthy WM within 150 µm
   the loss is ×0.83 (curated lesions, 98 % of pieces; DAPI ×1.00), and ~3 % with the broader control-referenced lesions,
   so it belongs to dense lesion cores. Diffuse mesh (×0.82) and bright spots (×0.85) are both lower.
-- <em>Astrocyte reactive RNA precedes vimentin protein</em>: protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
+  <strong>Correction 2 (8 October; notebook 20, section 9) — the loss is confined to the grey/white-matter border.</strong> ATP1A1
+  in healthy WM roughly halves over the first ~150 µm away from grey matter, and WM lesion cells lie much further from
+  grey matter (median ~200 µm) than the healthy WM they were compared with (47–83 µm), even within 150 µm. At the same
+  distance from grey matter, lesions have ×0.80–0.92 ATP1A1 within ~75 µm of grey matter in both run sets (per-animal
+  spline model, cells within 150 µm: ×0.78, 25/31 animals, runs 1–3; ×0.83, 13/18, runs 5/6; DAPI unchanged) and <strong>no
+  loss beyond ~75 µm</strong>, where most lesion WM lies. The ×0.72–0.83 above therefore mixed a border effect with the
+  ATP1A1 gradient; there is no general white-matter neuropil loss. Notebook 23 finds lower neuron-derived RNA between
+  cells at the same place (×0.4–0.6 within ~150 µm of grey matter).
+- <em>Astrocyte reactive RNA without vimentin protein in active disease, consistent with RNA preceding protein</em> (ordering
+  inferred from animals sacrificed at successive stages, not a within-animal time course): protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
   more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
 - ~~<em>Perivascular T cells orient their 18S-rich cytoplasm towards the vessel</em>~~ — <strong>withdrawn</strong> [19]. The measure
   replicates (cos 0.14 runs 5/6, 0.19 runs 1–3), but against a non-vessel neighbour at the same distance that is at
@@ -344,7 +382,7 @@ glial-reactive tissue.</p>
 <p>Astrocyte αSMA/vimentin inside lesions (within-image z) is higher in the milder or resolving group in every contrast:
 MILD16 vs SEVERE16 2.3 vs 0.7 (same images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1,
 chronic vs RR PEAK1 2.6 vs 0.2 (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13
-chronic-late animals it correlates with the clinical score (ρ = −0.80), partly a run artefact (MILD30 is run 1 only) [11, 12].</p>
+chronic-late animals it correlates with the clinical score (ρ = −0.80), partly a run artefact (MILD30 is run 1 only) [11, 12]; exploratory (below).</p>
 <p><strong>Strength of the link with outcome</strong> [18]. Across 35 post-peak animals, lesion vimentin (inside − outside) vs
 clinical score: ρ −0.34 (p = 0.046), −0.44 adjusted for days since the first peak (p = 0.008); stable when each run is
 left out (−0.42 to −0.55), within lesion states (S0 −0.49, S2 −0.56, S1 −0.45, S4 −0.41), and beyond RNA astrocyte
@@ -353,8 +391,9 @@ reactivity (vimentin | RNA reactivity ρ −0.63, p &lt; 0.001; RNA reactivity i
 animal has less vimentin in 12 of 19 pairs (p = 0.36). The apparent non-replication in runs 1–3 reflects no score
 variance there (MILD30 all 1.0; RR runs 1–3 ρ −0.46). Part of the association is channel-wide: VSMC αSMA/Vim signal per
 animal also falls with score (ρ −0.36, p = 0.04) and tracks astrocyte vimentin (ρ +0.56); adjusted for it, the
-astrocyte-specific association is ρ −0.32 (p = 0.06; astrocyte − VSMC ρ −0.36, p = 0.03). Overall: weak-to-moderate
-support, entangled with disease burden and partly shared across the channel; separate antibodies needed.</p>
+astrocyte-specific association is ρ −0.32 (p = 0.06; astrocyte − VSMC ρ −0.36, p = 0.03). Given the number of tests
+across the project, this is <strong>exploratory / hypothesis-generating</strong>: entangled with disease burden and partly shared
+across the channel; a dedicated test with separate antibodies is needed.</p>
 <p><strong>Not technical, not αSMA</strong> [15]. The effect keeps its direction in all four contrasts within animals (lesion −
 non-lesion astrocytes: +1.10, +1.09, +3.31, +0.40), far from vessels, with no VSMC, endothelial or fibroblast cell
 within 20 µm (+0.78, +1.21, +2.22, +0.96), in deep white matter, in reactive astrocytes only and within lesion states.
@@ -393,8 +432,10 @@ measurable barrier to infiltrating immune cells.</strong></p>
 <p><img alt="Immune gradient" src="../results/17_local_barrier/immune_gradient_by_local_vimentin.png" />
 <em>Immune share across the lesion edge for vimentin-rich vs vimentin-poor stretches of the same lesions.</em></p>
 <h3>E. Chronic severity: lesions that stayed active</h3>
-<p>Severity is set at the first attack: all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD peaked 1.5–2.5
-and partly recovered. At d27–41 severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30), more active
+<p>Severity is set at the first attack: all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD peaked 1.5–3.0
+and partly recovered. <strong>Sensitivity (MILD30 excluded, <code>scripts/03_mild30_sensitivity.py</code>):</strong> MILD16 first peaks 2.0–2.5
+vs SEVERE 3.5 (complete separation, one-sided p = 0.008; ρ(first peak, sacrifice score) +0.86, n = 8; MILD16 vs SEVERE16
+alone p = 0.03), so the conclusion does not depend on the run-1-only MILD30 group. At d27–41 severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30), more active
 states (S1, S4), T cells and cellularity, and fewer myelinating oligodendrocytes in WM (0.08 vs 0.15 per WM cell);
 neuropil is not lost more. Across 13 chronic-late animals the score correlates with low lesion vimentin (ρ −0.80; partly
 run-confounded),
@@ -423,8 +464,27 @@ are descriptive [11].</p>
 <p>Within the same lesion state, from peak (19 animals) to recovery (13), neuropil trends back towards normal (S1 0.79 →
 1.03; S5 0.88 → 0.99, p = 0.02) while vimentin rises (glial S0/S3 tissue vimentin p = 0.009/0.005; best q = 0.13).
 Lesions that persist into recovery look repaired in neuropil but scarred in vimentin [11]. (This readout pools WM and
-GM; WM lesions alone stay below 1 [13].)</p>
+GM; WM lesions alone stay below 1 [13]. Not yet checked for distance to grey matter, which notebook 20, section 9
+showed drives most of the WM neuropil contrast; treat the neuropil half of this pattern as unconfirmed.)</p>
 <hr />
+<h3>I. RNA in and around cells (notebook 23, runs 5/6)</h3>
+<ul>
+<li><em>Localisation biology (check)</em>: in healthy tissue 22 % of <em>Mbp</em> lies inside cell outlines (it is transported into
+  myelin) against ~75 % for the control myelin genes; <em>Neat1</em> is the most nuclear transcript; <em>Gfap</em> lies mostly in
+  astrocyte processes.</li>
+<li><em>Oligodendrocytes in lesions keep less Mbp in the soma relative to their other myelin genes</em> (modest): ×0.91 (12/15
+  animals), ×0.88 in MOL only, also with curated lesions (×0.94), every size third and at matched distance from grey
+  matter (×0.92–0.94, weaker). No accumulation in soma or nucleus, so not a transport block.</li>
+<li><em>No RNA trace of engulfed myelin</em> (robust negative): lesion-core myeloid cells carry less myelin RNA relative to
+  their surroundings than astrocytes (×0.88, 18/20; WM ×0.91, GM ×0.99); <em>Cd68</em>-high cells less than <em>Cd68</em>-low ones.
+  Lead only: in grey-matter cores myeloid cells hold more neuron-derived RNA than astrocytes (×1.35, 16/16), which
+  engulfment and spillover from touched neurons would both produce.</li>
+<li><em>Between cells in WM lesions, at matched distance from grey matter</em>: astrocyte RNA up everywhere (×1.14–1.50);
+  neuron-derived RNA down within ~150 µm of grey matter (×0.38–0.64); myelin RNA ~10 % down only beyond ~75 µm.</li>
+<li><em>Withdrawn</em>: nuclear RNA retention in lesion oligodendrocytes/OPC (+3 % pooled; ×1.00 within WM and within GM:
+  Simpson's paradox from region mix); "newly formed oligodendrocytes export less <em>Mbp</em>" (not robust to the lesion
+  definition). No readout tracks clinical score.</li>
+</ul>
 <h2>Limitations</h2>
 <ul>
 <li>Small groups (2–19 animals) and a cross-sectional design: temporal statements ("precedes", "builds", "resolves")
