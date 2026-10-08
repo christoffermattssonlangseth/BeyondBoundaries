@@ -2,6 +2,11 @@
 # jupyter:
 #   jupytext:
 #     formats: ipynb,py//py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.5
 #   kernelspec:
 #     display_name: Python (bb)
 #     language: python
@@ -273,7 +278,8 @@ pd.DataFrame(rows).round(3)
 # %% [markdown]
 # ## Findings
 #
-# > **Finding — a moderate, robust association that can't be separated from disease burden.** Across 35 post-peak
+# > **Finding — an exploratory association that can't be separated from disease burden** (label revised from "moderate";
+# > see the VSMC check and the review note at the end). Across 35 post-peak
 # > animals, lesion astrocyte vimentin (inside − outside) goes with a lower clinical score: ρ −0.34 (p = 0.046), −0.44
 # > adjusted for days since the first peak (p = 0.008). It holds when each run is left out in turn (ρ −0.42 to −0.55,
 # > all p < 0.03), within the same lesion state (S0 −0.49, S2 −0.56, S1 −0.45, S4 −0.41 with time adjustment, all
@@ -292,7 +298,7 @@ pd.DataFrame(rows).round(3)
 # > (ρ 0.18), and vimentin vs score adjusted for RNA reactivity is ρ −0.63 (p < 0.001). Worse animals have reactive
 # > transcription without the vimentin protein, consistent with RNA preceding protein (notebooks 06, 13).
 # >
-# > **Overall strength: moderate.** Direction consistent across every contrast and robust to run, time, lesion state and
+# > **Overall strength (superseded below): moderate.** Direction consistent across every contrast and robust to run, time, lesion state and
 # > RNA reactivity (ρ ≈ −0.45), but entangled with overall disease burden and only weakly supported by within-image
 # > pairs. A hypothesis with decent support, not an established result; separate vimentin/GFAP antibodies on more
 # > animals at matched days would settle it.
@@ -335,6 +341,8 @@ plotting.save_fig(fig, "vsmc_check", OUT, SRC)
 # > is shared by every cell in this channel: piece-level staining/brightness that within-image normalisation doesn't
 # > remove (pieces of different animals share an image), or real vascular αSMA biology. After removing it, an
 # > astrocyte-specific association remains but is smaller: astrocyte vimentin vs score adjusted for VSMC signal ρ −0.32
-# > (p = 0.06), astrocyte − VSMC ρ −0.36 (p = 0.03). **Revised strength: weak to moderate.** Post-Xenium
+# > (p = 0.06), astrocyte − VSMC ρ −0.36 (p = 0.03). **Status: exploratory / hypothesis-generating.** Given the number of tests run across this project and the
+# > channel-wide component (VSMC signal tracks score at ρ −0.36), the association (ρ −0.34, p = 0.046, n = 35) should not be
+# > read as a finding; it motivates a dedicated test with separate antibodies. Post-Xenium
 # > immunofluorescence with separate vimentin and αSMA antibodies on the same sections would remove the shared-channel
 # > problem.

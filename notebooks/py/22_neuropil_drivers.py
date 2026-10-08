@@ -2,6 +2,11 @@
 # jupyter:
 #   jupytext:
 #     formats: ipynb,py//py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.5
 #   kernelspec:
 #     display_name: Python (bb)
 #     language: python
@@ -9,7 +14,7 @@
 # ---
 
 # %% [markdown]
-# # 21 — What goes with neuropil loss in white-matter lesions?
+# # 22 — What goes with neuropil loss in white-matter lesions?
 #
 # Notebook 20: white-matter (WM) lesion cells have less ATP1A1 neuropil around them than healthy WM of the same piece,
 # robust to crowding, composition, the tissue surface and channel. Here: **which cells and which damaging programs sit
@@ -46,8 +51,8 @@ from beyondboundaries import data, plotting
 from beyondboundaries.io import XeniumBundle, find_bundles
 
 plotting.style()
-SRC = "notebooks/21_neuropil_drivers.ipynb"
-OUT = ROOT / "results" / "21_neuropil_drivers"
+SRC = "notebooks/22_neuropil_drivers.ipynb"
+OUT = ROOT / "results" / "22_neuropil_drivers"
 OUT.mkdir(parents=True, exist_ok=True)
 COL = plotting.CATEGORICAL
 PX = 0.2125

@@ -2,6 +2,11 @@
 # jupyter:
 #   jupytext:
 #     formats: ipynb,py//py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.5
 #   kernelspec:
 #     display_name: Python (bb)
 #     language: python
@@ -176,7 +181,8 @@ plotting.save_fig(fig, "astro_protein_vs_rna", OUT, SRC)
 st.round(3)
 
 # %% [markdown]
-# > **Finding — RNA comes before protein.** "RNA-only" astrocytes (reactive transcription, low vimentin) are 95 % in
+# > **Finding — consistent with RNA preceding protein.** (Inferred from animals sacrificed at successive stages; the
+# > tissue is cross-sectional.) "RNA-only" astrocytes (reactive transcription, low vimentin) are 95 % in
 # > lesions and peak in active disease (PEAK1 20 %, PEAK2 17 % of extreme astrocytes vs 3.5 % in CFA), falling in
 # > remission. "Protein-only" astrocytes (vimentin-high, homeostatic RNA; n = 401) are genuinely vimentin-channel-high
 # > (z ≈ 3.7–4.4), sit mostly in grey matter outside lesions and are most frequent in CFA / pre-symptomatic animals.
@@ -202,8 +208,9 @@ pa.to_csv(OUT / "astro_quadrants_per_animal.csv")
 
 # %% [markdown]
 # > **Finding — per animal:** protein-only − RNA-only share is negative in active disease (−0.08), smaller in remission
-# > (−0.03), positive before disease (+0.04); remission vs active p = 0.019 → reactive transcription leads, vimentin
-# > protein follows/persists.
+# > (−0.03), positive before disease (+0.04); remission vs active p = 0.019. Ordered by the stage at which animals were
+# > taken, this pattern is consistent with reactive transcription leading and vimentin protein following/persisting; it is
+# > not a within-animal time course.
 
 # %% [markdown]
 # Gallery: protein-only vs RNA-only astrocytes (one section), same contrast.
@@ -445,8 +452,10 @@ fig.tight_layout()
 plotting.save_fig(fig, "neuropil_index_paired", OUT, SRC)
 
 # %% [markdown]
-# > **Finding — neuropil loss in white-matter lesions.** Lesion-niche cells in WM have **25 % less surrounding ATP1A1**
-# > than physiological WM of the same tissue piece (38 pieces, Wilcoxon p = 8e-6); in GM there is no difference (45
+# > **Finding — neuropil loss in white-matter lesions.** Lesion-niche cells in WM have **less surrounding ATP1A1** than
+# > physiological WM of the same tissue piece: median per-piece ratio ×0.79, i.e. ~21 % less (38 pieces, runs 5/6,
+# > Wilcoxon p = 8e-6). (An earlier "25 %" was the median paired difference in index units, −0.25, read as a
+# > percentage.) Notebook 20 refines this: ~17 % against nearby healthy WM (all runs); in GM there is no difference (45
 # > pieces, p = 0.62). The loss does not scale with clinical score. ATP1A1 (*Atp1a1* is not on the panel) gives a
 # > tissue-damage readout the transcriptome cannot.
 

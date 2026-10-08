@@ -115,6 +115,48 @@ def run_celltype(df: pd.DataFrame, counts, feats: list[str], n_pcs: int = 50, n_
     return out
 
 
+def _hgb_fit_predict(Xtr, ytr, Xte, seed: int = 0) -> np.ndarray:
+    from sklearn.ensemble import HistGradientBoostingRegressor
+    m = HistGradientBoostingRegressor(max_iter=200, learning_rate=0.1, early_stopping=True, random_state=seed)
+    return m.fit(Xtr, ytr).predict(Xte)
+
+
+def _hgb(Xtr, Ytr, Xte, n_jobs: int = 8) -> np.ndarray:
+    """One gradient-boosted tree model per target column (HGB is single-output), in parallel over targets."""
+    from joblib import Parallel, delayed
+    cols = Parallel(n_jobs=n_jobs)(delayed(_hgb_fit_predict)(Xtr, Ytr[:, j], Xte) for j in range(Ytr.shape[1]))
+    return np.column_stack(cols).astype(np.float32)
+
+
+def run_celltype_nonlinear(df: pd.DataFrame, counts, feats: list[str], n_pcs: int = 50, n_rev_pcs: int = 20,
+                           genes: np.ndarray | None = None, n_folds: int = 5, group: str = "sample_name",
+                           n_jobs: int = 8) -> dict:
+    """Nonlinear arm of `run_celltype`: identical inputs, rank-inverse-normal targets, covariates, fold-wise PCA
+    (fitted on training folds only), GroupKFold by animal, pooled out-of-fold R² and zero-floored ΔR², but
+    HistGradientBoostingRegressor instead of RidgeCV for the cov / full / tx models (forward direction only;
+    `n_rev_pcs` and `genes` are accepted for interface parity and ignored)."""
+    Y = rank_int(df[feats]).values.astype(np.float32)
+    morph = np.array([c.startswith("morph_") for c in feats])
+    C_area, C_noarea = covariates(df, True), covariates(df, False)
+    Xln = lognorm(counts)
+    oof = {k: np.zeros_like(Y) for k in ("cov", "full", "tx")}
+    for tr, te in GroupKFold(n_folds).split(Y, groups=df[group].astype(str).values):
+        pca = PCA(n_pcs, svd_solver="covariance_eigh", random_state=0).fit(Xln[tr])
+        Ptr, Pte = pca.transform(Xln[tr]), pca.transform(Xln[te])
+        s = Ptr.std(0)
+        Ptr, Pte = Ptr / s, Pte / s
+        for cols, C in ((~morph, C_area), (morph, C_noarea)):
+            if not cols.any():
+                continue
+            oof["cov"][np.ix_(te, cols)] = _hgb(C[tr], Y[tr][:, cols], C[te], n_jobs)
+            oof["full"][np.ix_(te, cols)] = _hgb(np.c_[C[tr], Ptr], Y[tr][:, cols], np.c_[C[te], Pte], n_jobs)
+            oof["tx"][np.ix_(te, cols)] = _hgb(Ptr, Y[tr][:, cols], Pte, n_jobs)
+    out = {"r2": pd.DataFrame({k: r2(Y, v) for k, v in oof.items()}, index=feats),
+           "residuals": pd.DataFrame(Y - oof["full"], index=df.index, columns=feats)}
+    out["r2"]["tx_unique"] = _gain(out["r2"]["full"], out["r2"]["cov"])
+    return out
+
+
 def lesion_distance(df: pd.DataFrame, lesion: np.ndarray, x: str = "x_centroid", y: str = "y_centroid",
                     by: str = "meta_sample_id") -> np.ndarray:
     """Distance (µm) from each cell to the nearest lesion-niche cell in the same tissue piece (0 inside lesions).

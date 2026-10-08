@@ -11,9 +11,12 @@ the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 1–6: 54 sections, 67 ani
 
 | ✅ What it adds | ❌ What it does not add |
 |---|---|
-| **Protein the panel can't measure:** *Vim*, *Acta2*, *Atp1a1* aren't on the 5K panel. Example: astrocyte reactive RNA comes *before* vimentin protein ("RNA-only" astrocytes 20 % at peak vs 3.5 % in CFA) | **CD45:** undetectable in mouse spinal cord; the boundary channel is ATP1A1 only |
-| **Tissue context:** white-matter lesions have 25 % less ATP1A1 neuropil around each cell (p = 8e-6); images add anatomy to the transcriptome (0.68 → 0.73) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
-| **Images alone, held-out animals:** cell type 46 % (14 types, chance 7 %); lesion maps AUROC 0.90, and **0.87–0.90 when trained on one run and tested on the other** | **Better lesion calls or severity than RNA:** images are informative but redundant (clinical score ρ 0.62 vs 0.79) |
+| **Protein the panel can't measure:** *Vim*, *Acta2*, *Atp1a1* aren't on the 5K panel. Example: reactive astrocyte RNA *without* vimentin protein is enriched in active disease ("RNA-only" astrocytes 20 % at peak vs 3.5 % in CFA), consistent with RNA preceding protein (inferred from animals sacrificed at successive stages) | **CD45:** undetectable in mouse spinal cord; the boundary channel is ATP1A1 only |
+| **Tissue context:** dense white-matter lesions have ~17 % less ATP1A1 neuropil around each cell than nearby healthy white matter (×0.83, 98 % of ~103 pieces, all runs; piece-wide ×0.79 in runs 5/6, 38 pieces, ×0.72 in runs 1–3, 58 pieces). Images add anatomy to the transcriptome (0.68 → 0.73; pooled within-run CV, optimistic, no cross-run estimate) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
+| **Images alone, on an unseen run** (trained on the other runs, leave-one-run-out over 5 runs): cell type 42–47 % (14 types, chance 7 %); lesion maps AUROC 0.88–0.89. *Optimistic pooled within-run CV (runs 5/6, grouped by animal; animals are nested in runs, so run is not held out): 46 % and 0.90* | **Better lesion calls or severity than RNA:** images are informative but redundant (clinical score ρ 0.62 vs 0.79; pooled per-animal CV across runs 5/6, optimistic) |
+
+Animals are nested within imaging runs (each animal in exactly one run; `scripts/02_nesting_audit.py`), so headline
+prediction numbers are cross-run; pooled animal-grouped numbers are kept as optimistic secondary values.
 
 **Verdict (one page):** `report/BeyondBoundaries_verdict.pdf` — do the segmentation images add anything, what holds, what was withdrawn.
 **Start here:** `report/BeyondBoundaries_conclusions.pdf` — what the kit adds (9 pages) · `report/BeyondBoundaries_lesion_story.pdf`

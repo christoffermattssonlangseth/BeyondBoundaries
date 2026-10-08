@@ -38,7 +38,10 @@ The **statistical unit is the animal** throughout. 67 animals are in the annotat
   (chronic, XOA 3.2), runs 2–3 (RR, XOA 3.2), runs 5–6 (both arms, XOA 4.0). 54 annotated images (sections); each image
   holds 2–3 tissue pieces from different animals (`meta_sample_id` = piece, `sample_name` = animal; every piece is one
   animal, no piece spans images). In runs 5/6 pieces are ≥ 326 µm apart; in runs 1–3 they often touch (closest cells of
-  two pieces 6–30 µm apart in 8 images).
+  two pieces 6–30 µm apart in 8 images). **Animals are nested within runs:** each of the 67 animals appears in exactly
+  one run (`scripts/02_nesting_audit.py`), and the disease arm is almost confounded with run (run 1 chronic only, runs
+  2, 3 and 6 RR only, run 5 both). Cross-validation grouped by animal therefore does not separate run from biology when
+  runs are pooled; only train-on-other-runs tests do.
 - **Segmentation-kit stains** (Xenium Multimodal Cell Segmentation): ch0 DAPI; ch1 ATP1A1/CD45/E-cadherin (one
   channel); ch2 18S rRNA; ch3 αSMA/vimentin (one channel). Channel identity was verified from OME metadata and image
   content. Xenium segmented ~93–97 % of cells with the interior (18S) stain, 0.5–4 % with the boundary stain and 2–3 % by
@@ -85,6 +88,13 @@ invariance tested exactly; 0 truncated cells). Mask areas equal Xenium `cell_are
   disease (notebook 02). The all-runs table reproduces the runs 5/6 table exactly (max difference 0 over 500,379 cells).
 - **Robust within-image z** (used for all cross-animal image readouts): z = (x − median) / (1.4826 × MAD) over all cells
   of that image (or of that cell type), so animals are compared only against cells stained and imaged with them.
+- **Normalisation and the neuropil readout.** The p90 scale comes from physiological reference cells in the same image,
+  so a section-wide depression of a stain shrinks the scale along with the signal and is partly absorbed: between-image
+  comparisons of normalised intensities are conservative. The neuropil index itself uses *raw* territory intensity
+  (normalised value × scale + background) divided by a within-piece reference; in notebooks 06 and 13 that reference is
+  the median of all WM cells of the piece, lesion cells included, so a lesion-associated depression also lowers the
+  reference. Both make the reported neuropil loss conservative rather than inflated (notebook 20's local comparison uses
+  healthy cells only as reference).
 
 ### 5. What the stains add to the transcriptome (notebooks 03–09)
 
@@ -267,23 +277,27 @@ by all cell types (r ≈ 0.38 for rim/cytoplasm/nuclear intensity) that follows 
 cell-specific remainder shifts with lesion state in 19/924 tests (~0.1 SD); residual clustering finds no discrete
 hidden states [04–05].
 
-**Images alone recognise cells and map lesions, on unseen runs.** Without transcripts, held-out animals: cell type 46 %
-balanced accuracy (14 types, chance 7 %; ependymal 0.86, neuron 0.81, immune cells poor without CD45), subtypes
-(microglia 72 %, reactive astrocytes 68 %), anatomy 63 % (images add to the transcriptome, 0.68 → 0.73), lesion maps
-AUROC 0.90. Models trained on other runs work on every held-out run (lesion AUROC 0.85–0.91, cell type 0.42–0.47),
-across five runs, three batches and two analysis-software versions, even though images identify their run with 100 %
-accuracy [08, 09, 13].
+**Images alone recognise cells and map lesions, on unseen runs.** Without transcripts, trained on the other runs and
+tested on a held-out run (leave-one-run-out, five runs): cell type 0.42–0.47 balanced accuracy (14 types, chance 0.07),
+lesion maps AUROC 0.88–0.89 (curated niches; 0.85–0.91 control-referenced); train on run 5 → test run 6 and back:
+lesion 0.87–0.90, cell type 0.42–0.45 [09, 13]. These hold across three batches and two analysis-software versions
+even though images identify their run with 100 % accuracy. *Optimistic, pooled within-run CV* (runs 5/6, grouped by
+animal; animals are nested in runs, so run is not held out): cell type 0.46 (ependymal 0.86, neuron 0.81, immune
+cells poor without CD45), subtypes (microglia 0.72, reactive astrocytes 0.68), anatomy 0.63 (images + transcriptome
+0.68 → 0.73; no cross-run estimate exists for anatomy), lesion AUROC 0.90 [08].
 
 **Biology only the images show** (replicated in runs 1–3 unless stated) [06, 07, 13]:
-- *White-matter neuropil loss*: lesion WM has less surrounding ATP1A1 than physiological WM of the same piece (×0.79 in
-  runs 5/6, ×0.72 in runs 1–3, 58 pieces, p < 10⁻⁴); grey matter ~unchanged.
+- *White-matter neuropil loss*: lesion WM has less surrounding ATP1A1 than physiological WM of the same piece: ×0.79
+  in runs 5/6 (38 pieces, p = 8 × 10⁻⁶; notebook 06) and ×0.72 in runs 1–3 (58 pieces, p < 10⁻⁴; notebook 13);
+  ×0.73 over all five runs (107 pieces, notebook 20); grey matter ~unchanged.
 - *Neuropil-loss stress test* [20]: robust to local cell density (×0.73 density-matched), lesion composition (same cell
   type ×0.67–0.77), the tissue surface (cells > 200 µm deep ×0.72, 92 % of 99 pieces) and channel (DAPI/18S territory do
   not drop); tracks myelinating-oligodendrocyte loss (ρ +0.25); deepest in active/glial lesion states, absent in late
   fibrotic tissue. **Correction:** part of the piece-wide contrast is tract anatomy; against healthy WM within 150 µm
   the loss is ×0.83 (curated lesions, 98 % of pieces; DAPI ×1.00), and ~3 % with the broader control-referenced lesions,
   so it belongs to dense lesion cores. Diffuse mesh (×0.82) and bright spots (×0.85) are both lower.
-- *Astrocyte reactive RNA precedes vimentin protein*: protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
+- *Astrocyte reactive RNA without vimentin protein in active disease, consistent with RNA preceding protein* (ordering
+  inferred from animals sacrificed at successive stages, not a within-animal time course): protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
   more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
 - ~~*Perivascular T cells orient their 18S-rich cytoplasm towards the vessel*~~ — **withdrawn** [19]. The measure
   replicates (cos 0.14 runs 5/6, 0.19 runs 1–3), but against a non-vessel neighbour at the same distance that is at
@@ -317,7 +331,7 @@ glial-reactive tissue.
 Astrocyte αSMA/vimentin inside lesions (within-image z) is higher in the milder or resolving group in every contrast:
 MILD16 vs SEVERE16 2.3 vs 0.7 (same images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1,
 chronic vs RR PEAK1 2.6 vs 0.2 (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13
-chronic-late animals it correlates with the clinical score (ρ = −0.80), partly a run artefact (MILD30 is run 1 only) [11, 12].
+chronic-late animals it correlates with the clinical score (ρ = −0.80), partly a run artefact (MILD30 is run 1 only) [11, 12]; exploratory (below).
 
 **Strength of the link with outcome** [18]. Across 35 post-peak animals, lesion vimentin (inside − outside) vs
 clinical score: ρ −0.34 (p = 0.046), −0.44 adjusted for days since the first peak (p = 0.008); stable when each run is
@@ -327,8 +341,9 @@ reactivity (vimentin | RNA reactivity ρ −0.63, p < 0.001; RNA reactivity itse
 animal has less vimentin in 12 of 19 pairs (p = 0.36). The apparent non-replication in runs 1–3 reflects no score
 variance there (MILD30 all 1.0; RR runs 1–3 ρ −0.46). Part of the association is channel-wide: VSMC αSMA/Vim signal per
 animal also falls with score (ρ −0.36, p = 0.04) and tracks astrocyte vimentin (ρ +0.56); adjusted for it, the
-astrocyte-specific association is ρ −0.32 (p = 0.06; astrocyte − VSMC ρ −0.36, p = 0.03). Overall: weak-to-moderate
-support, entangled with disease burden and partly shared across the channel; separate antibodies needed.
+astrocyte-specific association is ρ −0.32 (p = 0.06; astrocyte − VSMC ρ −0.36, p = 0.03). Given the number of tests
+across the project, this is **exploratory / hypothesis-generating**: entangled with disease burden and partly shared
+across the channel; a dedicated test with separate antibodies is needed.
 
 **Not technical, not αSMA** [15]. The effect keeps its direction in all four contrasts within animals (lesion −
 non-lesion astrocytes: +1.10, +1.09, +3.31, +0.40), far from vessels, with no VSMC, endothelial or fibroblast cell
@@ -378,8 +393,10 @@ measurable barrier to infiltrating immune cells.**
 
 ### E. Chronic severity: lesions that stayed active
 
-Severity is set at the first attack: all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD peaked 1.5–2.5
-and partly recovered. At d27–41 severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30), more active
+Severity is set at the first attack: all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD peaked 1.5–3.0
+and partly recovered. **Sensitivity (MILD30 excluded, `scripts/03_mild30_sensitivity.py`):** MILD16 first peaks 2.0–2.5
+vs SEVERE 3.5 (complete separation, one-sided p = 0.008; ρ(first peak, sacrifice score) +0.86, n = 8; MILD16 vs SEVERE16
+alone p = 0.03), so the conclusion does not depend on the run-1-only MILD30 group. At d27–41 severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30), more active
 states (S1, S4), T cells and cellularity, and fewer myelinating oligodendrocytes in WM (0.08 vs 0.15 per WM cell);
 neuropil is not lost more. Across 13 chronic-late animals the score correlates with low lesion vimentin (ρ −0.80; partly
 run-confounded),

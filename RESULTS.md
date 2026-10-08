@@ -154,7 +154,8 @@ differs between animals) → inflated "image gain". Fixed: consistent PCA target
    by the vimentin channel (components ρ 0.44 / 0.62; ATP1A1 rim 0.14). Strongest single genes: *C3* 0.50, *Serping1*
    0.39, *Gfap* 0.38; homeostatic *Slc6a11* −0.44, *Aldoc* −0.37.
    - **RNA-only** (reactive transcription, vimentin-quiet): 95 % in lesions, share peaks in active disease (PEAK1 20 %,
-     PEAK2 17 % vs CFA 3.5 %), lower in remission → **reactive transcription precedes vimentin protein**
+     PEAK2 17 % vs CFA 3.5 %), lower in remission → **consistent with reactive transcription preceding vimentin protein**
+     (ordering inferred from animals sacrificed at successive stages; cross-sectional tissue)
      (protein-only − RNA-only per animal: active −0.08, remission −0.03, pre/none +0.04; remission vs active p = 0.019).
    - **Protein-only** (vimentin-channel-high, homeostatic RNA; n = 401): mostly GM, outside lesions, deep tissue;
      most frequent in CFA/pre-symptomatic animals. Caveat: channel pools αSMA → arteriole-associated astrocytes possible.
@@ -168,9 +169,10 @@ differs between animals) → inflated "image gain". Fixed: consistent PCA target
    increases persist (e.g. endothelium +0.39, Schwann +0.83, homeostatic astro +0.39) while the oligodendrocyte drop
    ~vanishes (MOL +0.04) → lesion 18S gain beyond RNA content in activated cells; oligo loss = RNA-content loss.
 4. **Neuropil-loss index** (territory ATP1A1 ÷ median of same piece × WM/GM; first version referenced per section and
-   was confounded by piece-level intensity — replaced). **WM lesion cells have 25 % less surrounding ATP1A1 than
-   physiological WM of the same piece (38 pieces, p = 8e-6); GM no difference (45 pieces, p = 0.62);** not related to
-   clinical score. Highest in ventral/dorsal rim OL niches (1.3–1.4).
+   was confounded by piece-level intensity — replaced). **WM lesion cells have less surrounding ATP1A1 than
+   physiological WM of the same piece (median ratio ×0.79 ≈ 21 % less; 38 pieces, runs 5/6, p = 8e-6); GM no
+   difference (45 pieces, p = 0.62);** not related to clinical score. (The earlier "25 %" was the median paired
+   difference in index units, −0.25, read as a percentage.) Highest in ventral/dorsal rim OL niches (1.3–1.4).
 
 ### Open questions (updated)
 - 18S texture biomarker: validate on runs 1–3 (raw images on P drive) or a new run; visual check of high vs low animals.
@@ -376,7 +378,8 @@ regions, median 96 % lesion cells inside; depth from the cord outline):
 - Strength: moderate; hypothesis with decent support, not established.
 - **VSMC check:** VSMC αSMA/Vim per animal also falls with score (ρ −0.36, p = 0.04) and tracks astrocyte vimentin
   (ρ +0.56) → part of the effect is channel-wide (staining/brightness or vascular biology). Astrocyte-specific remainder:
-  ρ −0.32 adjusted for VSMC (p = 0.06); astrocyte − VSMC −0.36 (p = 0.03). Revised strength: weak to moderate.
+  ρ −0.32 adjusted for VSMC (p = 0.06); astrocyte − VSMC −0.36 (p = 0.03). Status: **exploratory / hypothesis-generating** (review 2026-10;
+  previously "weak to moderate").
 
 ## 2026-10-08 — T-cell 18S polarity: WITHDRAWN (`notebooks/19_tcell_polarity.ipynb`)
 All runs: perivascular T cells' 18S centroid points at the nearest vessel cell (median cos 0.17, 98 % of 54 animals;
