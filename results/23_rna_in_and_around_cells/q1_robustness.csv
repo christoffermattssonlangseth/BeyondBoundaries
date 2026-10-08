@@ -8,6 +8,8 @@ readout,check,animals,core_over_healthy,share_lower,p
 "Mbp ÷ control, soma (all oligos)",large cells (size third),14,0.8876,0.8571,0.0017
 "Mbp ÷ control, soma (all oligos)",mid cells (size third),14,0.9079,0.8571,0.0009
 "Mbp ÷ control, soma (all oligos)",small cells (size third),14,0.8916,0.8571,0.0012
+"Mbp ÷ control, soma (all oligos)",WM 0–100 µm from grey matter,13,0.915,0.6923,0.0574
+"Mbp ÷ control, soma (all oligos)",WM 100–400 µm from grey matter,12,0.9415,0.6667,0.1763
 "Mbp ÷ control, soma (MOL only)",main: lesion-region zones,14,0.8847,0.9286,0.0134
 "Mbp ÷ control, soma (MOL only)",curated lesion niches vs physiological,17,0.9606,0.7059,0.011
 "Mbp ÷ control, soma (MOL only)",run5 only,10,0.8496,0.9,0.084
@@ -17,6 +19,8 @@ readout,check,animals,core_over_healthy,share_lower,p
 "Mbp ÷ control, soma (MOL only)",large cells (size third),8,0.8524,1.0,0.0078
 "Mbp ÷ control, soma (MOL only)",mid cells (size third),12,0.9037,0.9167,0.0161
 "Mbp ÷ control, soma (MOL only)",small cells (size third),12,0.861,0.75,0.0122
+"Mbp ÷ control, soma (MOL only)",WM 0–100 µm from grey matter,9,0.8747,0.7778,0.0391
+"Mbp ÷ control, soma (MOL only)",WM 100–400 µm from grey matter,8,0.9392,0.875,0.0156
 own Mbp halo ÷ ambient (NFOL),main: lesion-region zones,13,0.9113,0.8462,0.0024
 own Mbp halo ÷ ambient (NFOL),curated lesion niches vs physiological,16,0.9868,0.6875,0.1297
 own Mbp halo ÷ ambient (NFOL),run5 only,9,0.9188,0.7778,0.0391
@@ -26,6 +30,8 @@ own Mbp halo ÷ ambient (NFOL),segmented by nucleus expansion of 5.0µm,0,,,
 own Mbp halo ÷ ambient (NFOL),large cells (size third),4,0.8465,1.0,
 own Mbp halo ÷ ambient (NFOL),mid cells (size third),5,0.8991,1.0,0.0625
 own Mbp halo ÷ ambient (NFOL),small cells (size third),6,0.9338,0.8333,0.1562
+own Mbp halo ÷ ambient (NFOL),WM 0–100 µm from grey matter,4,0.9149,1.0,
+own Mbp halo ÷ ambient (NFOL),WM 100–400 µm from grey matter,7,0.9691,1.0,0.0156
 ambient Mbp around other WM cells,main: lesion-region zones,16,0.8862,0.75,0.0182
 ambient Mbp around other WM cells,curated lesion niches vs physiological,18,0.9453,0.7222,0.0539
 ambient Mbp around other WM cells,run5 only,12,0.8782,0.8333,0.0034
@@ -35,3 +41,5 @@ ambient Mbp around other WM cells,segmented by nucleus expansion of 5.0µm,3,0.8
 ambient Mbp around other WM cells,large cells (size third),14,0.9106,0.6429,0.0906
 ambient Mbp around other WM cells,mid cells (size third),14,0.9174,0.7143,0.1189
 ambient Mbp around other WM cells,small cells (size third),15,0.8786,0.8,0.0151
+ambient Mbp around other WM cells,WM 0–100 µm from grey matter,13,1.0853,0.3077,0.1099
+ambient Mbp around other WM cells,WM 100–400 µm from grey matter,12,0.8929,0.8333,0.1099

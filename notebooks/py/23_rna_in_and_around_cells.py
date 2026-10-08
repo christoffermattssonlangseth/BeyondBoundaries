@@ -225,6 +225,9 @@ def robust(d, vfn, label):
     checks += [(f"{r} only", d[d.run_id == r], z) for r in ["run5", "run6"]]
     checks += [(f"segmented by {m}", s, z) for m, s in d.groupby("seg") if len(s) > 2000]
     checks += [(f"{k} cells (size third)", s, z) for k, s in d.groupby("size_third")]
+    rg = d.Global_anatomical_region
+    if (~d.wm).mean() > 0.05:  # analyses that pool regions: white and grey matter separately (Simpson's paradox check)
+        checks += [("white matter only", d[d.wm], z), ("grey matter only", d[rg.isin(GMR)], z)]
     if d.d_gm.notna().mean() > 0.5:  # white-matter analyses: same distance band from grey matter
         checks += [("WM 0–100 µm from grey matter", d[d.d_gm <= 100], z),
                    ("WM 100–400 µm from grey matter", d[d.d_gm.between(100, 400)], z)]
@@ -858,6 +861,29 @@ fig.tight_layout()
 plotting.save_fig(fig, "q3_per_animal", OUT, SRC)
 
 # %% [markdown]
+# ### Correction: white vs grey matter (Simpson's paradox)
+# The checks above pool white- and grey-matter cells. Healthy WM cells of every type have a higher nuclear excess than
+# GM cells, and lesion cores hold proportionally more WM cells than the healthy reference. Split by region:
+
+# %%
+cells["region2"] = np.where(cells.wm, "WM", np.where(cells.Global_anatomical_region.isin(GMR), "GM", "other"))
+rows = []
+for t in ["Oligodendrocyte", "OPC", "Myeloid", "Astrocyte"]:
+    s_ = cells[(cells.Anno_L1_curated == t) & cells.zone.isin(["core", "healthy"])]
+    mix = pd.crosstab(s_.zone, s_.region2, normalize="index")
+    for lab_, ss in [("WM + GM pooled", s_), ("WM only", s_[s_.region2 == "WM"]), ("GM only", s_[s_.region2 == "GM"])]:
+        rows.append(dict(cell_type=t, cells=lab_, **contrast(per_zone(ss, nucx))))
+    h = s_[s_.zone == "healthy"]
+    for rg in ["WM", "GM"]:
+        rows.append(dict(cell_type=t, cells=f"healthy {rg}: nuclear excess level", animals=np.nan,
+                         core_over_healthy=nucx(h[h.region2 == rg])))
+    rows.append(dict(cell_type=t, cells="share WM: core / healthy", animals=np.nan,
+                     core_over_healthy=mix.loc["core", "WM"] / mix.loc["healthy", "WM"]))
+q3r = report(rows)
+q3r.to_csv(OUT / "q3_region_split.csv", index=False)
+q3r
+
+# %% [markdown]
 # ## 4. What does the space between cells lose in white-matter lesions?
 # RNA outside cell outlines in white matter, per µm² of free space within 10 µm of a cell: myelin RNA (*Mbp* and the
 # other myelin genes), neuron-derived RNA (neurofilaments, *Stmn2*, *Gap43*; mostly from grey matter, see the correction in section 4), astrocyte RNA (*Gfap*, *Aqp4*, …) and all genes.
@@ -1069,4 +1095,46 @@ plotting.save_fig(fig, "course", OUT, SRC)
 
 # %% [markdown]
 # ## Findings
-# (filled in after the run)
+# Runs 5/6 (25 animals; 15–20 with lesion cores per readout). Each claim was repeated under: the other lesion
+# definition, each run alone, each segmentation method, each cell-size third, MOL only, and (white matter) the same
+# distance band from grey matter. Strength labels follow those checks.
+#
+# > **Check — RNA sits where cell biology says it should (strong).** In healthy tissue only 22 % of *Mbp* lies inside
+# > cell outlines (it is shipped out into myelin), against ~75 % for its sister myelin genes and the oligodendrocyte
+# > soma genes; *Neat1* is the most nuclear; *Gfap* RNA lies mostly in astrocyte processes. The method sees real
+# > subcellular biology.
+# >
+# > **1. Oligodendrocytes in lesions keep less *Mbp* in the cell body relative to their other myelin genes (modest,
+# > consistent).** ×0.91 (12/15 animals lower, p = 0.007); ×0.88 in mature oligodendrocytes alone (13/14); also with
+# > curated lesions (×0.94), in every size third, and at the same distance from grey matter (×0.92–0.94, weaker p).
+# > There is **no sign of a transport block**: *Mbp* does not pile up in the soma or the nucleus. The data fit a
+# > relative down-shift of *Mbp* (less made, or relatively more sent out), not a jam. *Withdrawn:* the earlier
+# > "newly formed oligodendrocytes have less exported *Mbp* around them" disappears with the curated lesion definition
+# > (×0.99, p = 0.13).
+# >
+# > **2. No RNA trace of engulfed myelin in macrophages/microglia (robust negative).** In lesion cores myeloid cells
+# > carry *less* myelin RNA inside relative to around them than astrocytes do (×0.88, 18/20 animals; both runs, both
+# > lesion definitions, every size third); *Cd68*-high myeloid cells carry less than *Cd68*-low ones, also per
+# > transcript (×0.60), although they are bigger; what myelin RNA they contain sits at the rim like spillover. Engulfed
+# > mRNA is probably degraded too fast to be seen; phagocytosis has to be read from the cells' own programs.
+# >
+# > **3. Nuclear retention in lesions: withdrawn (Simpson's paradox).** The pooled +3 % for oligodendrocytes and OPC
+# > vanished within white matter (×1.00) and within grey matter (×1.00) separately; it came from mixing regions
+# > (healthy WM cells have more nuclear RNA than GM cells, and lesion cores hold more WM cells). The gene-level screen
+# > pools regions in the same way and is not interpreted.
+# >
+# > **4. The space between cells in white-matter lesions, compared at the same distance from grey matter
+# > (consistent).** *Astrocyte RNA* (*Gfap*, *Aqp4*, …) between cells is **higher everywhere** (×1.14–1.50; gliosis).
+# > *Neuron-derived RNA* (neurofilaments, *Stmn2*, *Gap43*), which in healthy WM comes mainly from the adjacent grey
+# > matter, is **lower within ~150 µm of grey matter** (×0.38–0.64, nearly all animals), together with ATP1A1
+# > (×0.83–0.89 within 75 µm; notebook 20, section 9). *Myelin RNA* is not lower near grey matter but ~10 % lower
+# > deeper in the white matter (×0.86–0.92 beyond 75 µm). The first, unmatched comparison (axonal RNA ×0.17) was mostly
+# > anatomy: lesions lie further from grey matter, and neuronal RNA falls ~20-fold over the first 200 µm.
+# >
+# > **5. Disease course.** None of the readouts follows clinical score or first-attack peak (all p > 0.05, 15–20
+# > animals).
+# >
+# > **Overall.** The subcellular view adds two solid points (the myelin-RNA localisation biology itself, and a modest
+# > lesion shift in *Mbp* handling by oligodendrocytes), one robust negative (no engulfed-RNA trace), and, with the
+# > anatomy control, a coherent picture of the grey/white border in lesions: less neuronal RNA *and* less ATP1A1
+# > neuropil there, with gliosis RNA up throughout. The nuclear-retention signal did not survive.

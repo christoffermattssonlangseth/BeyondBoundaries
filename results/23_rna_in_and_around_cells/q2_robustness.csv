@@ -9,13 +9,13 @@ myelin uptake: myeloid ÷ astrocyte (core),segmented by nucleus expansion of 5.0
 myelin uptake: myeloid ÷ astrocyte (core),large cells (size third),20,0.8793,0.95,0.0
 myelin uptake: myeloid ÷ astrocyte (core),mid cells (size third),20,0.8992,0.8,0.002
 myelin uptake: myeloid ÷ astrocyte (core),small cells (size third),19,0.8849,0.9474,0.0
-axonal uptake: myeloid ÷ astrocyte (core),main: lesion-region zones,20,0.9701,0.6,0.5217
-axonal uptake: myeloid ÷ astrocyte (core),curated lesion niches vs physiological,24,0.9826,0.5833,0.2522
-axonal uptake: myeloid ÷ astrocyte (core),run5 only,14,0.9701,0.6429,0.2958
-axonal uptake: myeloid ÷ astrocyte (core),run6 only,6,1.0293,0.5,0.6875
-axonal uptake: myeloid ÷ astrocyte (core),segmented by boundary stain (ATP1A1+CD45+E-Cadherin),2,0.6542,1.0,
-axonal uptake: myeloid ÷ astrocyte (core),segmented by interior stain (18S),20,0.9702,0.6,0.498
-axonal uptake: myeloid ÷ astrocyte (core),segmented by nucleus expansion of 5.0µm,3,0.9852,0.6667,
-axonal uptake: myeloid ÷ astrocyte (core),large cells (size third),20,0.9838,0.55,0.5459
-axonal uptake: myeloid ÷ astrocyte (core),mid cells (size third),20,0.8189,0.75,0.024
-axonal uptake: myeloid ÷ astrocyte (core),small cells (size third),19,0.8882,0.7895,0.0323
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),main: lesion-region zones,20,0.9701,0.6,0.5217
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),curated lesion niches vs physiological,24,0.9826,0.5833,0.2522
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),run5 only,14,0.9701,0.6429,0.2958
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),run6 only,6,1.0293,0.5,0.6875
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),segmented by boundary stain (ATP1A1+CD45+E-Cadherin),2,0.6542,1.0,
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),segmented by interior stain (18S),20,0.9702,0.6,0.498
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),segmented by nucleus expansion of 5.0µm,3,0.9852,0.6667,
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),large cells (size third),20,0.9838,0.55,0.5459
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),mid cells (size third),20,0.8189,0.75,0.024
+neuron-derived RNA uptake: myeloid ÷ astrocyte (core),small cells (size third),19,0.8882,0.7895,0.0323

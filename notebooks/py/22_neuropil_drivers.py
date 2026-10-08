@@ -32,6 +32,11 @@
 # 3. **Across animals and stages:** does an animal's WM neuropil loss follow the make-up of its WM lesions, and is it
 #    already there at onset?
 # 4. **The tissue:** ATP1A1 in WM lesions with the top candidate cells marked.
+#
+# **Caveat (added after notebook 20, section 9).** The WM neuropil loss turned out to be confined to lesions within
+# ~75 µm of grey matter (×0.80–0.88 at matched distance); deeper WM lesions show none, and the larger unmatched loss
+# was partly distance to grey matter. Section 1 therefore adjusts for distance to grey matter; sections 2–3 use the
+# unmatched local index and should be read as descriptive of where lesion cells sit, not as drivers.
 
 # %%
 import sys
@@ -140,20 +145,33 @@ for pc, g in fa.groupby("meta_sample_id", observed=True):
         fa.loc[Lc.index, f"local_{c}"] = Lc[f"{c}_index"].to_numpy() / ref
 for c in ["bnd", "dapi"]:
     fa[f"log_{c}"] = np.log(fa[f"local_{c}"].where(fa[f"local_{c}"] > 0))
+# distance to grey matter (notebook 20, section 9: ATP1A1 falls steeply with distance from grey matter, and the lesion
+# loss is confined to the first ~75 µm); used as a covariate below
+GM = ["GM", "DorsalHorn", "VentralHorn"]
+fa["d_gm"] = np.nan
+for pc, g in obs.groupby("meta_sample_id", observed=True):
+    gm = g[g.Global_anatomical_region.astype(str).isin(GM)]
+    idx = fa.index[fa.meta_sample_id == pc]
+    if len(gm) >= 20 and len(idx):
+        fa.loc[idx, "d_gm"] = cKDTree(gm[["x_centroid", "y_centroid"]].to_numpy()).query(
+            fa.loc[idx, ["x_centroid", "y_centroid"]].to_numpy())[0]
+fa["log_dgm"] = np.log1p(fa.d_gm)
 L = fa[fa.les & fa.log_bnd.notna() & np.isfinite(fa.log_bnd)].copy()
 print(len(fa), "WM cells;", len(L), "WM lesion cells in", L.meta_sample_id.nunique(), "pieces")
 
 # %% [markdown]
 # ## 1. Local composition and programs, within WM lesions
 # Per tissue piece (≥ 200 WM lesion cells): partial Spearman ρ between each neighbourhood feature and the cell's log
-# ATP1A1 index, adjusting for log cellularity and log depth; the same for the DAPI index (control). Per animal: median
+# ATP1A1 index, adjusting for log cellularity, log depth from the surface and log distance to grey matter (added
+# after notebook 20, section 9 showed the WM loss is confined to the grey/white border); the same for the DAPI index
+# (control). Per animal: median
 # over its pieces; summary over animals. Negative ρ for ATP1A1 = more of this feature, less neuropil.
 
 # %%
 FEATS = [c for c in frac_cols if c.replace("frac ", "") in
          ["MDM", "Microglia", "CAM", "DC", "T cell", "B cell", "Neutrophil", "NK/DC", "Reactive astro", "Homeostatic astro",
           "MOL", "NFOL", "DAO", "OPC/COP", "EAE fibroblast", "Fibroblast", "Endothelial", "VSMC"]] + list(nbp.columns)
-COV = ["log cellularity", "log_depth"]
+COV = ["log cellularity", "log_depth", "log_dgm"]  # distance to grey matter added after notebook 20, section 9
 
 
 def partial_rho(g, x, y):

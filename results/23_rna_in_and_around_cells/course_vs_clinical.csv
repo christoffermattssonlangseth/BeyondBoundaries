@@ -11,5 +11,5 @@ myeloid nuclear retention (Q3),score,15,0.303,0.272
 myeloid nuclear retention (Q3),first_peak,15,0.208,0.457
 WM myelin RNA outside cells (Q4),score,18,-0.413,0.088
 WM myelin RNA outside cells (Q4),first_peak,18,-0.043,0.867
-WM axonal RNA outside cells (Q4),score,18,-0.452,0.059
-WM axonal RNA outside cells (Q4),first_peak,18,-0.148,0.558
+WM neuron-derived RNA outside cells (Q4),score,18,-0.452,0.059
+WM neuron-derived RNA outside cells (Q4),first_peak,18,-0.148,0.558

@@ -626,25 +626,26 @@ binned[binned.channel == plotting.CHANNEL_LABELS["bnd"]].round(3)
 
 # %%
 fig, axs = plt.subplots(1, 3, figsize=(16, 4.2))
-for k, (rs, s) in enumerate(wmd.groupby("runs")):
+RC = {"runs 1-3": COL[0], "runs 5/6": COL[1]}
+for rs, s in wmd.groupby("runs"):
     for zn, ls in [("healthy", "-"), ("lesion", "--")]:
         m = s[s.z == zn].groupby("bin", observed=True).bnd_index.median()
-        axs[0].plot([b.mid for b in m.index], m.values, ls=ls, marker="o", ms=3, color=COL[k], label=f"{rs}, {zn} WM")
-    axs[1].hist([s[s.z == "healthy"].d_gm, s[s.z == "lesion"].d_gm], bins=np.arange(0, 600, 20), density=True,
-                histtype="step", color=[COL[k], COL[k]], ls="-", lw=1.4)
+        axs[0].plot([b.mid for b in m.index], m.values, ls=ls, marker="o", ms=3, color=RC[rs], label=f"{rs}, {zn} WM")
+        axs[1].hist(s[s.z == zn].d_gm, bins=np.arange(0, 600, 20), density=True, histtype="step", color=RC[rs], ls=ls,
+                    lw=1.4, label=f"{rs}, {zn} WM")
 axs[0].set_xscale("symlog", linthresh=50)
 axs[0].set_xlabel("distance to grey matter (µm)")
 axs[0].set_ylabel("ATP1A1 territory index (median)")
 axs[0].set_title("ATP1A1 falls with distance from grey matter")
 axs[0].legend(fontsize=7)
 axs[1].set_xlabel("distance to grey matter (µm)")
-axs[1].set_title("where the cells are (step lines: healthy and lesion WM;\nlesion WM is the distribution reaching further out)",
-                 fontsize=9)
-for k, rs in enumerate(["runs 5/6", "runs 1-3"]):
+axs[1].set_title("where the cells are: lesion WM lies further from grey matter")
+axs[1].legend(fontsize=7)
+for rs in ["runs 5/6", "runs 1-3"]:
     for ch, mk in [("bnd", "o"), ("dapi", "s")]:
         t = binned[(binned.runs == rs) & (binned.channel == plotting.CHANNEL_LABELS[ch])]
         x = [BINS[BINS.index(lo)] + (BINS[BINS.index(lo) + 1] - lo) / 2 for lo in t.lo]
-        axs[2].errorbar(x, t.ratio, yerr=[t.ratio - t.q25, t.q75 - t.ratio], marker=mk, ms=4, capsize=2, color=COL[k],
+        axs[2].errorbar(x, t.ratio, yerr=[t.ratio - t.q25, t.q75 - t.ratio], marker=mk, ms=4, capsize=2, color=RC[rs],
                         alpha=1 if ch == "bnd" else 0.45, label=f"{rs}, {plotting.CHANNEL_LABELS[ch]}")
 axs[2].axhline(1, color="0.5", ls="--", lw=0.8)
 axs[2].set_xscale("symlog", linthresh=50)
@@ -714,4 +715,22 @@ reg_sum.round(4)
 
 # %% [markdown]
 # ## Findings (revised after section 9)
-# (filled in after the run)
+#
+# > **Correction 2 — most of the "white-matter neuropil loss" was distance to grey matter.** In healthy WM the ATP1A1
+# > index roughly halves over the first ~150 µm away from grey matter, and WM lesion cells lie much further from grey
+# > matter than the healthy WM they were compared with (median ~200 µm vs 47–83 µm; only 13–16 % of lesion cells
+# > within 75 µm), even within 150 µm (section 7). Compared **at the same distance from grey matter**:
+# > - **within ~75 µm of grey matter, ATP1A1 is lower in lesions**: ×0.80–0.92 per 10–25 µm band, in both run sets
+# >   (runs 1–3: 14–24 of 17–27 animals lower per band; runs 5/6: 9–14 of 13–16); per-animal model with distance as a
+# >   spline, cells within 150 µm of grey matter: ×0.78 (25/31 animals, runs 1–3) and ×0.83 (13/18, runs 5/6). DAPI
+# >   does not drop there (×0.98–1.04 in runs 5/6);
+# > - **beyond ~75 µm there is no loss** (×0.95–1.19), i.e. in most of the white-matter lesion area;
+# > - section 7's local test with a distance-matched reference: ×0.91 (87 % of 61 pieces), but only ~2 % of lesion cells
+# >   have matched healthy WM nearby, so this mainly re-tests the border.
+# >
+# > **Revised claim:** ATP1A1 neuropil is ~15–20 % lower in lesions **at the grey/white-matter border**, robust in
+# > both run sets; there is **no general white-matter neuropil loss** in lesions. The earlier ×0.73 (piece-wide) and
+# > ×0.83 (local) mixed this border effect with the ATP1A1 gradient away from grey matter. Notebook 23 finds the RNA
+# > counterpart at the same place: neuron-derived RNA between cells is ×0.4–0.6 within ~150 µm of grey matter in
+# > lesions. Together this points at loss of neuronal processes at the lesion's grey-matter edge rather than of WM
+# > axon membrane in general.

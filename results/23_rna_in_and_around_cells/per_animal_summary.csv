@@ -1,4 +1,4 @@
-,Mbp kept in soma (Q1),own Mbp halo (Q1),myeloid myelin uptake ÷ astro (Q2),oligo nuclear retention (Q3),myeloid nuclear retention (Q3),WM myelin RNA outside cells (Q4),WM axonal RNA outside cells (Q4),stage,arm,score,first_peak
+,Mbp kept in soma (Q1),own Mbp halo (Q1),myeloid myelin uptake ÷ astro (Q2),oligo nuclear retention (Q3),myeloid nuclear retention (Q3),WM myelin RNA outside cells (Q4),WM neuron-derived RNA outside cells (Q4),stage,arm,score,first_peak
 C_CFA_4,,,,,,,,CFA,chronic,0.0,0.0
 C_CFA_6,,,,,,,,CFA,chronic,0.0,0.0
 C_M16_1,0.001,0.017,0.011,0.061,0.085,-0.283,-2.988,MILD16,chronic,1.5,2.0
