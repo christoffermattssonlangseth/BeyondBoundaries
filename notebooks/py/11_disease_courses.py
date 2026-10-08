@@ -113,6 +113,25 @@ fa = pd.read_parquet(ROOT / "data" / "features_norm_all.parquet", columns=COLS)
 fa = fa[fa.segmentation_method == "Segmented by interior stain (18S)"]
 fa = fa.join(obs[["lesion_state", "region_class"]], how="inner")
 fa["les"] = fa.lesion_state.str.startswith("S")
+
+# Each image holds 2-3 tissue pieces from different animals. In runs 1-3 pieces often touch (closest cells of two
+# pieces 6-30 µm apart in 8 images; runs 5/6 >= 326 µm), so a border cell's territory / ring / local background
+# partly measures the other animal's tissue. Neighbourhoods and lesion calls are per piece and unaffected; for
+# image readouts, cells within 20 µm of another piece are excluded.
+other = pd.Series(np.inf, index=obs.index)
+for _, g in obs.groupby("sample_id", observed=True):
+    xy = g[["x_centroid", "y_centroid"]].to_numpy()
+    pc = g.meta_sample_id.astype(str).to_numpy()
+    for p in np.unique(pc):
+        m = pc == p
+        if m.all():
+            continue
+        d, _ = cKDTree(xy[~m]).query(xy[m], k=1)
+        other[g.index[m]] = d
+fa["other_piece_um"] = other.reindex(fa.index).to_numpy()
+print("cells within 20 µm of another piece, by run:",
+      (fa.other_piece_um < 20).groupby(fa.run).mean().round(4).to_dict())
+fa = fa[fa.other_piece_um >= 20]
 print(fa.run.value_counts().sort_index().to_dict())
 
 
