@@ -1,0 +1,374 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Beyond Boundaries — Methods and Results</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* Written report, rendered to A4 PDF with headless Chrome (see README in report/).
+   Same typography/palette as the lab-meeting deck (Notebook Tabs). */
+:root {
+    --ink: #1a1a1a; --muted: #5b5852; --rule: #d9d4c7; --paper: #ffffff; --accent: #b4462f;
+    --tab-1: #98d4bb; --tab-2: #c7b8ea; --tab-3: #f4b8c5; --tab-4: #a8d8ea; --tab-5: #ffe6a7; --tab-6: #f2c5a0;
+}
+@page { size: A4; margin: 18mm 17mm 18mm 17mm;
+        @bottom-right { content: counter(page); font: 8pt 'DM Sans', sans-serif; color: #9a958a; } }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: 'DM Sans', sans-serif; font-size: 9.6pt; line-height: 1.5; color: var(--ink); background: var(--paper); }
+main { max-width: 176mm; margin: 0 auto; }
+
+h1, h2, h3 { font-family: 'Bodoni Moda', Georgia, serif; font-weight: 400; line-height: 1.15; margin: 0; }
+h1 { font-size: 25pt; letter-spacing: -0.01em; }
+h1 em, h2 em { color: var(--accent); }
+h2 { font-size: 16pt; margin: 0 0 3mm; padding-top: 2mm; display: flex; align-items: baseline; gap: 3mm; }
+h2 .no { font-size: 9pt; font-family: 'DM Sans', sans-serif; padding: 0.5mm 2mm; border-radius: 2px; }
+h3 { font-size: 11.5pt; margin: 4mm 0 1.5mm; break-after: avoid; }
+p { margin: 0 0 2.4mm; }
+ul { margin: 0 0 2.4mm; padding-left: 4.5mm; }
+li { margin-bottom: 1mm; }
+.muted { color: var(--muted); }
+.small { font-size: 8.2pt; }
+b.n, .n { color: var(--accent); font-weight: 700; }
+
+.cover { border-top: 6px solid var(--ink); padding-top: 6mm; margin-bottom: 6mm; }
+.kicker { font-size: 7.8pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 3mm; }
+.meta { margin-top: 3mm; color: var(--muted); font-size: 8.8pt; }
+.tabsbar { display: flex; gap: 1.5mm; margin-top: 4mm; }
+.tabsbar span { height: 2.2mm; flex: 1; border-radius: 1px; }
+
+.answer { background: #faf7f0; border-left: 4px solid var(--accent); padding: 4mm 5mm; margin: 4mm 0 5mm; }
+.answer p:last-child { margin-bottom: 0; }
+.answer .big { font-family: 'Bodoni Moda', serif; font-size: 12.5pt; line-height: 1.35; margin-bottom: 2.5mm; }
+
+section { margin-top: 7mm; }
+section.newpage { break-before: page; }
+.finding { border-left: 3px solid var(--rule); padding-left: 3.5mm; margin: 2.5mm 0 3mm; }
+.finding b:first-child { font-weight: 700; }
+
+figure { margin: 3mm 0 4mm; break-inside: avoid; }
+figure img { width: 100%; display: block; border: 1px solid #eee; }
+figure img.h50 { max-height: 50mm; width: auto; max-width: 100%; margin: 0 auto; }
+figure img.h65 { max-height: 65mm; width: auto; max-width: 100%; margin: 0 auto; }
+figure img.h80 { max-height: 80mm; width: auto; max-width: 100%; margin: 0 auto; }
+figure img.h110 { max-height: 110mm; width: auto; max-width: 100%; margin: 0 auto; }
+figcaption { font-size: 8pt; color: var(--muted); margin-top: 1.5mm; line-height: 1.4; }
+figcaption b { color: var(--ink); }
+.two { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 5mm; align-items: start; }
+
+table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 8.2pt; break-inside: avoid; }
+th { text-align: left; font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 10pt; border-bottom: 1.5px solid var(--ink); padding: 1.2mm 2mm; }
+td { border-bottom: 1px solid var(--rule); padding: 0.8mm 2mm; vertical-align: top; }
+td.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.no td { color: var(--muted); }
+code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; }
+</style>
+<style>
+main img { width: 100%; display:block; margin: 3mm 0 1mm; border:1px solid #eee; break-inside: avoid; }
+main p em:only-child { font-size: 8pt; color: var(--muted); }
+h1 { margin-bottom: 3mm; } h2 { margin-top: 7mm; border-top: 2px solid var(--ink); padding-top: 3mm; }
+h3 { margin-top: 5mm; } hr { border: 0; border-top: 1px solid var(--rule); margin: 5mm 0; }
+li { margin-bottom: 1.2mm; }
+</style></head><body><main><h1>Beyond Boundaries — Methods and Results</h1>
+<p><em>Xenium multimodal cell-segmentation stains in mouse EAE spinal cord: what they add to the transcriptome, and what
+they show about how lesions form, resolve or persist.</em> Draft, 8 October 2026. Every number below is produced by the
+notebooks named in brackets (<code>notebooks/NN_*.ipynb</code>); the running log is <code>RESULTS.md</code>.</p>
+<hr />
+<h2>Methods</h2>
+<h3>1. Animals, disease models and clinical scoring</h3>
+<p>Two experimental autoimmune encephalomyelitis (EAE) courses from the RRMAP2 study were analysed (animal work, induction
+and scoring were done upstream; descriptions here follow the study metadata).</p>
+<ul>
+<li><strong>Chronic EAE</strong> (MOG35–55 immunisation; adjuvant controls "MOG CFA", "CFA"; immunised pre-symptomatic animals
+  "NONSYMPTOM"). Sacrifice stages: onset (OS1, d10–14, score 0.25–0.5), peak (PEAK1, d13–18, 2.5–3.25), chronic mild
+  (MILD16 d27–28, MILD30 d43–50) and chronic severe (SEVERE16 d28–29, SEVERE30 d41). The 16/30 suffix is a cohort label,
+  not the sacrifice day.</li>
+<li><strong>Relapsing–remitting (RR) EAE</strong> (PLP139–151; adjuvant control "PLP CFA"). Stages: ONSET1 (d11–15), ONSET2 (d13),
+  PEAK1 (d14–18), REMISSION1 (d20–25), PEAK2_MILD (d31), PEAK2 (d32–33), MONOPHASIC (never relapsed, d32–33), PEAK3
+  (d38–49), REMISSION2 (d42–47), REMISSION2_LONG (d48).</li>
+<li><strong>Clinical scores and weights</strong> were recorded daily from d0 to sacrifice (up to d51;
+  <code>data/clinical/Fixed_RRMap2_FinalSamples_All{Score,Weight}_curated_20260723_212152.xlsx</code>). Per animal
+  (<code>scripts/clinical_metrics.py</code>): onset day (first score &gt; 0); first-attack peak (maximum within 10 days of onset) and
+  its day; lowest score after the first peak (nadir); area under the score curve (trapezoid over scored days); maximum
+  score; relapse seen (rise ≥ 1 after the nadir); maximum weight loss (% of d0). Name harmonisation: the five MILD30
+  animals are <code>C_M30_k</code> in the score sheet and <code>C_L_k</code> in the annotation; k = 1, 4, 5 match uniquely on sacrifice day and
+  sex, k = 2, 3 (both d45, male, score 1) were paired by number. RR_MP_3 lacks a sacrifice score in the sheet; the
+  annotation's 0.75 was used.</li>
+</ul>
+<p>The <strong>statistical unit is the animal</strong> throughout. 67 animals are in the annotated object (chronic 34, RR 33): controls
+13, onset 9, peak 19, chronic late 13, recovery 13.</p>
+<h3>2. Xenium data</h3>
+<ul>
+<li><strong>Runs.</strong> Five Xenium 5K runs (mouse 5K panel + 95 custom genes), fresh-frozen spinal cord, 0.2125 µm/px: run 1
+  (chronic, XOA 3.2), runs 2–3 (RR, XOA 3.2), runs 5–6 (both arms, XOA 4.0). 54 annotated images (sections); each image
+  holds 2–3 tissue pieces from different animals (<code>meta_sample_id</code> = piece, <code>sample_name</code> = animal; every piece is one
+  animal, no piece spans images). In runs 5/6 pieces are ≥ 326 µm apart; in runs 1–3 they often touch (closest cells of
+  two pieces 6–30 µm apart in 8 images).</li>
+<li><strong>Segmentation-kit stains</strong> (Xenium Multimodal Cell Segmentation): ch0 DAPI; ch1 ATP1A1/CD45/E-cadherin (one
+  channel); ch2 18S rRNA; ch3 αSMA/vimentin (one channel). Channel identity was verified from OME metadata and image
+  content. Xenium segmented ~93–97 % of cells with the interior (18S) stain, 0.5–4 % with the boundary stain and 2–3 % by
+  nucleus expansion. <em>Vim</em>, <em>Acta2</em> and <em>Atp1a1</em> are not on the panel.</li>
+<li><strong>Annotation</strong> (upstream, curated): 1,384,881 cells; cell types at four levels (<code>Anno_L1_curated</code>, 19 types;
+  <code>Anno_L2</code>, 42); curated niche states (<code>Curated_niche_state</code>: Physiological, Lesion_active/progressive/mix/reactive,
+  Meninges, Vasculature); anatomical regions (<code>Global_anatomical_region</code>). Expression: log-normalised <code>X</code>, raw counts in
+  <code>layers['counts']</code>. Contaminating tissue and misassigned cells were removed upstream; analyses use annotated cells only.</li>
+<li><strong>Data transfer and integrity (runs 1–3).</strong> Images and masks (<code>morphology_focus/</code>, <code>cells.zarr.zip</code>, <code>cells.parquet</code>,
+  <code>cell_feature_matrix.h5</code>, <code>experiment.xenium</code>) were copied from the KI file share; transcripts were not copied (only
+  needed for a QC-only autofluorescence mask). Every bundle was checked (<code>scripts/check_bundle_integrity.py</code>): CRC of
+  every <code>cells.zarr.zip</code> entry, full reads of parquet/h5 files, decode of every full-resolution image tile; one file
+  corrupted in transit was re-fetched and verified by MD5. All copied files were additionally compared by MD5 with the
+  source.</li>
+</ul>
+<h3>3. Per-cell image features (<code>scripts/01_extract_features.py</code>, <code>src/beyondboundaries/features.py</code>)</h3>
+<p>For every segmented cell, 201 features were computed from the four full-resolution stain images and the Xenium cell
+and nucleus masks, in 2048 × 2048 px windows with a 256 px (54 µm) halo so every cell is measured whole (tiling
+invariance tested exactly; 0 truncated cells). Mask areas equal Xenium <code>cell_area</code>; centroids agree within 0.28 µm.</p>
+<ul>
+<li><strong>Compartments</strong>: cell; nucleus; cytoplasm (cell − nucleus); rim (cell pixels within 1 µm of the cell edge); ring
+  (non-cell pixels within 2 µm outside the cell, assigned to the nearest cell); territory (non-cell pixels within
+  10 µm, nearest cell: the cell's extracellular surroundings, e.g. neuropil).</li>
+<li><strong>Intensity</strong>: mean, 50th/90th/99th percentile and sum per compartment and channel.</li>
+<li><strong>Radial profile</strong>: mean intensity in 5 bins from cell centre to edge (by distance to the edge), ÷ the cell mean.</li>
+<li><strong>Polarity</strong>: offset of the intensity-weighted centroid (intensity above the cell's 10th percentile) from the
+  geometric centroid and from the nucleus centroid, ÷ equivalent radius; plus the x/y offset in µm (direction).</li>
+<li><strong>Texture</strong>: Haralick features (contrast, homogeneity, angular second moment, entropy, correlation) from a symmetric
+  grey-level co-occurrence matrix over 4 directions at 0.5 µm, 16 levels (per-cell 1–99 % rescaling), on the nucleus for
+  DAPI and the whole cell for the other channels.</li>
+<li><strong>Morphology</strong>: cell and nucleus area, perimeter, eccentricity, solidity, axes, orientation, circularity,
+  nucleus:cell area ratio, nucleus offset.</li>
+</ul>
+<h3>4. Background and normalisation (<code>src/beyondboundaries/background.py</code>, notebook 02, <code>scripts/02_normalise_all_runs.py</code>)</h3>
+<ul>
+<li><strong>Low-resolution maps</strong> (pyramid level 3, 1.7 µm/px) per image: tissue mask (smoothed log(DAPI + 18S) above Otsu,
+  holes filled, objects &lt; 2 × 10⁴ µm² removed); cell-free tissue (tissue &gt; 5 µm from any cell); local background per
+  channel = Gaussian-weighted (σ 25 µm) mean of cell-free pixels (normalised convolution); distance to the tissue edge.
+  An autofluorescence proxy (cell-free and transcript-poor) was used for QC only (runs 5/6).</li>
+<li><strong>Normalisation</strong> of intensity features: x_norm = (x − local background) / s, with s = 90th percentile of the raw cell
+  mean of physiological-niche cells in the same image (the staining/imaging unit). Ratio-type features (radial,
+  polarity, texture, morphology) are unchanged. Per-piece scaling was rejected because piece-level intensity tracks
+  disease (notebook 02). The all-runs table reproduces the runs 5/6 table exactly (max difference 0 over 500,379 cells).</li>
+<li><strong>Robust within-image z</strong> (used for all cross-animal image readouts): z = (x − median) / (1.4826 × MAD) over all cells
+  of that image (or of that cell type), so animals are compared only against cells stained and imaged with them.</li>
+</ul>
+<h3>5. What the stains add to the transcriptome (notebooks 03–09)</h3>
+<ul>
+<li><strong>Expectation tests</strong> (03): AUROC between expected-high and expected-low cell groups for six known stain patterns
+  (VSMC αSMA; leukocyte vimentin; neuron/oligodendrocyte low ch3; ependymal vimentin; neuronal 18S; leukocyte CD45 at the
+  rim), overall, per segmentation method and per animal.</li>
+<li><strong>Orthogonality</strong> (04): per cell type (14 types with ≥ 500 cells and ≥ 5 animals; ≤ 30,000 cells per type; 18S-
+  segmented), 118 image features (rank-inverse-normal transformed within type) predicted by ridge regression
+  (<code>RidgeCV</code>, α = 10⁻²…10⁴, per target) from technical covariates (image, spinal level, log transcripts, log area, log
+  distance to tissue edge) with or without 50 transcriptome principal components (fitted inside each fold on
+  log-normalised counts); 5-fold cross-validation grouped by animal; pooled out-of-fold R². The reverse direction
+  (images → transcriptome PCs), lesion tests on residuals (per-animal shifts, BH-corrected) and Leiden clustering of
+  residuals (resolution 0.3) followed.</li>
+<li><strong>Field vs cell</strong> (05): each cell's residual vs the mean residual of its 30 nearest cells of <em>other</em> types (shared
+  local field); field vs lesion distance and local background. <strong>Animal level</strong>: leave-one-animal-out ridge
+  (α = 10⁻¹…10⁵) predicting clinical score from per-animal transcriptome or image summaries (lumbar), permutation p
+  (score labels shuffled).</li>
+<li><strong>Targeted readouts</strong> (06–07): (i) astrocyte protein score (within-image z of αSMA/Vim cell mean + cytoplasm p90 −
+  ATP1A1 rim) vs an RNA reactivity score (mean gene-wise z of <em>C3, Gfap, Serpina3n, Cd44, Osmr, Timp1, Socs3, Serping1,
+  H2-D1, Psmb8, Gbp2</em> minus <em>Slc1a3, Kcnj10, Slc6a11, Fgfr3, Gjb6, Aldoc, Aldh1l1</em>); quadrants of the top/bottom
+  quartiles; (ii) polarity direction: cosine between a cell's 18S polarity vector and the direction to the nearest
+  endothelial/VSMC cell (≤ 15 µm); (iii) 18S per cell type, lesion vs physiological, with and without adjusting for
+  transcript density; (iv) <strong>neuropil index</strong> = raw ATP1A1 territory intensity ÷ the median of the same tissue piece and
+  region class (WM or GM); lesion vs physiological paired within piece (Wilcoxon over pieces).</li>
+<li><strong>Image-only prediction</strong> (08–09): gradient-boosted trees (<code>HistGradientBoostingClassifier</code>, 300 iterations,
+  learning rate 0.1, early stopping, balanced class weights) on image features only (cell features + means over the 15
+  and 50 nearest cells of 17 key features); 5-fold CV grouped by animal with balanced subsampling (≤ 3,000–8,000 cells
+  per class). Targets: L1 type (14), L2 subtypes, anatomical region (10), lesion state, lesion vs physiological; per
+  animal: clinical score and metadata. <strong>Transfer</strong>: train on one run, test on another (09); leave one run out over all
+  five runs (13).</li>
+</ul>
+<h3>6. Control-referenced lesions and lesion states (notebook 10)</h3>
+<ul>
+<li><strong>Neighbourhood vector</strong> for every cell: its 30 nearest cells in the same tissue piece (including itself) described
+  by (i) composition over 23 cell types/states (L2 where it carries disease state: microglia, monocyte-derived
+  macrophages (MDM), border-associated macrophages, DC, NK/DC, T, B, neutrophils, homeostatic and reactive astrocytes,
+  MOL, NFOL, disease-associated oligodendrocytes (DAO), OPC/COP, excitatory/inhibitory/cholinergic neurons, endothelium,
+  VSMC, EAE-associated and other fibroblasts, Schwann, ependymal), (ii) the neighbourhood mean of seven gene programs
+  (per-cell score = mean gene-wise z of log-normalised expression): lipid-associated myeloid (<em>Trem2, Lpl, Cd36, Gpnmb,
+  Igf1, Itgax, Cst7, Cd9, Plin2, Abca1, Ch25h, Msr1</em>), MHC-II (<em>H2-Aa, H2-Ab1, H2-Eb1, Cd74</em>), interferon (<em>Ifit1, Ifit3,
+  Isg15, Irf7, Stat1, Oasl2</em>), astrocyte reactivity (<em>C3, Gfap, Serpina3n, Cd44, Osmr, Timp1, Socs3, Serping1</em>),
+  homeostatic microglia (<em>P2ry12, Tmem119, Sall1, Cx3cr1, Siglech</em>), myelin (<em>Mbp, Mog, Mag, Cldn11, Mal, Opalin</em>),
+  ECM/fibrosis (<em>Col1a1, Col1a2, Fn1, Tnc, Postn</em>), and (iii) log cellularity (cells per 1000 µm² within the 30-cell
+  radius).</li>
+<li><strong>Reference and abnormality.</strong> Per region class (WM: WM + WM_Meningeal; GM: GM + dorsal + ventral horn; meninges),
+  features were standardised by the control neighbourhoods (mean, SD floored at 0.02) and the squared Mahalanobis
+  distance to the control cloud computed (Ledoit–Wolf covariance, ≤ 60,000 control cells). <strong>Calibration</strong>: each control
+  animal was scored against the other controls; the lesion threshold is the 99th percentile of these held-out distances,
+  so a new control animal is ~1 % lesion by construction. Cells in DRG, vasculature, central canal or unassigned regions
+  were not scored.</li>
+<li><strong>Lesion states.</strong> Ten interpretable axes, each a mean z against control neighbourhoods of the same region:
+  infiltration (T, B, NK/DC, neutrophils), monocyte-derived myeloid (MDM, DC), lipid-associated myeloid program,
+  MHC-II/IFN, astrocyte reactivity (program + reactive astrocyte share), oligodendrocyte disease state (DAO),
+  myelinating-oligodendrocyte loss (MOL share and myelin program, sign flipped), microglia homeostasis loss (sign
+  flipped), fibrosis (EAE fibroblasts + ECM program), cellularity. Lesion neighbourhoods were clustered by k-means
+  (k = 6, 10 initialisations, fitted on ≤ 400,000 cells, arcsinh-transformed axes). States are named by the two axes
+  that most distinguish them from the other states (profile z-scored across states).</li>
+</ul>
+<h3>7. Disease-course analyses (notebook 11)</h3>
+<p>Per animal: share of WM/GM/meningeal cells in each lesion state; composition (share of all cells per type; MOL per WM
+cell; neurons per GM cell); mean lesion axes in lesion tissue; image readouts (18S-segmented cells; cells &lt; 20 µm from
+another tissue piece excluded): neuropil index (vs the piece's own non-lesion WM/GM), tissue vimentin (territory) and
+astrocyte vimentin (cell mean) as within-image z, myeloid 18S texture (GLCM correlation, within-image z); medians in
+lesion and non-lesion tissue (≥ 50 cells). Contrasts by Mann–Whitney U (descriptive), associations by Spearman ρ.
+<strong>B-cell aggregates</strong>: B cells with ≥ 5 B cells among their 15 nearest cells (same piece). <strong>Damage memory</strong>: per animal
+× lesion state readouts, peak vs recovery groups (≥ 3 animals each), Benjamini–Hochberg across tests.</p>
+<h3>8. Replication on runs 1–3 (notebook 13)</h3>
+<p>The same code on runs 5/6 (reproducing earlier numbers) and separately on runs 1–3: 18S texture vs score (per animal ×
+section, lumbar, ≥ 30 cells per type, within-section centring; DAPI texture as control); WM neuropil loss (paired within
+piece, both lesion definitions; both neuropil references compared); astrocyte protein vs RNA (06 definitions); T-cell
+polarity towards vessels; leave-one-run-out image models.</p>
+<h3>9. Relapse lesion origin (notebook 14)</h3>
+<p>Lesion states grouped as active (S1, S4), old/late (S2), glial (S0) and other. Per animal: share of active cells with an
+old cell within 50 µm in the same piece, against a within-piece permutation null (state labels shuffled among the
+piece's lesion cells, 30 permutations; enrichment = observed ÷ expected); distance from active to nearest old cell;
+lesion objects (lesion cells linked when &lt; 30 µm apart in a piece, ≥ 50 cells) and the share of active tissue in objects
+containing ≥ 10 % old tissue; location of active tissue; B-cell aggregates near old tissue; astrocyte vimentin at the
+active/old interface. First attack (RR and chronic PEAK1, 10 animals) vs relapse (PEAK2, PEAK2_MILD, PEAK3, 9 animals).</p>
+<h3>10. Vimentin: robustness, lesion edge, αSMA (notebook 15)</h3>
+<p>Effect = median per-animal value in the milder/resolving group minus the more severe/active group, for four contrasts
+(MILD16 vs SEVERE16; MILD30 vs SEVERE30; MONOPHASIC vs REMISSION1; chronic vs RR PEAK1). Tests: within-animal contrast
+(lesion − non-lesion astrocytes of the same animal); same contrast in DAPI, 18S and ATP1A1; astrocytes &gt; 20 µm from
+endothelial/VSMC cells; astrocytes with no VSMC, endothelial or fibroblast cell within 20 µm; WM &gt; 50 µm from the tissue
+edge; reactive astrocytes only; within each lesion state; lesion neurons and oligodendrocytes (negative controls); VSMC
+αSMA/Vim (calibrator); raw intensities within the four images that hold both MILD16 and SEVERE16 animals; piece
+sharpness (variance of the Laplacian of DAPI at 0.43 µm/px); smooth-muscle/contractile (<em>Myh11, Tagln, Cnn1, Des, Mylk,
+Smtn</em>), pericyte (<em>Pdgfrb, Kcnj8</em>) and fibroblast (<em>Postn, Col1a1</em>) transcripts in lesion astrocytes; per run.
+<strong>Lesion edge</strong>: signed distance of every cell to the lesion edge within its piece (inside: distance to the nearest
+non-lesion cell; outside: minus the distance to the nearest lesion cell); vimentin profiles in distance bins, medians of
+per-animal medians (≥ 15 cells per bin).</p>
+<h3>11. Scar and containment (notebook 16)</h3>
+<p>Lesion objects: control-referenced lesion cells linked within 30 µm in a piece, ≥ 100 cells (419 objects, 53 animals);
+non-lesion cells within 50 µm outside are assigned to the nearest object. Per object: border astrocyte and tissue
+vimentin (−30…+30 µm), core astrocyte vimentin (&gt; 60 µm inside), <strong>edge spike</strong> (tissue vimentin 0–10 µm inside minus
+the mean of −30…−10 µm and +20…+45 µm), active share (S1 + S4), infiltrating immune share (T, B, NK/DC, DC, MDM,
+neutrophils; not microglia) inside and 0–50 µm outside, and <strong>escape</strong> = log₂(immune share outside ÷ the same animal's
+immune share &gt; 150 µm from any lesion). Per-animal summaries are size-weighted means over objects. <strong>Within-animal
+test</strong>: for animals with ≥ 5 objects, Spearman ρ between border vimentin and escape across their lesions, raw or after
+regressing out log size and active share (and log depth from the tissue surface), Wilcoxon signed-rank of the
+per-animal ρ against 0; deep lesions = median distance from the tissue edge &gt; 100 µm.</p>
+<h3>12. Software and statistics</h3>
+<p>Python 3.12.14; numpy 2.2.6, pandas 2.2.3, scipy 1.15.2, scikit-learn 1.7.2, anndata 0.12.19, scanpy 1.11.5,
+scikit-image 0.25.2, tifffile 2025.10.16, zarr 2.18.7, matplotlib 3.10.9 (<code>environment.yml</code>). Notebooks are paired
+jupytext scripts (<code>notebooks/py/</code>). Tests are two-sided; with 2–19 animals per group, p values are descriptive and the
+evidence for a finding is its consistency across independent contrasts. Benjamini–Hochberg where a family of tests
+was screened. Small-group contrasts are reported with every animal shown.</p>
+<hr />
+<h2>Results</h2>
+<h3>A. What the segmentation stains add to the transcriptome</h3>
+<p><strong>The stains measure what they claim, except CD45.</strong> Known patterns appear in every animal: ependymal vimentin (AUROC
+0.86), neuronal 18S (0.78), neuron/oligodendrocyte low ch3 (0.74), leukocyte vimentin (0.73), VSMC αSMA (0.66), also in
+boundary-segmented cells. Leukocytes are not brighter at the rim in the boundary channel (0.48), even where neuropil is
+dimmest: in mouse spinal cord that channel reports ATP1A1 only [03].</p>
+<p><strong>Most of each image feature is not explained by the transcriptome, but most of that is optics.</strong> Covariates plus
+transcriptome explain a median 11–18 % of image-feature variance per cell type (transcriptome-unique 6–10 %; best
+morphology, nucleus:cell ratio ΔR² 0.40–0.47). The remainder is spatially coherent but largely a local field shared
+by all cell types (r ≈ 0.38 for rim/cytoplasm/nuclear intensity) that follows local background, not lesions; the
+cell-specific remainder shifts with lesion state in 19/924 tests (~0.1 SD); residual clustering finds no discrete
+hidden states [04–05].</p>
+<p><strong>Images alone recognise cells and map lesions, on unseen runs.</strong> Without transcripts, held-out animals: cell type 46 %
+balanced accuracy (14 types, chance 7 %; ependymal 0.86, neuron 0.81, immune cells poor without CD45), subtypes
+(microglia 72 %, reactive astrocytes 68 %), anatomy 63 % (images add to the transcriptome, 0.68 → 0.73), lesion maps
+AUROC 0.90. Models trained on other runs work on every held-out run (lesion AUROC 0.85–0.91, cell type 0.42–0.47),
+across five runs, three batches and two analysis-software versions, even though images identify their run with 100 %
+accuracy [08, 09, 13].</p>
+<p><strong>Biology only the images show</strong> (replicated in runs 1–3 unless stated) [06, 07, 13]:
+- <em>White-matter neuropil loss</em>: lesion WM has less surrounding ATP1A1 than physiological WM of the same piece (×0.79 in
+  runs 5/6, ×0.72 in runs 1–3, 58 pieces, p &lt; 10⁻⁴); grey matter ~unchanged.
+- <em>Astrocyte reactive RNA precedes vimentin protein</em>: protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
+  more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
+- <em>Perivascular T cells orient their 18S-rich cytoplasm towards the vessel</em> (cos 0.14 runs 5/6; 0.19 runs 1–3,
+  33 animals, p &lt; 10⁻⁴); also fibroblasts, macrophages, microglia; not neurons.
+- <em>18S rises beyond RNA content in activated lesion cells</em> (Schwann +0.8, endothelium +0.4 SD).
+- <em>18S texture vs severity</em> replicates only in astrocytes, myeloid cells and oligodendrocytes (within-section ρ 0.54–0.76),
+  not endothelium, fibroblasts or neurons; downgraded from candidate biomarker.</p>
+<p><img alt="Image-only lesion maps" src="../results/08_image_only_prediction/lesion_maps_images_vs_annotation.png" />
+<em>Lesion maps from images alone (held-out animals) next to the transcriptome-defined lesion niches.</em></p>
+<h3>B. Lesions redefined against control tissue</h3>
+<p>The curated niche labels call 4–20 % of never-immunised control tissue "lesion" (almost all "Lesion_mix"). With the
+control-referenced definition, controls are 0.3–2.4 % lesion (MOG-CFA and PLP-CFA alike), and 72 % of cells labelled
+Lesion_mix look like control tissue. Lesions do resolve: median lesion share RR PEAK1 0.93 → REMISSION1 0.53 →
+MONOPHASIC 0.35 → REMISSION2 0.30 → REMISSION2_LONG 0.14; chronic PEAK1 0.87, SEVERE16 0.52, MILD16 0.28 [10].</p>
+<p><strong>Six lesion states</strong> [10]: S1 monocyte-derived myeloid (active; ~35 % of tissue at PEAK1/PEAK2, ~0 in long
+remission); S4 monocyte-derived + oligodendrocyte damage (peak); S2 fibrosis + myelinating-oligodendrocyte loss (late:
+SEVERE30 20 %, MILD30 13 %, REMISSION2 12 %); S0 astrocyte reactivity + DAO (persists after peak); S3 astrocyte
+reactivity + MHC-II; S5 lymphocytic infiltration. The course runs from active infiltrate to fibrotic, demyelinated and
+glial-reactive tissue.</p>
+<p><img alt="Lesion states in tissue" src="../results/12_lesion_story/lesion_state_maps.png" />
+<em>Lesion states in one representative animal per stage (median lesion share of its stage, largest piece).</em></p>
+<h3>C. Vimentin marks milder and resolving lesions</h3>
+<p>Astrocyte αSMA/vimentin inside lesions (within-image z) is higher in the milder or resolving group in every contrast:
+MILD16 vs SEVERE16 2.3 vs 0.7 (same images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1,
+chronic vs RR PEAK1 2.6 vs 0.2 (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13
+chronic-late animals it is the strongest correlate of the clinical score (ρ = −0.80) [11, 12].</p>
+<p><strong>Not technical, not αSMA</strong> [15]. The effect keeps its direction in all four contrasts within animals (lesion −
+non-lesion astrocytes: +1.10, +1.09, +3.31, +0.40), far from vessels, with no VSMC, endothelial or fibroblast cell
+within 20 µm (+0.78, +1.21, +2.22, +0.96), in deep white matter, in reactive astrocytes only and within lesion states.
+Controls stay near zero: DAPI (−0.21…0.00), lesion neurons and oligodendrocytes, piece sharpness, and smooth-muscle,
+pericyte and fibroblast transcripts in the lesion astrocytes (no sign of αSMA-cell contamination). The VSMC
+calibrator is also higher in the milder group for MILD16 vs SEVERE16 (+1.16) and chronic vs RR (+0.91), so part of
+those two raw differences may be channel brightness; the within-animal contrast removes it, leaving chronic vs RR as
+the weakest contrast (+0.40). MILD30/SEVERE30 and MONOPHASIC/REMISSION1 have flat calibrators.</p>
+<p><strong>A vimentin ring at the lesion edge</strong> [15]. MILD and MONOPHASIC animals show a sharp vimentin peak in the first ~10 µm
+inside the lesion edge (tissue vimentin z ≈ 1.6 and 3.3; ~0 just outside) and high vimentin in the lesion core; SEVERE,
+REMISSION1 and PEAK animals show neither.</p>
+<p><img alt="Vimentin edge profiles" src="../results/15_vimentin_robustness/vimentin_edge_profiles.png" />
+<em>Vimentin against signed distance to the lesion edge (negative = outside), median over animals per group.</em></p>
+<p><img alt="Robustness" src="../results/15_vimentin_robustness/robustness_forest.png" />
+<em>The vimentin effect under each technical test; controls and calibrators should sit near zero.</em></p>
+<h3>D. Does the scar contain lesions?</h3>
+<p><strong>The border builds between the chronic peak and day ~30, in animals that do well</strong> [16]. Border tissue vimentin:
+chronic PEAK1 0.04 → MILD16 0.97 (p = 0.02) but SEVERE16 0.02; never-relapsing MONOPHASIC 2.91 vs relapsed PEAK2 0.30
+at d32–33; RR PEAK1 → MONOPHASIC p = 0.03.</p>
+<p><strong>Within animals it does not look like containment</strong> [16]. Across lesions of the same animal, stronger vimentin
+borders go with <em>more</em> infiltrating immune cells just outside (escape ρ +0.3 to +0.45, p &lt; 0.01; 37 animals). Surface
+lesions confound this (vimentin-rich glia limitans and meningeal immune entry; lesion depth vs border vimentin ρ −0.44,
+vs escape −0.34), but on deep lesions and with depth as a covariate the association stays positive (ρ +0.25 to +0.31,
+p = 0.003–0.03). Reactive astrocytes build the vimentin border where immune cells are active at the lesion edge.
+Whether the border later restricts spread cannot be decided from single time points.</p>
+<p><img alt="Best vs worst bordered lesion" src="../results/16_scar_containment/best_vs_worst_bordered_lesion.png" />
+<em>Best- and worst-bordered lesion of one MONOPHASIC animal: vimentin channel (left); lesion, edge band and infiltrating
+immune cells (right).</em></p>
+<h3>E. Chronic severity: lesions that stayed active</h3>
+<p>Severity is set at the first attack: all SEVERE animals peaked at 3.5 and never fell below 2.25; MILD peaked 1.5–2.5
+and partly recovered. At d27–41 severe animals still carry more lesion (0.52 vs 0.28; 0.42 vs 0.30), more active
+states (S1, S4), T cells and cellularity, and fewer myelinating oligodendrocytes in WM (0.08 vs 0.15 per WM cell);
+neuropil is not lost more. Across 13 chronic-late animals the score correlates with low lesion vimentin (ρ −0.80),
+lesion share (0.58), T cells (0.47) and cellularity (0.38) (run 5 alone: inflammation 0.77–0.89). The tissue-loss
+hypothesis is not supported [11, 12].</p>
+<h3>F. Relapse</h3>
+<p><strong>Not predictable clinically</strong>: monophasic first peaks 2.25–2.75 vs relapsers 2.5–3.0, similar onset, weight loss and
+early nadir. <strong>B cells</strong>: RR animals accumulate B cells after the first attack (per 1000 cells: PEAK1 14 → REMISSION1
+22 → PEAK2_MILD 25 / PEAK3 19), increasingly in aggregates (0.26 → 0.55) and in the meninges (0.16 → 0.58–0.90).
+Never-relapsing animals have fewer than REMISSION1 animals (9 vs 22, p = 0.03), recovered further after the first
+attack (nadir 0.25 vs 0.75, p = 0.03) and carry more lesion vimentin. The chronic arm has ≤ 8 B cells per 1000
+throughout [11, 12].</p>
+<p><strong>New lesions, with flaring at old borders</strong> [14]. At relapse, active tissue touches old fibrotic tissue far more than
+at the first attack (active cells within 50 µm of old tissue 0.23 vs 0.05, p = 4 × 10⁻⁴; median distance 101 vs 265 µm),
+but active and old tissue still form separate patches (enrichment vs permutation 0.33 vs 0.14, both &lt; 1). Relapse
+animals have more lesion objects (17 vs 8, p = 0.01) and only 19 % of active relapse tissue is in objects containing old
+tissue (0 % at the first attack). B-cell aggregates at relapse sit near old tissue (0.72 vs 0.31) and in the meninges
+(0.33 vs 0.05). No vimentin signature at the active/old interface. Caveat: S2 also forms a thin pial rim at the first
+attack (1.7 % of lesion tissue).</p>
+<h3>G. Chronic vs RR at the same peak</h3>
+<p>Both PEAK1 (d13–18, score ~3): RR lesions are more monocyte-derived with oligodendrocyte damage (S4 0.26 vs 0.17,
+p = 0.01) and less lipid-laden (5.4 vs 9.1, p = 0.01); RR animals have more B cells (14 vs 3 per 1000) and more weight
+loss (22 vs 14 %); chronic lesions show more astrocyte vimentin. Arms differ in antigen, likely strain and run, so these
+are descriptive [11].</p>
+<h3>H. Damage memory</h3>
+<p>Within the same lesion state, from peak (19 animals) to recovery (13), neuropil trends back towards normal (S1 0.79 →
+1.03; S5 0.88 → 0.99, p = 0.02) while vimentin rises (glial S0/S3 tissue vimentin p = 0.009/0.005; best q = 0.13).
+Lesions that persist into recovery look repaired in neuropil but scarred in vimentin [11]. (This readout pools WM and
+GM; WM lesions alone stay below 1 [13].)</p>
+<hr />
+<h2>Limitations</h2>
+<ul>
+<li>Small groups (2–19 animals) and a cross-sectional design: temporal statements ("precedes", "builds", "resolves")
+  are inferred from animals sacrificed at different times.</li>
+<li>The two arms differ in antigen, likely mouse strain, and Xenium run; MILD30 is run 1 only; MONOPHASIC and REMISSION1
+  never share an image (handled with within-image z, within-animal contrasts and normalised displays).</li>
+<li>Lesion calls and states are transcriptome-defined; image readouts are independent measurements on top.</li>
+<li>αSMA and vimentin share one channel (tests in [15] find no αSMA contribution in astrocytes, but a validation stain
+  with separate antibodies would settle it); CD45 is undetectable; 18S drew ~95 % of the masks, so 18S distribution
+  features are partly by construction.</li>
+<li>In runs 1–3 tissue pieces touch; cells &lt; 20 µm from another piece are excluded from image readouts, and spatial
+  computations are done within pieces.</li>
+</ul></main></body></html>

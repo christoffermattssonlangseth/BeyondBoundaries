@@ -1,7 +1,7 @@
 # Beyond Boundaries
 
 What do the Xenium Multimodal Cell Segmentation stains (DAPI, ATP1A1/CD45/E-Cadherin, 18S rRNA, αSMA/Vimentin) add to
-the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 5/6; 18 sections, 25 animals, 500k annotated cells).
+the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 1–6: 54 sections, 67 animals, 1.38 M annotated cells; notebooks 01–09 use runs 5/6).
 
 ## The answer
 
@@ -15,7 +15,9 @@ the transcriptome? Mouse EAE spinal cord (RRMAP2 runs 5/6; 18 sections, 25 anima
 | **Tissue context:** white-matter lesions have 25 % less ATP1A1 neuropil around each cell (p = 8e-6); images add anatomy to the transcriptome (0.68 → 0.73) | **Hidden cell states:** ~85 % of the image isn't explained by RNA, but that is mostly a local optical/staining field |
 | **Images alone, held-out animals:** cell type 46 % (14 types, chance 7 %); lesion maps AUROC 0.90, and **0.87–0.90 when trained on one run and tested on the other** | **Better lesion calls or severity than RNA:** images are informative but redundant (clinical score ρ 0.62 vs 0.79) |
 
-**Start here:** `report/BeyondBoundaries_conclusions.pdf` — the answer, conclusions and key figures (9 pages).
+**Start here:** `report/BeyondBoundaries_conclusions.pdf` — what the kit adds (9 pages) · `report/BeyondBoundaries_lesion_story.pdf`
+— disease biology across all five runs (9 pages) · `report/BeyondBoundaries_methods_results.{md,pdf}` — full Methods and
+Results (editable Markdown).
 Lab-meeting deck: `report/slides/BeyondBoundaries_labmeeting.html` (PDF alongside). All findings in detail:
 `notebooks/00_summary.ipynb` (also `report/BeyondBoundaries_summary.pdf`).
 Every analysis notebook has **Finding** cells next to the plots that support them.
@@ -32,6 +34,13 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `07_visual_checks` | images behind the findings: perivascular T cells, protein-only astrocytes vs VSMC, 18S texture, crowding test |
 | `08_image_only_prediction` | what images alone predict: cell type, subtypes, anatomy, lesion state + lesion maps, animal metadata (vs transcriptome) |
 | `09_conclusions` | cross-run transfer test (train run5 → test run6 and back), one-figure summary, conclusions + how to use the stains |
+| `10_lesion_states` | lesions redefined against control tissue (all 5 runs), six lesion states, trajectories along both disease courses |
+| `11_disease_courses` | chronic mild vs severe, relapse vs monophasic, B cells, chronic vs RR, damage memory (all runs incl. images) |
+| `12_lesion_story` | **illustrated story of 10–16**: tissue maps, microscopy, galleries next to every finding |
+| `13_replication_runs123` | do the earlier image findings replicate in runs 1–3 (and leave-one-run-out models) |
+| `14_relapse_lesion_origin` | relapse: new lesions or reactivated old ones; B-cell aggregates |
+| `15_vimentin_robustness` | vimentin effect vs batch, brightness, focus, αSMA; vimentin ring at the lesion edge |
+| `16_scar_containment` | does the vimentin scar contain lesions; day ~30 vs chronic peak |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.

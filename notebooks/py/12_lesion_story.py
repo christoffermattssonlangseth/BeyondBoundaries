@@ -11,7 +11,7 @@
 # %% [markdown]
 # # 12 — The lesion story: how EAE lesions form, resolve or persist, and what the stains show
 #
-# A picture-led summary of notebooks 10 and 11 (all five RRMAP2 runs, 67 animals, 1.38 M cells; images for all
+# A picture-led summary of notebooks 10–16 (all five RRMAP2 runs, 67 animals, 1.38 M cells; images for all
 # runs). Every claim comes with the plot behind it **and** with the tissue: whole-piece maps, microscopy overviews
 # and single-cell galleries. Statistics are per animal; groups are small, so the evidence is consistency across
 # independent contrasts, stated with each finding.
@@ -19,12 +19,15 @@
 # 1. The two disease courses (clinical scores)
 # 2. Lesions redefined against controls, and the six lesion states
 # 3. Lesion states in the tissue, along both courses
-# 4. **Vimentin marks lesions that are being contained** (the stains' clearest contribution)
+# 4. **Vimentin marks milder and resolving lesions** (the stains' clearest contribution), with the technical and αSMA
+#    tests (notebook 15) and the vimentin ring at the lesion edge
 # 5. Chronic severity = lesions that stayed active
-# 6. Relapse and B cells
-# 7. Chronic vs relapsing-remitting at the same peak
+# 6. Relapse: B cells, and new vs reactivated lesions (notebook 14)
+# 7. Chronic vs relapsing–remitting at the same peak
 # 8. Damage memory: neuropil returns, vimentin builds
-# 9. Caveats and what's next
+# 9. Does the scar contain lesions? Day ~30 vs chronic peak (notebook 16)
+# 10. Which earlier image findings replicate in runs 1–3 (notebook 13)
+# 11. Caveats and what's next
 
 # %%
 import sys
@@ -191,7 +194,7 @@ plotting.save_fig(fig, "lesion_state_maps", OUT, SRC)
 show("10_lesion_states/lesion_state_trajectories.png")
 
 # %% [markdown]
-# ## 4. Vimentin marks lesions that are being contained
+# ## 4. Vimentin marks milder and resolving lesions
 # *Vim* is not on the 5K panel, so the αSMA/vimentin stain is the only per-cell vimentin readout. In astrocytes it
 # reports reactive, scar-forming astrocytes. Astrocyte vimentin **inside lesions** (robust z within image) is higher
 # wherever disease is milder or resolving, in every contrast we have:
@@ -365,13 +368,44 @@ t.round(2)
 # > lesion-specific vimentin difference is not explained by it (numbers in the table above).
 
 # %% [markdown]
-# > **Finding — vimentin marks contained lesions.** Lesion astrocyte vimentin: MILD16 vs SEVERE16 2.3 vs 0.7 (same
+# > **Finding — vimentin marks milder and resolving lesions.** Lesion astrocyte vimentin: MILD16 vs SEVERE16 2.3 vs 0.7 (same
 # > images), MILD30 vs SEVERE30 4.4 vs 2.0, MONOPHASIC vs REMISSION1 3.3 vs 1.1, chronic vs RR first peak 2.6 vs 0.2
 # > (p = 0.04), and within the glial state from peak to recovery 0.16 → 1.14. Among the 13 chronic-late animals, more
 # > vimentin goes with a lower score (ρ = −0.80, the strongest correlate of severity). Mild and resolving lesions are wrapped by vimentin-bright reactive
 # > astrocytes; severe and active ones are not (yet). The transcriptome can't show this: *Vim* is not on the panel and
 # > reactive-astrocyte RNA is similar between groups (notebook 11). Caveats: 3–19 animals per group, no single test
 # > survives strict correction, and the channel also contains αSMA (vascular smooth muscle).
+
+# %% [markdown]
+# ### 4b. Technical batch or αSMA? (notebook 15)
+# Every technical explanation got its own test. Each row is one test; the four colours are the four contrasts;
+# positive = more vimentin in the milder / resolving group. Controls and calibrators should sit near zero.
+
+# %%
+show("15_vimentin_robustness/robustness_forest.png", 1000)
+
+# %% [markdown]
+# > **Finding — not technical, not αSMA.** The effect keeps its direction in all four contrasts within animals
+# > (lesion − non-lesion astrocytes), far from vessels, with **no VSMC / endothelial / fibroblast cell within 20 µm**,
+# > in deep white matter, in reactive astrocytes only, and within lesion states. DAPI, lesion neurons and
+# > oligodendrocytes, piece sharpness, and smooth-muscle / pericyte / fibroblast transcripts in the astrocytes all stay
+# > near zero, so there is no sign of αSMA-cell contamination. Caveat: the VSMC calibrator is also higher in the milder
+# > group for MILD16 vs SEVERE16 and chronic vs RR, so some of those raw differences may be channel brightness; the
+# > within-animal contrast removes it (MILD16/SEVERE16 +1.10; chronic vs RR only +0.40, the weakest contrast).
+# > MILD30/SEVERE30 and MONOPHASIC/REMISSION1 have flat calibrators.
+
+# %% [markdown]
+# ### 4c. A vimentin ring at the lesion edge
+# Vimentin against signed distance to the lesion edge (negative = outside, positive = inside), median over animals:
+
+# %%
+show("15_vimentin_robustness/vimentin_edge_profiles.png")
+
+# %% [markdown]
+# > **Finding — milder and never-relapsing animals have a vimentin ring at the lesion edge.** MILD and MONOPHASIC
+# > animals show a sharp peak in the first ~10 µm inside the edge (tissue vimentin z ≈ 1.6 and 3.3; ~0 just outside),
+# > a dip, and high vimentin again in the lesion core. SEVERE, REMISSION1 and PEAK animals have neither the ring nor
+# > much core vimentin.
 
 # %% [markdown]
 # ## 5. Chronic severity = lesions that stayed active
@@ -496,6 +530,22 @@ plotting.save_fig(fig, "b_cell_aggregate_microscopy", OUT, SRC)
 # > old ones.
 
 # %% [markdown]
+# ### 6b. Relapse: new lesions or reactivated old ones? (notebook 14)
+# Active tissue (S1/S4, orange) vs old fibrotic tissue (S2, blue) and aggregated B cells (black), relapse pieces
+# (PEAK3) and a first-attack piece for comparison (right). Note: colours here follow notebook 14 (old = blue).
+
+# %%
+show("14_relapse_lesion_origin/F_maps.png")
+show("14_relapse_lesion_origin/A_adjacency.png", 900)
+
+# %% [markdown]
+# > **Finding — relapse is mostly new lesions, plus flaring at old borders.** At relapse, active tissue touches old
+# > fibrotic tissue far more than at the first attack (active cells within 50 µm of old tissue 0.23 vs 0.05, p = 4e-4),
+# > but relapse animals have more separate lesions (17 vs 8) and only 19 % of active relapse tissue sits in lesions that
+# > also contain old tissue. B-cell aggregates at relapse sit near old lesions (0.72 vs 0.31) and in the meninges
+# > (0.33 vs 0.05). Caveat: the fibrotic state also forms a thin pial rim at the first attack, so "old" is not purely old.
+
+# %% [markdown]
 # ## 7. Chronic vs relapsing–remitting at the same peak
 # Both PEAK1 (d13–18, score ~3); different antigens/strains and runs, so differences are descriptive.
 
@@ -529,16 +579,63 @@ show("11_disease_courses/image_readouts_by_state_all_runs.png")
 # > Within the same lesion state, the ATP1A1 neuropil around cells trends back towards normal from peak to recovery
 # > (active S1 0.79 → 1.03; lymphocytic S5 0.88 → 0.99, p = 0.02) while vimentin rises (glial S0/S3 tissue vimentin
 # > p = 0.009/0.005; best q = 0.13). Lesions that persist into recovery look repaired in neuropil but scarred in
-# > vimentin: a tissue memory the stains show and the lesion label doesn't.
+# > vimentin: a tissue memory the stains show and the lesion label doesn't. (Neuropil index here pools WM and GM;
+# > in white matter alone lesions stay below 1, notebook 13.)
 
 # %% [markdown]
-# ## 9. Caveats and next
-# - Groups are small (3–19 animals); evidence is consistency across independent contrasts, not single p values.
-# - Arms differ in antigen, likely strain, and run; MILD30 is run 1 only; MONOPHASIC and REMISSION1 never share an
-#   image (within-image z and normalised display used).
-# - Lesion calls and states are transcriptome-defined (control-referenced); image readouts are independent of them.
-# - The αSMA/vimentin channel pools two proteins; vascular αSMA is a minority in astrocytes (notebook 07).
-# - Neuropil index reference differs from notebook 06 (lesion index > 1 in some chronic groups), checked in notebook 13.
+# ## 9. Does the scar contain lesions? Day ~30 vs chronic peak (notebook 16)
+# A collaborator's hypothesis: a successful astrocyte scar is a good sign for recovery because it restricts immune
+# infiltration. Lesions as objects (419 in 53 animals); border vimentin (−30…+30 µm) per animal by group:
+
+# %%
+show("16_scar_containment/day30_vs_peak.png")
+
+# %% [markdown]
+# > **The border builds between the chronic peak and day ~30, in animals that do well.** Border tissue vimentin: chronic
+# > PEAK1 0.04 → MILD16 0.97 (p = 0.02), but SEVERE16 0.02; never-relapsing MONOPHASIC 2.91 vs relapsed PEAK2 0.30 at
+# > d32–33.
+
+# %% [markdown]
+# Within one animal, a well- and a poorly-bordered lesion (vimentin channel; lesion, edge band and infiltrating immune
+# cells on the right):
+
+# %%
+show("16_scar_containment/best_vs_worst_bordered_lesion.png", 1000)
+show("16_scar_containment/immune_profile_by_edge_vimentin.png")
+
+# %% [markdown]
+# > **But within animals it does not look like containment.** Lesions with a stronger vimentin border have *more*
+# > infiltrating immune cells just outside them, not fewer (ρ +0.3 to +0.45). Surface lesions confound this (glia
+# > limitans plus meningeal entry), yet on deep lesions and with depth as a covariate the link stays positive
+# > (ρ +0.25 to +0.31, p ≤ 0.03). Reading: astrocytes build the vimentin border where immune cells are active at the
+# > lesion edge. At the animal level, borders form in the animals that recover. A border that forms in response to the
+# > infiltrate and later helps resolve it fits both; proving restriction needs time-resolved data.
+
+# %% [markdown]
+# ## 10. Do the earlier image findings replicate in runs 1–3? (notebook 13)
 #
-# **Next:** notebook 13 replicates the earlier image findings on runs 1–3; notebook 14 asks whether relapse lesions
-# start next to old ones.
+# | finding (notebooks 05–09) | runs 1–3 |
+# |---|---|
+# | white-matter neuropil loss in lesions | **replicated**: ×0.72 (58 pieces, p < 1e-4) vs ×0.79 |
+# | astrocyte reactive RNA before vimentin protein | **replicated**: ρ 0.51–0.58 per run; RNA-only astrocytes more common in active disease |
+# | T cells orient 18S-rich cytoplasm towards vessels | **replicated**: cos 0.19 (33 animals) vs 0.14 |
+# | image-only models on an unseen run | **yes, every run**: lesion AUROC 0.85–0.91, cell type 0.42–0.47 |
+# | 18S texture as severity marker | **partly**: astrocytes, myeloid, oligodendrocytes (ρ 0.54–0.76), not endothelium, fibroblasts, neurons |
+
+# %%
+show("13_replication_runs123/b_neuropil_paired.png", 900)
+show("13_replication_runs123/e_leave_one_run_out.png", 800)
+
+# %% [markdown]
+# ## 11. Caveats and next
+# - Groups are small (2–19 animals); evidence is consistency across independent contrasts, not single p values.
+# - Arms differ in antigen, likely strain, and run; MILD30 is run 1 only; MONOPHASIC and REMISSION1 never share an
+#   image (within-image z, within-animal contrasts and normalised display used).
+# - Lesion calls and states are transcriptome-defined (control-referenced); image readouts are independent of them.
+# - The αSMA/vimentin channel pools two proteins; tests in notebook 15 find no αSMA contribution in astrocytes.
+# - Everything is cross-sectional: "precedes", "builds" and "resolves" are inferred from animals taken at different
+#   times.
+#
+# **Possible next steps:** event ordering along the active → fibrotic lesion trajectory; an image-only lesion-state
+# classifier; spinal level (lumbar vs thoracic); a validation stain for vimentin vs αSMA (separate antibodies) on a
+# few MILD / SEVERE and MONOPHASIC / REMISSION1 sections.
