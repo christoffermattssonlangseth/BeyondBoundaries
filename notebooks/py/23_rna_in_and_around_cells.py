@@ -1114,9 +1114,13 @@ plotting.save_fig(fig, "course", OUT, SRC)
 # >
 # > **2. No RNA trace of engulfed myelin in macrophages/microglia (robust negative).** In lesion cores myeloid cells
 # > carry *less* myelin RNA inside relative to around them than astrocytes do (×0.88, 18/20 animals; both runs, both
-# > lesion definitions, every size third); *Cd68*-high myeloid cells carry less than *Cd68*-low ones, also per
+# > lesion definitions, every size third; in white matter alone ×0.91, in grey matter alone equal, ×0.99);
+# > *Cd68*-high myeloid cells carry less than *Cd68*-low ones, also per
 # > transcript (×0.60), although they are bigger; what myelin RNA they contain sits at the rim like spillover. Engulfed
 # > mRNA is probably degraded too fast to be seen; phagocytosis has to be read from the cells' own programs.
+# > *Lead, not a finding:* in **grey-matter** lesion cores, myeloid cells hold more neuron-derived RNA relative to
+# > around them than astrocytes (×1.35, 16/16 animals). Engulfed neuronal material and spillover from neurons that
+# > microglia touch would both give this; it needs the depth test restricted to grey matter before any claim.
 # >
 # > **3. Nuclear retention in lesions: withdrawn (Simpson's paradox).** The pooled +3 % for oligodendrocytes and OPC
 # > vanished within white matter (×1.00) and within grey matter (×1.00) separately; it came from mixing regions
