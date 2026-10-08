@@ -377,3 +377,14 @@ regions, median 96 % lesion cells inside; depth from the cord outline):
 - **VSMC check:** VSMC αSMA/Vim per animal also falls with score (ρ −0.36, p = 0.04) and tracks astrocyte vimentin
   (ρ +0.56) → part of the effect is channel-wide (staining/brightness or vascular biology). Astrocyte-specific remainder:
   ρ −0.32 adjusted for VSMC (p = 0.06); astrocyte − VSMC −0.36 (p = 0.03). Revised strength: weak to moderate.
+
+## 2026-10-08 — T-cell 18S polarity: WITHDRAWN (`notebooks/19_tcell_polarity.ipynb`)
+All runs: perivascular T cells' 18S centroid points at the nearest vessel cell (median cos 0.17, 98 % of 54 animals;
+also B, DC, MDM, fibroblasts; not neurons) and much less at a same-distance non-vessel neighbour (0.05). But:
+- DAPI "points" at vessels as strongly (0.14); relative to the cell's own nucleus the T-cell effect is 0.047 (controls −0.04).
+- Brightness-matched control (non-vessel neighbour at the same distance, ≥ as bright in 18S): T cells point *more* at the
+  bright neighbour (0.19) than at the vessel (0.08); vessel − bright < 0 in 76 % of animals (p = 4e-5); relative to the
+  nucleus nothing vessel-specific remains (0.017 vs 0.046).
+- → bleed from 18S-bright perivascular neighbours + outline geometry. The finding in notebooks 06, 07, 09, 13 and in the
+  reports/deck is withdrawn. Lesson: polarity of small cells near bright neighbours needs brightness-matched and
+  outline-free controls.

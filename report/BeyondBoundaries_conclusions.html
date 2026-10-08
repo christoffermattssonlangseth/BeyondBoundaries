@@ -175,11 +175,9 @@ code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; 
 </section>
 
 <section>
-  <h3>5.3 18S rRNA: activation and vessel-oriented T cells</h3>
+  <h3>5.3 18S rRNA: activation</h3>
   <p class="finding"><b>18S rises in activated cells in lesions beyond their RNA content.</b> After adjusting for transcript density: Schwann +0.83, endothelium +0.39, homeostatic astrocytes +0.39 SD. The oligodendrocyte drop (−0.14) disappears (+0.04), so it reflects RNA-content loss.</p>
-  <p class="finding"><b>Perivascular T cells orient their 18S-rich cytoplasm towards the vessel</b> (cos 0.13, n = 4,163; 0.20 in the most polarised quarter; 9/12 random cells point vessel-wards). The same holds for fibroblasts (0.17) and MDM (0.06), but not neurons (0.00) or oligodendrocytes (−0.01), so it isn't blur. DAPI and αSMA/Vim "polarity" is optical bleed and shouldn't be used.</p>
-  <figure><img class="h65" src="../results/07_visual_checks/tcell_perivascular_polarity.png" alt="T cell polarity gallery">
-    <figcaption><b>Figure 10 · Perivascular T cells</b>, strongly 18S-polarised (random): yellow = 18S polarity, green = direction to nearest vessel cell (notebook 07).</figcaption></figure>
+  <p class="finding"><b>Withdrawn: "perivascular T cells orient their 18S towards the vessel."</b> A later brightness-matched control (notebook 19) showed T cells point their 18S <i>more</i> at an equally bright non-vessel neighbour at the same distance than at the vessel. Measured relative to the cell's own nucleus, nothing vessel-specific remains. The signal is bleed from 18S-bright neighbours plus lopsided outlines of small cells; polarity readouts of small cells next to bright neighbours should not be used.</p>
 
   <h3>5.4 Candidate severity marker: 18S texture <span class="muted small">(needs replication)</span></h3>
   <p class="finding"><b>Smoother, less punctate 18S in sicker animals</b> in six cell types (ρ 0.37–0.76). It holds when comparing animals within the same section (ρ 0.53–0.86) and after adjusting for crowding (0.41–0.81). DAPI texture under the same optics doesn't follow. Possible causes: ribosome redistribution, RNA degradation in inflamed tissue, or animal-level tissue handling.</p>
@@ -228,7 +226,7 @@ code { font-size: 8pt; background: #f3efe6; padding: 0 1mm; border-radius: 1px; 
 
   <h3>Next steps</h3>
   <ol>
-    <li><b>Replicate on runs 1–3</b> (P drive): 18S texture marker, WM neuropil loss, astrocyte RNA → protein lag, T-cell polarity, and cross-run transfer of the image models.</li>
+    <li><b>Replicate on runs 1–3</b> (P drive): 18S texture marker, WM neuropil loss, astrocyte RNA → protein lag, and cross-run transfer of the image models.</li>
     <li>Separate vimentin from αSMA (VSMC-adjacent subset) and check CD45 antibody mouse reactivity with 10x.</li>
     <li>Feed the neuropil-loss index and per-cell 18S into the RRMAP2 lesion/niche analyses as image-derived covariates.</li>
   </ol>

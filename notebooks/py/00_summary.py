@@ -167,7 +167,7 @@ display(pd.read_csv(RES / "06_targeted_readouts/astro_quadrants.csv", index_col=
 fig("07_visual_checks/astro_protein_only_vsmc_gallery.png", 800)
 
 # %% [markdown]
-# ### Leukocyte polarity: 18S points towards vessels in T cells (not in neurons/oligos); DAPI/αSMA "polarity" is bleed
+# ### Leukocyte polarity — WITHDRAWN (notebook 19): the 18S "towards vessels" signal is bleed from 18S-bright neighbours plus outline geometry
 
 # %%
 fig("06_targeted_readouts/polarity_vessel_direction.png", 550)

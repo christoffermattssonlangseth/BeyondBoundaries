@@ -633,7 +633,7 @@ show("17_local_barrier/immune_gradient_by_local_vimentin.png", 700)
 # |---|---|
 # | white-matter neuropil loss in lesions | **replicated**: ×0.72 (58 pieces, p < 1e-4) vs ×0.79 |
 # | astrocyte reactive RNA before vimentin protein | **replicated**: ρ 0.51–0.58 per run; RNA-only astrocytes more common in active disease |
-# | T cells orient 18S-rich cytoplasm towards vessels | **replicated**: cos 0.19 (33 animals) vs 0.14 |
+# | T cells orient 18S-rich cytoplasm towards vessels | **withdrawn**: the measure replicates, but a brightness-matched control shows bleed from bright neighbours + outline geometry (notebook 19) |
 # | image-only models on an unseen run | **yes, every run**: lesion AUROC 0.85–0.91, cell type 0.42–0.47 |
 # | 18S texture as severity marker | **partly**: astrocytes, myeloid, oligodendrocytes (ρ 0.54–0.76), not endothelium, fibroblasts, neurons |
 

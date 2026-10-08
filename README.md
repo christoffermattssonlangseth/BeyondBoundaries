@@ -31,7 +31,7 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `04_orthogonality` | image ↔ transcriptome cross-prediction per cell type, residual coherence, lesion tests, clustering |
 | `05_field_vs_cell_and_animal_level` | is the unexplained signal technical or biological; clinical-score prediction per animal; 18S texture |
 | `06_targeted_readouts` | astrocyte vimentin vs RNA reactivity, leukocyte polarity vs vessels, 18S lesion vs physiological, neuropil loss |
-| `07_visual_checks` | images behind the findings: perivascular T cells, protein-only astrocytes vs VSMC, 18S texture, crowding test |
+| `07_visual_checks` | images behind the findings: perivascular T cells (orientation later withdrawn, see 19), protein-only astrocytes vs VSMC, 18S texture, crowding test |
 | `08_image_only_prediction` | what images alone predict: cell type, subtypes, anatomy, lesion state + lesion maps, animal metadata (vs transcriptome) |
 | `09_conclusions` | cross-run transfer test (train run5 → test run6 and back), one-figure summary, conclusions + how to use the stains |
 | `10_lesion_states` | lesions redefined against control tissue (all 5 runs), six lesion states, trajectories along both disease courses |
@@ -43,6 +43,7 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `16_scar_containment` | lesion regions (real outlines); where vimentin sits; does the scar contain lesions (lesion level) |
 | `17_local_barrier` | within-lesion barrier tests: edge stretches vs immune escape; do scarred old lesions stay quiet at relapse |
 | `18_vimentin_outcome` | how strong is the vimentin–outcome link: adjusted models, leave-one-run-out, within lesion states, beyond RNA, within-image pairs |
+| `19_tcell_polarity` | T-cell 18S "orientation towards vessels" tested with outline-free and brightness-matched controls: **an imaging artefact (withdrawn)** |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.

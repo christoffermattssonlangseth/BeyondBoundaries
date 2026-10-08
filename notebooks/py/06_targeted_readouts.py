@@ -317,7 +317,11 @@ plotting.save_fig(fig, "polarity_vessel_direction", OUT, SRC)
 pv.round(3)
 
 # %% [markdown]
-# > **Finding — DAPI and αSMA/Vim "polarity towards vessels" is an artefact** (neurons, oligodendrocytes and astrocytes
+# > **Correction (notebook 19): the 18S result below is also an artefact and is withdrawn.** Against a non-vessel
+# > neighbour at the same distance that is at least as bright in 18S, cells point more at the bright neighbour than at the
+# > vessel; measured relative to the nucleus nothing vessel-specific remains (bright-neighbour bleed + outline geometry).
+# >
+# > ~~Finding — DAPI and αSMA/Vim "polarity towards vessels" is an artefact~~ (original text kept for the record:) (neurons, oligodendrocytes and astrocytes
 # > show it too: optical bleed from the vessel wall and neighbouring nuclei). **18S towards vessels is cell-type
 # > specific:** T cells cos 0.14, fibroblasts 0.17 (wrap vessels — partly geometry), MDM 0.06, microglia 0.05, but
 # > neurons 0.00 and oligodendrocytes −0.01. Images of these T cells in notebook 07.

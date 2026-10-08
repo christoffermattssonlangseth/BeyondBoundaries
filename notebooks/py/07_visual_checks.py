@@ -109,7 +109,10 @@ fig.tight_layout()
 plotting.save_fig(fig, "tcell_polarity_cos_hist", OUT, SRC)
 
 # %% [markdown]
-# > **Finding — perivascular T cells polarise 18S towards the vessel.** Mean cos(18S polarity, direction to nearest vessel
+# > **Withdrawn (notebook 19):** the apparent T-cell orientation is bleed from 18S-bright neighbours plus outline geometry
+# > (brightness-matched control: T cells point more at a bright non-vessel neighbour than at the vessel). Original text:
+# >
+# > ~~Finding — perivascular T cells polarise 18S towards the vessel.~~ Mean cos(18S polarity, direction to nearest vessel
 # > cell) = 0.13 over 4,163 perivascular T cells, 0.20 in the most polarised quarter; in the random gallery 9 of 12
 # > point roughly vessel-wards. (Neurons and oligodendrocytes next to vessels show no such bias — notebook 06.)
 

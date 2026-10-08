@@ -303,8 +303,8 @@ plotting.save_fig(fig, "conclusions_figure", OUT, SRC)
 #   "RNA-only" astrocytes peak in active disease (20 % vs 3.5 % in CFA).
 # - **Ribosomal RNA:** 18S rises in activated cells in lesions beyond their RNA content (Schwann +0.8, endothelium +0.4
 #   SD); the oligodendrocyte drop is RNA loss.
-# - **Perivascular T cells** orient their 18S-rich cytoplasm towards the vessel (cos 0.13–0.20; absent in neurons and
-#   oligodendrocytes — not blur).
+# - ~~**Perivascular T cells** orient their 18S-rich cytoplasm towards the vessel~~ — withdrawn (notebook 19): bleed from
+#   18S-bright neighbours plus outline geometry.
 # - **Candidate severity marker:** smoother 18S texture in sicker animals, in six cell types, within sections and after
 #   a crowding adjustment (ρ 0.41–0.81) — needs replication.
 #

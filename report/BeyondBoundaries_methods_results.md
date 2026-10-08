@@ -214,7 +214,15 @@ median (animals resampled, 5000×). **Old lesions at relapse** (PEAK2, PEAK2_MIL
 (S2) cells; vimentin of the old tissue (S2 astrocytes; S2 territory) vs the active (S1/S4) share among cells within
 60 µm, centred within region, per-animal partial ρ adjusting for log depth and log old-cell count.
 
-### 13. Strength of the vimentin–outcome association (notebook 18)
+### 13. T-cell polarity controls (notebook 19)
+
+18S polarity vector (intensity-weighted centroid minus outline centroid) compared by cosine with the direction to (i) the
+nearest endothelial/VSMC cell, (ii) a non-vessel neighbour at the same distance (± 3 µm), (iii) a non-vessel neighbour
+at the same distance that is at least as bright in raw 18S cell mean as the nearest vessel cell, and (iv) the nearest
+MHC-II-high myeloid cell; plus an outline-free version (18S centroid minus DAPI centroid, i.e. relative to the cell's
+own nucleus). Perivascular = < 15 µm; per-animal mean (≥ 20 cells; ≥ 10 for the matched controls); Wilcoxon.
+
+### 13b. Strength of the vimentin–outcome association (notebook 18)
 
 35 post-peak animals with ≥ 30 lesion astrocytes. Measure: median astrocyte vimentin (within-image z) inside lesion
 regions minus the same animal's astrocytes > 60 µm outside. Partial Spearman ρ with the clinical score at sacrifice
@@ -261,8 +269,10 @@ accuracy [08, 09, 13].
   runs 5/6, ×0.72 in runs 1–3, 58 pieces, p < 10⁻⁴); grey matter ~unchanged.
 - *Astrocyte reactive RNA precedes vimentin protein*: protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes are
   more common in active disease than in recovery (runs 1–3 0.076 vs 0.046, p = 0.01; runs 5/6 0.111 vs 0.071, p = 0.02).
-- *Perivascular T cells orient their 18S-rich cytoplasm towards the vessel* (cos 0.14 runs 5/6; 0.19 runs 1–3,
-  33 animals, p < 10⁻⁴); also fibroblasts, macrophages, microglia; not neurons.
+- ~~*Perivascular T cells orient their 18S-rich cytoplasm towards the vessel*~~ — **withdrawn** [19]. The measure
+  replicates (cos 0.14 runs 5/6, 0.19 runs 1–3), but against a non-vessel neighbour at the same distance that is at
+  least as bright in 18S, T cells point more at the bright neighbour (0.19) than at the vessel (0.08), and relative to
+  the nucleus nothing vessel-specific remains: bleed from 18S-bright neighbours plus outline geometry.
 - *18S rises beyond RNA content in activated lesion cells* (Schwann +0.8, endothelium +0.4 SD).
 - *18S texture vs severity* replicates only in astrocytes, myeloid cells and oligodendrocytes (within-section ρ 0.54–0.76),
   not endothelium, fibroblasts or neurons; downgraded from candidate biomarker.
