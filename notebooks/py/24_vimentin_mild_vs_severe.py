@@ -207,9 +207,9 @@ plotting.save_fig(fig, "vimentin_vs_depth", OUT, SRC)
 
 # %% [markdown]
 # ## Images
-# Display: the αSMA/vimentin channel alone, converted to the same within-image z scale as the measure
-# ((pixel − image median of cell means) ÷ image MAD), clipped at −1 to 12 — so brightness is comparable between
-# animals and runs in the same units the statistics use. Cell outlines thin grey; **astrocytes outlined in yellow**.
+# Display: the αSMA/vimentin channel alone, scaled per image from its own raw pixels (1st to 99.5th percentile of
+# tissue pixels on a downsampled copy of the whole image), so the scale is identical for every animal on the same
+# image and comparable in rank terms between images. Cell outlines thin grey; **astrocytes outlined in cyan**.
 # Crops 80 µm, centred on a random astrocyte (seed 0; not chosen for the effect).
 
 # %%
@@ -224,6 +224,20 @@ def cell_labels(sid):
     return _L[sid]
 
 
+_R = {}
+
+
+def display_range(sid, level=3):
+    """1st and 99.5th percentile of tissue pixels of the αSMA/vimentin channel (2**level downsampled whole image)."""
+    if sid not in _R:
+        if sid not in _B:
+            _B[sid] = XeniumBundle(bundles[sid])
+        im = _B[sid].read_level("smavim", level).astype(np.float32)
+        v = im[im > 0]
+        _R[sid] = (np.percentile(v, 1), np.percentile(v, 99.5))
+    return _R[sid]
+
+
 def crop(ax, r, w_um=80, title=""):
     sid = r.sample_id
     if sid not in _B:
@@ -232,15 +246,14 @@ def crop(ax, r, w_um=80, title=""):
     px = b.pixel_size
     x0, y0 = r.x_centroid - w_um / 2, r.y_centroid - w_um / 2
     img, lab, _ = b.read_window(int(y0 / px), int(x0 / px), int(w_um / px), int(w_um / px))
-    sc = SEC_SCALE.loc[sid]
-    z = (img[3] - sc.med) / sc.mad
-    ax.imshow(np.clip((z + 1) / 13, 0, 1), cmap="inferno", extent=(0, w_um, w_um, 0))
+    lo, hi = display_range(sid)
+    ax.imshow(np.clip((img[3] - lo) / (hi - lo), 0, 1), cmap="inferno", extent=(0, w_um, w_um, 0))
     near = sub[(sub.sample_id == sid) & sub.x_centroid.between(x0, x0 + w_um) & sub.y_centroid.between(y0, y0 + w_um)]
     astro_lab = cell_labels(sid).reindex(near[near.Anno_L1_curated == "Astrocyte"].cell_id).dropna().astype(int)
     ov = np.zeros((*lab.shape, 4))
     e = find_boundaries(lab, mode="inner")
     ov[e] = (0.6, 0.6, 0.6, 0.35)
-    ov[e & np.isin(lab, astro_lab.to_numpy())] = (1, 0.85, 0.1, 1)
+    ov[e & np.isin(lab, astro_lab.to_numpy())] = (0.2, 0.9, 1, 1)
     ax.imshow(ov, extent=(0, w_um, w_um, 0))
     ax.set_title(title, fontsize=7)
     ax.set_xticks([])
@@ -280,7 +293,7 @@ for i, an in enumerate(order):
     st = A.loc[an]
     axs[i, 0].set_ylabel(f"{an}\n{st.stage}\nΔ {st['original (notebook 18)']:.1f}", fontsize=8,
                          color=GCOL[st.group], rotation=0, ha="right", va="center")
-fig.suptitle("αSMA/vimentin channel (inferno, same z scale everywhere); astrocytes outlined yellow. Left 4: inside "
+fig.suptitle("αSMA/vimentin channel (inferno, same z scale everywhere); astrocytes outlined cyan. Left 4: inside "
              "lesion WM; right 2: outside WM at the same depth", fontsize=9)
 fig.tight_layout()
 plotting.save_fig(fig, "gallery_every_animal", OUT, SRC)
@@ -340,4 +353,27 @@ plotting.save_fig(fig, "gallery_surface_vs_deep", OUT, SRC)
 
 # %% [markdown]
 # ## Findings
-# (filled in after the run)
+#
+# > **Mild > severe holds in direction, but it is weak and not established (exploratory).**
+# > - **Only in white matter.** In grey matter mild and severe are identical (lesion − outside ≈ 0.1 in both).
+# > - **Depth from the cord surface is a confound.** Lesion astrocytes sit ~100–200 µm from the surface, their healthy
+# >   reference ~350–400 µm, and astrocyte vimentin is highest near the pia (glia limitans). Matching region and depth
+# >   roughly halves the difference (all mild vs severe 2.32 vs 0.86, p = 0.22, 8 vs 5 animals); deep cells only
+# >   (> 150 µm): 1.91 vs 0.45, p = 0.047. In the depth profile, deep lesion white matter is z ≈ 3–4.5 in mild vs
+# >   ≈ 1–1.5 in severe while healthy white matter at the same depth is ≈ 0–1 in both: the best support for a real
+# >   difference.
+# > - **The channel calibrator moves too.** VSMC vimentin, in the same αSMA/vimentin channel, is also higher in mild
+# >   animals (1.64 vs 0.74, p = 0.03), as is the healthy glia limitans near the surface, so part of the difference is
+# >   likely piece-level channel brightness, not astrocyte biology.
+# > - **Small groups.** MILD16 vs SEVERE16 (same images, 3 vs 3): no check separates them completely except reactive
+# >   astrocytes only (p = 0.05). MILD30 vs SEVERE30 compares run 1 with run 5, and the run-1 images look different
+# >   (softer focus, different dynamic range), so that contrast is not a fair visual or quantitative comparison.
+# > - **By eye (same-image gallery, deep lesion white matter).** In two of the four shared images the mild animal's
+# >   lesion is clearly brighter (G2_Top: C_M16_3 vs C_S16_1; G3_Mid: C_M16_2 vs C_S16_3); in one the severe animal's
+# >   is brighter (G1_Bot: C_S16_2 vs C_M16_1); one is similar. In the every-animal gallery, lesions are brighter than
+# >   the animal's own healthy white matter at the same depth in most animals of both groups.
+# >
+# > **Status:** lesions are vimentin-richer than surrounding white matter in both mild and severe animals; that mild
+# > lesions are *more* vimentin-rich is a consistent direction that weakens under depth matching and is partly shared
+# > by the channel calibrator. Keep as exploratory; settling it needs a separate vimentin antibody (not pooled with
+# > αSMA) on the MILD16/SEVERE16 slides, or more animals per group.

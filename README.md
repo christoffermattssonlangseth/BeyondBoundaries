@@ -52,6 +52,7 @@ Every analysis notebook has **Finding** cells next to the plots that support the
 | `21_nonlinear_orthogonality` | review: gradient-boosted (nonlinear) image ↔ transcriptome test per cell type; joint tests (residual clusters, reverse prediction, lesion and score) |
 | `22_neuropil_drivers` | which neighbouring cells and programs go with neuropil loss in WM lesions — none found; weak link to oligodendrocyte state (exploratory) |
 | `23_rna_in_and_around_cells` | where transcripts sit relative to the stain outlines: *Mbp* handling by oligodendrocytes, no engulfed-RNA trace in myeloid cells, RNA between cells at the grey/white border; nuclear retention withdrawn |
+| `24_vimentin_mild_vs_severe` | mild vs severe chronic lesion vimentin under anatomy controls (WM/GM, depth from the surface, VSMC calibrator), every animal, image galleries — **direction holds, weak; exploratory** |
 
 Code: `src/beyondboundaries` (io, features, extract, background, orthogonality, data, plotting) with tests in `tests/`;
 batch extraction `scripts/01_extract_features.py`; config `config.yaml`; env `environment.yml`.

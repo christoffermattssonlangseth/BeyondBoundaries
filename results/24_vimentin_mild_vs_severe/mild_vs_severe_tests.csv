@@ -1,0 +1,22 @@
+comparison,check,mild_median,severe_median,n_mild,n_severe,every_mild_above_every_severe,p_one_sided
+MILD16 vs SEVERE16 (same images),original (notebook 18),2.267,1.013,3,3,False,0.2
+MILD16 vs SEVERE16 (same images),white matter only,3.561,1.269,3,3,False,0.2
+MILD16 vs SEVERE16 (same images),grey matter only,0.041,0.053,2,3,False,0.8
+MILD16 vs SEVERE16 (same images),matched region × depth from surface,1.485,0.774,3,3,False,0.35
+MILD16 vs SEVERE16 (same images),deep only (> 150 µm from surface),0.713,0.404,3,3,False,0.2
+MILD16 vs SEVERE16 (same images),reactive astrocytes only,1.98,0.22,3,3,True,0.05
+MILD16 vs SEVERE16 (same images),VSMC vimentin (calibrator),1.903,0.744,3,3,False,0.1
+MILD30 vs SEVERE30 (different runs),original (notebook 18),3.3,2.065,5,2,True,0.048
+MILD30 vs SEVERE30 (different runs),white matter only,3.645,2.168,5,2,True,0.048
+MILD30 vs SEVERE30 (different runs),grey matter only,0.141,0.162,4,2,False,0.6
+MILD30 vs SEVERE30 (different runs),matched region × depth from surface,3.05,1.642,5,2,False,0.429
+MILD30 vs SEVERE30 (different runs),deep only (> 150 µm from surface),1.991,1.739,5,2,False,0.19
+MILD30 vs SEVERE30 (different runs),reactive astrocytes only,1.514,1.37,5,2,False,0.429
+MILD30 vs SEVERE30 (different runs),VSMC vimentin (calibrator),1.378,1.126,5,2,False,0.286
+all mild vs all severe,original (notebook 18),2.896,1.089,8,5,False,0.009
+all mild vs all severe,white matter only,3.603,1.528,8,5,False,0.009
+all mild vs all severe,grey matter only,0.101,0.092,6,5,False,0.535
+all mild vs all severe,matched region × depth from surface,2.317,0.856,8,5,False,0.218
+all mild vs all severe,deep only (> 150 µm from surface),1.907,0.454,8,5,False,0.047
+all mild vs all severe,reactive astrocytes only,1.747,0.691,8,5,False,0.033
+all mild vs all severe,VSMC vimentin (calibrator),1.641,0.744,8,5,False,0.033

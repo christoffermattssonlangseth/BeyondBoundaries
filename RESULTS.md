@@ -518,3 +518,17 @@ The region-edge dip is a surface artefact on top. Not obvious by eye in random c
     paradox, healthy WM cells have higher nuclear excess and lesion cores hold more WM cells); NFOL "less exported
     *Mbp*" (curated ×0.99, p = 0.13). Gene-level nuclear screen pools regions, not interpreted.
   - No readout tracks clinical score or first-attack peak (15–20 animals).
+
+## 2026-10-09 — Mild vs severe lesion vimentin under anatomy controls (`notebooks/24_vimentin_mild_vs_severe.ipynb`)
+Astrocyte vimentin, lesion − outside (notebook 18 measure), chronic MILD (8: MILD16 ×3 run 5, MILD30 ×5 run 1) vs
+SEVERE (5: SEVERE16 ×3, SEVERE30 ×2, run 5).
+- Original 2.90 vs 1.09 (p = 0.009); WM only 3.60 vs 1.53 (p = 0.009); **GM only 0.10 vs 0.09** (no difference).
+- Region × depth-from-surface matched: 2.32 vs 0.86 (p = 0.22); deep only (> 150 µm): 1.91 vs 0.45 (p = 0.047);
+  reactive astrocytes only 1.75 vs 0.69 (p = 0.03). MILD16 vs SEVERE16 (same images, 3 vs 3): no complete separation
+  except reactive astrocytes (p = 0.05).
+- Confounds: lesion astrocytes are ~100–200 µm from the surface vs ~350–400 µm for the reference; glia-limitans
+  astrocytes are vimentin-high. **VSMC calibrator also higher in mild animals (1.64 vs 0.74, p = 0.03).** Run-1 images
+  (MILD30) look different (focus, dynamic range).
+- Depth profile: deep lesion WM z ≈ 3–4.5 (mild) vs 1–1.5 (severe), healthy WM at the same depth ≈ 0–1 in both.
+- Galleries (same-image, deep lesion WM): mild brighter in 2 of 4 shared images, severe brighter in 1, similar in 1.
+- **Status: exploratory** — consistent direction, weakened by depth matching and partly shared by the channel calibrator.
