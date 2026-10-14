@@ -1,0 +1,24 @@
+# Human MS / Baló spinal cord (NBB), Xenium 5K human (hAtlas v1.1 + 100 custom), same segmentation kit, XOA 4.0.1.
+# Paths are on the analysis Mac. RAW DATA NEVER GOES TO GIT (code and figures only; see human/README.md).
+runs:
+  human1: /Volumes/moldiassd/human_MS_Balo/20260115__103940__GoncaloCharles_5kHumanCNS_run1
+exclude_regions: []
+
+annotation:
+  h5ad: /Volumes/moldiassd/human_MS_Balo/processed_data/baloMS_clustered.h5ad   # Leiden clusters only
+  cell_type: cell_type        # added by human/scripts/01_label_clusters.py
+
+features_dir: human/data/features
+
+features:
+  rim_um: 1.0
+  ring_um: 2.0
+  territory_um: 10.0
+  radial_bins: 5
+  glcm_levels: 16
+  glcm_distance_um: 0.5
+
+tiling:
+  tile_px: 2048
+  halo_px: 256
+  workers: 6
