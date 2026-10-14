@@ -1,6 +1,6 @@
-"""Where each transcript sits relative to the stain-based cell outlines (runs 5/6; input to notebook 23).
+"""Where each transcript sits relative to the stain-based cell outlines (all runs; input to notebook 23).
 
-For every decoded gene transcript (qv >= 20) of the 18 run-5/6 sections:
+For every decoded gene transcript (qv >= 20) of every annotated section (runs 1-3 need transcripts.parquet copied):
   - in a cell (Xenium assignment) or not; in its nucleus or not (`overlaps_nucleus`);
   - depth inside the cell: distance to the cell's outline (µm, from the mask at 2x downsampling, 0.425 µm);
   - outside cells: the nearest cell (outline) and the distance to it.
@@ -12,9 +12,9 @@ Writes, per section, to data/subcellular/:
                  nearest to this cell within HALO_UM), `owners` (group names)
   {sid}_points.parquet   every transcript of the FOCUS genes, with its compartment, depth, nearest cell and distance
 Plus gene_owner.csv: each gene's owner cell type (the type with >= 50 % of the summed per-type mean expression in
-runs 5/6, else 'shared'), used to label what the RNA outside cells is made of.
+runs 5/6, else 'shared'; computed once and cached), used to label what the RNA outside cells is made of.
 
-usage: python scripts/04_transcript_compartments.py [--jobs 2] [--sections run5_C2_G1_Bot_0088858 ...]
+usage: python scripts/04_transcript_compartments.py [--jobs 2] [--runs run1 run2 ...] [--sections run5_C2_G1_Bot_0088858 ...]
 """
 import argparse
 import sys
@@ -157,22 +157,24 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", type=int, default=2)
     ap.add_argument("--sections", nargs="*")
+    ap.add_argument("--runs", nargs="*", default=["run1", "run2", "run3", "run5", "run6"])
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
-    cfg["runs"] = {k: v for k, v in cfg["runs"].items() if k in ("run5", "run6")}
+    cfg["runs"] = {k: v for k, v in cfg["runs"].items() if k in args.runs}
     bundles = find_bundles(cfg)
-    a = ad.read_h5ad(ROOT / "data" / "RRMAP2_all_runs.h5ad")
-    keep = a.obs.run_id.isin(["run5", "run6"]).to_numpy()
-    a = a[keep]
-    obs = a.obs[["sample_id", "cell_id", "Anno_L1_curated"]].copy()
-    if (OUT / "gene_owner.csv").exists():
-        owner = pd.read_csv(OUT / "gene_owner.csv", index_col=0).owner.reindex(a.var_names).fillna("shared")
-    else:
-        owner = gene_owners(a, obs)
-        owner.to_csv(OUT / "gene_owner.csv")
-    print(owner.value_counts().to_string(), flush=True)
+    a = ad.read_h5ad(ROOT / "data" / "RRMAP2_all_runs.h5ad", backed="r")
     genes = a.var_names.copy()
+    obs = a.obs[["sample_id", "cell_id", "Anno_L1_curated", "run_id"]].copy()
+    if (OUT / "gene_owner.csv").exists():
+        owner = pd.read_csv(OUT / "gene_owner.csv", index_col=0).owner.reindex(genes).fillna("shared")
+    else:
+        keep = obs.run_id.isin(["run5", "run6"]).to_numpy()
+        a = a.to_memory()[keep]
+        owner = gene_owners(a, obs[keep])
+        owner.to_csv(OUT / "gene_owner.csv")
+    obs = obs[obs.run_id.isin(args.runs)]
+    print(owner.value_counts().to_string(), flush=True)
     del a
     sids = [s for s in (args.sections or sorted(obs.sample_id.astype(str).unique())) if s in bundles]
     jobs = (delayed(run_section)(s, bundles[s], obs[obs.sample_id.astype(str) == s], genes, owner) for s in sids)
