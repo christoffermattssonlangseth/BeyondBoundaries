@@ -1,0 +1,25 @@
+focal,sample,readout,pairs,median_diff,share_brighter,p
+lymphocytes,Balo-1,membrane contrast,70,0.5936,0.7826,0.0
+lymphocytes,Balo-1,cell mean z,70,0.6151,0.6571,0.002
+lymphocytes,Balo-2,membrane contrast,127,0.6516,0.874,0.0
+lymphocytes,Balo-2,cell mean z,127,2.315,0.9134,0.0
+lymphocytes,S07-256,membrane contrast,2469,0.3418,0.7121,0.0
+lymphocytes,S07-256,cell mean z,2469,0.5212,0.6962,0.0
+lymphocytes,S13-019,membrane contrast,6885,0.2673,0.6698,0.0
+lymphocytes,S13-019,cell mean z,6885,0.4703,0.6456,0.0
+myeloid,Balo-1,membrane contrast,2476,0.0939,0.7137,0.0
+myeloid,Balo-1,cell mean z,2476,0.4224,0.7779,0.0
+myeloid,Balo-2,membrane contrast,9013,0.0515,0.5966,0.0
+myeloid,Balo-2,cell mean z,9013,0.342,0.743,0.0
+myeloid,S07-256,membrane contrast,17061,0.2567,0.7058,0.0
+myeloid,S07-256,cell mean z,17061,0.5365,0.7915,0.0
+myeloid,S13-019,membrane contrast,19006,0.2407,0.6848,0.0
+myeloid,S13-019,cell mean z,19006,0.6953,0.7572,0.0
+oligodendrocytes (control),Balo-1,membrane contrast,3033,-0.0225,0.4449,0.0
+oligodendrocytes (control),Balo-1,cell mean z,3033,-0.08,0.4296,0.0
+oligodendrocytes (control),Balo-2,membrane contrast,12387,-0.0061,0.4865,0.0
+oligodendrocytes (control),Balo-2,cell mean z,12387,-0.1496,0.3912,0.0
+oligodendrocytes (control),S07-256,membrane contrast,20612,-0.1944,0.3507,0.0
+oligodendrocytes (control),S07-256,cell mean z,20612,-0.3174,0.293,0.0
+oligodendrocytes (control),S13-019,membrane contrast,22669,-0.1998,0.3434,0.0
+oligodendrocytes (control),S13-019,cell mean z,22669,-0.4555,0.2853,0.0

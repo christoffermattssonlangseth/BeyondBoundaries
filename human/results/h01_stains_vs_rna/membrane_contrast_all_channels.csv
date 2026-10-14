@@ -1,0 +1,19 @@
+sample,cell_type,cells,bnd,dapi,r18s,smavim
+Balo-1,Lymphocyte (T/B/plasma),121,1.097,2.149,2.453,0.975
+Balo-1,Oligodendrocyte,3288,-0.087,1.603,1.2,-0.055
+Balo-1,Astrocyte,5420,-0.126,0.849,0.564,0.476
+Balo-2,Lymphocyte (T/B/plasma),142,0.772,1.966,1.29,0.682
+Balo-2,Myeloid,101,0.052,1.593,0.767,0.257
+Balo-2,Oligodendrocyte,13614,0.033,1.405,1.131,-0.024
+Balo-2,Astrocyte,5234,-0.055,0.754,0.672,0.458
+Balo-2,Endothelial,66,-0.068,1.706,1.079,0.493
+S07-256,Lymphocyte (T/B/plasma),2570,0.754,2.513,1.482,0.872
+S07-256,Myeloid,18404,0.428,2.754,1.305,0.054
+S07-256,Oligodendrocyte,24593,0.024,3.083,1.614,0.0
+S07-256,Astrocyte,8346,0.055,2.303,1.198,0.037
+S07-256,Endothelial,7296,0.427,2.296,1.386,0.873
+S13-019,Lymphocyte (T/B/plasma),7085,0.609,2.541,1.437,0.67
+S13-019,Myeloid,19801,0.387,2.935,1.33,0.963
+S13-019,Oligodendrocyte,25383,-0.031,3.246,1.364,0.084
+S13-019,Astrocyte,14170,0.001,2.213,1.222,0.368
+S13-019,Endothelial,3688,0.299,2.341,1.179,0.624

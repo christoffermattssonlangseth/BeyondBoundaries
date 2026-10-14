@@ -80,7 +80,7 @@ feats = pd.concat(feats)
 d = cells.reset_index().merge(feats.drop(columns=["x_centroid", "y_centroid", "segmentation_method"]),
                               on=["sample_id", "cell_id"], how="inner").set_index("index")
 for ch in ["bnd", "smavim", "r18s", "dapi"]:
-    d[f"{ch}_rim_contrast"] = np.log((d[f"{ch}_rim_mean"] + 1) / (d[f"{ch}_ring_mean"] + 1))
+    d[f"{ch}_rim_contrast"] = np.log(d[f"{ch}_rim_mean"].clip(lower=1) / d[f"{ch}_ring_mean"].clip(lower=1))
     g = d.groupby("sample_id")[f"{ch}_cell_mean"]
     d[f"{ch}_z"] = (d[f"{ch}_cell_mean"] - g.transform("median")) / (
         (d[f"{ch}_cell_mean"] - g.transform("median")).abs().groupby(d.sample_id).transform("median") * 1.4826)
@@ -139,6 +139,7 @@ def paired(d, focal, label):
         ok = dist <= 30
         for col, nm in [("bnd_rim_contrast", "membrane contrast"), ("bnd_z", "cell mean z")]:
             diff = F[col].to_numpy()[ok] - O[col].to_numpy()[idx[ok]]
+            diff = diff[np.isfinite(diff)]
             rows.append(dict(focal=label, sample=smp, readout=nm, pairs=int(ok.sum()), median_diff=np.median(diff),
                              share_brighter=(diff > 0).mean(), p=wilcoxon(diff).pvalue))
     return rows
@@ -163,11 +164,50 @@ for smp, g in d.groupby("sample_id"):
         if len(s) < 50:
             continue
         for gene in ["PTPRC", "ATP1A1"]:
-            r = spearmanr(s[f"{gene}_per1k"], s.bnd_rim_contrast)
+            x = s[[f"{gene}_per1k", "bnd_rim_contrast"]].replace([np.inf, -np.inf], np.nan).dropna()
+            r = spearmanr(x.iloc[:, 0], x.iloc[:, 1])
             rows.append(dict(sample=smp, cell_type=t, gene=gene, cells=len(s), rho=r.statistic, p=r.pvalue))
 dose = pd.DataFrame(rows)
 dose.round(4).to_csv(OUT / "ptprc_dose_response.csv", index=False)
 dose.round(3)
+
+# %% [markdown]
+# ### Is it CD45 or geometry?
+# Lymphocytes are small with little cytoplasm, so their outline hugs the nucleus and the 2 µm ring around them can
+# catch neighbours; in mouse, a T-cell "polarity" turned out to be geometry plus bleed (notebook 19). Two controls:
+# 1. **Other channels:** the same membrane contrast in DAPI, 18S and αSMA/vimentin. CD45 should raise it in the
+#    boundary channel only.
+# 2. **Size-matched:** lymphocytes against non-immune cells of the same cell-area decile, same section.
+
+# %%
+rows = []
+for smp, g in d.groupby("sample_id"):
+    for t in ["Lymphocyte (T/B/plasma)", "Myeloid", "Oligodendrocyte", "Astrocyte", "Endothelial"]:
+        s_ = g[g.cell_type == t]
+        if len(s_) < 50:
+            continue
+        rows.append(dict(sample=smp, cell_type=t, cells=len(s_),
+                         **{ch: s_[f"{ch}_rim_contrast"].median() for ch in ["bnd", "dapi", "r18s", "smavim"]}))
+geo = pd.DataFrame(rows)
+geo.round(3).to_csv(OUT / "membrane_contrast_all_channels.csv", index=False)
+print("membrane contrast log(rim / ring), median per section and type")
+geo.round(2)
+
+# %%
+rows = []
+for smp, g in d.groupby("sample_id"):
+    g = g.assign(size_dec=pd.qcut(g.cell_area.rank(method="first"), 10, labels=False))
+    for dec, gd in g.groupby("size_dec"):
+        L, N = gd[gd.cell_type == "Lymphocyte (T/B/plasma)"], gd[~gd.immune]
+        if len(L) >= 20 and len(N) >= 20:
+            for ch in ["bnd", "dapi", "r18s"]:
+                rows.append(dict(sample=smp, size_decile=dec, channel=ch, lymphocytes=len(L),
+                                 diff=L[f"{ch}_rim_contrast"].median() - N[f"{ch}_rim_contrast"].median()))
+sm = pd.DataFrame(rows)
+smt = sm.groupby(["sample", "channel"]).agg(deciles=("diff", "size"), median_diff=("diff", "median"),
+                                            deciles_positive=("diff", lambda x: (x > 0).mean())).round(3)
+smt.to_csv(OUT / "size_matched_lymphocyte_contrast.csv")
+smt
 
 # %% [markdown]
 # ## 2. Each stain against its own gene's RNA, per cell type
@@ -266,4 +306,21 @@ plotting.save_fig(fig, "gallery_immune_vs_oligo", OUT, SRC)
 
 # %% [markdown]
 # ## Findings
-# (filled in after the run)
+#
+# > **CD45 is detectable in human MS lymphocytes — unlike in mouse (moderate, MS sections).** In both MS sections
+# > lymphocytes have the highest boundary-channel membrane contrast of any cell type (log rim ÷ ring 0.61–0.75 vs ≈ 0
+# > for glia), are brighter at the membrane than their nearest non-immune neighbour in 67–71 % of 2,469–6,885 pairs,
+# > and stay brighter at **matched cell size** (+0.57 to +0.64, 10 of 10 size deciles) while DAPI (−0.25 to −0.48,
+# > 2/10) and 18S (≈ 0) do not: a boundary-channel-specific membrane signal, not outline geometry. Within lymphocytes
+# > it rises with *PTPRC* RNA (ρ +0.13, +0.19, p < 0.001) but not with *ATP1A1* RNA (+0.08, +0.01). Myeloid cells show a
+# > weaker signal (+0.24 to +0.26 vs neighbours; *PTPRC* ρ +0.02), as expected for CD45-low microglia. In the images,
+# > some lymphocytes have a clear bright membrane ring and many do not. In the Baló sections lymphocytes are too few
+# > (121, 142) and DAPI/18S rise with them, so CD45 cannot be separated from geometry there.
+# >
+# > **The αSMA/vimentin channel reports vimentin (strong).** Across cell types it follows *VIM* RNA in every section
+# > (ρ 0.69–0.98; *ACTA2* is not on the panel). This validates the vimentin readouts used in mouse.
+# >
+# > **The boundary channel does not follow *ATP1A1* RNA across cell types** (ρ −0.56 to +0.23): ATP1A1 protein sits
+# > in neuropil membranes, away from the cell bodies that make the RNA, as in mouse. E-cadherin (*CDH1*) is not
+# > detectable (ρ −0.26 to +0.24). Endothelial cells also show a raised boundary-channel membrane contrast
+# > (0.30–0.43), not explained here.

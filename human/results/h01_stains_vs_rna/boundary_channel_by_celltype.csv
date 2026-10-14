@@ -1,0 +1,50 @@
+cell_type,sample_id,cells,membrane_contrast,cell_mean_z,PTPRC_per1k
+Astrocyte,Balo-1,5420,-0.126,0.182,0.019
+Astrocyte,Balo-2,5234,-0.055,-0.135,0.05
+Astrocyte,S07-256,8346,0.055,-0.415,0.034
+Astrocyte,S13-019,14170,0.001,-0.481,0.038
+Astrocyte (reactive),S07-256,9065,0.075,-0.408,0.03
+Astrocyte (reactive),S13-019,224,0.043,-0.225,0.004
+Endothelial,Balo-2,66,-0.068,-0.962,0.0
+Endothelial,S07-256,7296,0.427,0.615,0.05
+Endothelial,S13-019,3688,0.299,1.053,0.062
+Ependymal,S07-256,651,0.506,-0.559,0.065
+Ependymal,S13-019,785,0.314,-0.438,0.017
+Fibroblast,Balo-1,130,0.747,-0.128,0.151
+Fibroblast,Balo-2,46,0.314,-0.952,0.0
+Fibroblast,S07-256,7345,0.32,0.096,0.058
+Fibroblast,S13-019,5093,0.366,0.16,0.088
+Lymphocyte (T/B/plasma),Balo-1,121,1.097,0.314,4.849
+Lymphocyte (T/B/plasma),Balo-2,142,0.772,2.129,4.485
+Lymphocyte (T/B/plasma),S07-256,2570,0.754,0.837,1.583
+Lymphocyte (T/B/plasma),S13-019,7085,0.609,1.165,1.853
+Myeloid,Balo-1,48,0.056,0.147,0.661
+Myeloid,Balo-2,101,0.052,0.444,1.533
+Myeloid,S07-256,18404,0.428,0.468,0.882
+Myeloid,S13-019,19801,0.387,0.67,0.833
+Myeloid (SPP1+ activated),Balo-1,2669,0.003,0.55,1.233
+Myeloid (SPP1+ activated),Balo-2,9146,0.079,0.272,0.924
+Myeloid (SPP1+ activated),S07-256,40,0.474,0.122,0.629
+Neuron,Balo-1,10272,-0.084,-0.044,0.011
+Neuron,Balo-2,4451,-0.036,0.217,0.024
+Neuron,S07-256,2434,-0.034,-0.403,0.027
+Neuron,S13-019,1382,-0.037,-0.375,0.042
+Neuron (with oligodendrocyte signal),Balo-1,2069,-0.126,-0.349,0.015
+Neuron (with oligodendrocyte signal),Balo-2,1488,-0.058,-0.089,0.018
+OPC,Balo-1,1249,-0.155,-0.123,0.018
+OPC,Balo-2,1322,-0.042,-0.233,0.047
+OPC,S07-256,2612,0.017,-0.413,0.029
+OPC,S13-019,3143,-0.092,-0.618,0.041
+Oligodendrocyte,Balo-1,3288,-0.087,-0.151,0.019
+Oligodendrocyte,Balo-2,13614,0.033,-0.212,0.035
+Oligodendrocyte,S07-256,24593,0.024,-0.469,0.038
+Oligodendrocyte,S13-019,25383,-0.031,-0.462,0.032
+Pericyte / VSMC,Balo-1,92,0.423,-1.176,0.175
+Pericyte / VSMC,Balo-2,56,0.274,-1.153,0.203
+Pericyte / VSMC,S07-256,4899,0.233,1.03,0.017
+Pericyte / VSMC,S13-019,2964,0.173,0.806,0.022
+Perivascular (mixed),Balo-2,44,0.079,-0.316,0.128
+Perivascular (mixed),S07-256,3644,0.45,0.446,0.269
+Perivascular (mixed),S13-019,1061,0.325,0.45,0.189
+Schwann,S07-256,10012,0.21,0.25,0.038
+Schwann,S13-019,5174,0.184,0.649,0.067

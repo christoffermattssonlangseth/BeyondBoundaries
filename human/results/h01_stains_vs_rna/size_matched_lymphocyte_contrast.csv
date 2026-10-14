@@ -1,0 +1,13 @@
+sample,channel,deciles,median_diff,deciles_positive
+Balo-1,bnd,2,1.533,1.0
+Balo-1,dapi,2,1.11,1.0
+Balo-1,r18s,2,1.888,1.0
+Balo-2,bnd,2,0.797,1.0
+Balo-2,dapi,2,0.619,1.0
+Balo-2,r18s,2,0.191,1.0
+S07-256,bnd,10,0.636,1.0
+S07-256,dapi,10,-0.249,0.2
+S07-256,r18s,10,0.005,0.5
+S13-019,bnd,10,0.569,1.0
+S13-019,dapi,10,-0.477,0.2
+S13-019,r18s,10,0.091,0.8
