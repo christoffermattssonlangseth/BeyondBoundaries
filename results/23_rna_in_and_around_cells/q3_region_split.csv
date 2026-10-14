@@ -1,25 +1,25 @@
 cell_type,cells,animals,core_over_healthy,share_lower,p
-Oligodendrocyte,WM + GM pooled,15.0,1.03,0.067,0.0
-Oligodendrocyte,WM only,15.0,0.999,0.533,0.524
-Oligodendrocyte,GM only,12.0,1.004,0.25,0.339
-Oligodendrocyte,healthy WM: nuclear excess level,,1.282,,
-Oligodendrocyte,healthy GM: nuclear excess level,,1.219,,
-Oligodendrocyte,share WM: core / healthy,,1.58,,
-OPC,WM + GM pooled,15.0,1.033,0.2,0.007
-OPC,WM only,9.0,1.001,0.444,0.91
-OPC,GM only,6.0,1.009,0.333,0.562
-OPC,healthy WM: nuclear excess level,,1.332,,
-OPC,healthy GM: nuclear excess level,,1.217,,
-OPC,share WM: core / healthy,,2.226,,
-Myeloid,WM + GM pooled,15.0,1.022,0.333,0.121
-Myeloid,WM only,12.0,0.967,0.75,0.077
-Myeloid,GM only,11.0,1.014,0.364,0.765
-Myeloid,healthy WM: nuclear excess level,,1.323,,
-Myeloid,healthy GM: nuclear excess level,,1.225,,
-Myeloid,share WM: core / healthy,,2.729,,
-Astrocyte,WM + GM pooled,15.0,1.02,0.4,0.169
-Astrocyte,WM only,14.0,0.97,0.571,0.426
-Astrocyte,GM only,11.0,0.982,0.636,0.831
-Astrocyte,healthy WM: nuclear excess level,,1.382,,
-Astrocyte,healthy GM: nuclear excess level,,1.26,,
-Astrocyte,share WM: core / healthy,,2.715,,
+Oligodendrocyte,WM + GM pooled,42.0,1.024,0.286,0.003
+Oligodendrocyte,WM only,38.0,0.993,0.579,0.657
+Oligodendrocyte,GM only,33.0,1.01,0.273,0.071
+Oligodendrocyte,healthy WM: nuclear excess level,,1.28,,
+Oligodendrocyte,healthy GM: nuclear excess level,,1.182,,
+Oligodendrocyte,share WM: core / healthy,,1.17,,
+OPC,WM + GM pooled,36.0,1.026,0.222,0.0
+OPC,WM only,18.0,0.989,0.611,0.393
+OPC,GM only,18.0,1.0,0.5,0.865
+OPC,healthy WM: nuclear excess level,,1.298,,
+OPC,healthy GM: nuclear excess level,,1.184,,
+OPC,share WM: core / healthy,,1.808,,
+Myeloid,WM + GM pooled,41.0,0.99,0.585,0.241
+Myeloid,WM only,34.0,0.939,0.824,0.0
+Myeloid,GM only,30.0,1.0,0.5,0.871
+Myeloid,healthy WM: nuclear excess level,,1.331,,
+Myeloid,healthy GM: nuclear excess level,,1.204,,
+Myeloid,share WM: core / healthy,,2.111,,
+Astrocyte,WM + GM pooled,40.0,1.021,0.35,0.039
+Astrocyte,WM only,36.0,0.992,0.5,0.279
+Astrocyte,GM only,29.0,1.0,0.517,0.966
+Astrocyte,healthy WM: nuclear excess level,,1.309,,
+Astrocyte,healthy GM: nuclear excess level,,1.187,,
+Astrocyte,share WM: core / healthy,,1.869,,

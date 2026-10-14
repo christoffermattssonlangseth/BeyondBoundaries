@@ -1,6 +1,6 @@
 readout,animals,core_over_healthy,share_lower,p
-Mbp ÷ control myelin genes in the soma,15,0.906,0.8,0.007
-Mbp nuclear share ÷ control nuclear share,15,1.003,0.4,0.89
-own Mbp halo ÷ ambient Mbp (other WM cells),15,0.944,0.733,0.008
-ambient Mbp density around other WM cells,16,0.886,0.75,0.018
-control myelin genes per transcript in oligos,15,0.972,0.6,0.048
+Mbp ÷ control myelin genes in the soma,38,0.904,0.816,0.0
+Mbp nuclear share ÷ control nuclear share,38,1.005,0.395,0.184
+own Mbp halo ÷ ambient Mbp (other WM cells),38,0.971,0.579,0.255
+ambient Mbp density around other WM cells,42,0.818,0.786,0.0
+control myelin genes per transcript in oligos,38,0.925,0.737,0.0

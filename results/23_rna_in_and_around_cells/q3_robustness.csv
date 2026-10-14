@@ -1,59 +1,61 @@
 readout,check,animals,core_over_healthy,share_lower,p
-Oligodendrocyte,main: lesion-region zones,15,1.0299,0.0667,0.0001
-Oligodendrocyte,curated lesion niches vs physiological,23,1.0331,0.087,0.0
-Oligodendrocyte,run5 only,11,1.0335,0.0909,0.002
-Oligodendrocyte,run6 only,4,1.0286,0.0,
-Oligodendrocyte,segmented by interior stain (18S),15,1.0311,0.0667,0.0001
-Oligodendrocyte,segmented by nucleus expansion of 5.0µm,1,0.9838,1.0,
-Oligodendrocyte,large cells (size third),15,1.0154,0.2,0.0215
-Oligodendrocyte,mid cells (size third),15,1.033,0.0667,0.0003
-Oligodendrocyte,small cells (size third),15,1.0411,0.1333,0.0012
-Oligodendrocyte,white matter only,15,0.9995,0.5333,0.5245
-Oligodendrocyte,grey matter only,12,1.0042,0.25,0.3394
-Oligodendrocyte,WM 0–100 µm from grey matter,13,0.9898,0.6923,0.3054
-Oligodendrocyte,WM 100–400 µm from grey matter,12,0.9956,0.5833,0.7334
-OPC,main: lesion-region zones,15,1.0327,0.2,0.0067
-OPC,curated lesion niches vs physiological,18,1.0465,0.0556,0.0
-OPC,run5 only,11,1.02,0.2727,0.0674
-OPC,run6 only,4,1.0576,0.0,
-OPC,segmented by interior stain (18S),15,1.0423,0.1333,0.0004
-OPC,large cells (size third),11,1.0025,0.4545,0.2402
-OPC,mid cells (size third),10,1.0316,0.0,0.002
-OPC,small cells (size third),10,1.0391,0.4,0.1055
-OPC,white matter only,9,1.0013,0.4444,0.9102
-OPC,grey matter only,6,1.0085,0.3333,0.5625
+Oligodendrocyte,main: lesion-region zones,42,1.0244,0.2857,0.0029
+Oligodendrocyte,curated lesion niches vs physiological,64,1.0423,0.1094,0.0
+Oligodendrocyte,runs 5/6 only,15,1.0299,0.0667,0.0001
+Oligodendrocyte,runs 1-3 only,27,1.0193,0.4074,0.1775
+Oligodendrocyte,segmented by interior stain (18S),42,1.0288,0.2381,0.0002
+Oligodendrocyte,segmented by nucleus expansion of 5.0µm,4,0.9656,0.75,
+Oligodendrocyte,large cells (size third),39,1.009,0.3846,0.0347
+Oligodendrocyte,mid cells (size third),40,1.0282,0.275,0.0001
+Oligodendrocyte,small cells (size third),39,1.0205,0.3077,0.0026
+Oligodendrocyte,white matter only,38,0.9926,0.5789,0.6566
+Oligodendrocyte,grey matter only,33,1.0105,0.2727,0.0708
+Oligodendrocyte,WM 0–100 µm from grey matter,29,0.9871,0.6897,0.0455
+Oligodendrocyte,WM 100–400 µm from grey matter,30,0.9824,0.7333,0.0221
+OPC,main: lesion-region zones,36,1.0265,0.2222,0.0001
+OPC,curated lesion niches vs physiological,54,1.0466,0.0926,0.0
+OPC,runs 5/6 only,15,1.0327,0.2,0.0067
+OPC,runs 1-3 only,21,1.0258,0.2381,0.0063
+OPC,segmented by interior stain (18S),36,1.033,0.1944,0.0
+OPC,large cells (size third),23,1.0152,0.3043,0.0802
+OPC,mid cells (size third),16,1.0316,0.0625,0.0001
+OPC,small cells (size third),15,1.0274,0.4,0.1876
+OPC,white matter only,18,0.9895,0.6111,0.3927
+OPC,grey matter only,18,1.0004,0.5,0.865
 OPC,WM 0–100 µm from grey matter,4,1.0086,0.25,
-OPC,WM 100–400 µm from grey matter,5,1.0301,0.4,0.8125
-Myeloid,main: lesion-region zones,15,1.0225,0.3333,0.1205
-Myeloid,curated lesion niches vs physiological,22,0.9735,0.7727,0.0032
-Myeloid,run5 only,11,1.0274,0.2727,0.1475
-Myeloid,run6 only,4,1.0022,0.5,
-Myeloid,segmented by interior stain (18S),15,1.0379,0.0667,0.0002
-Myeloid,segmented by nucleus expansion of 5.0µm,4,0.8846,0.75,
-Myeloid,large cells (size third),15,1.0169,0.4667,1.0
-Myeloid,mid cells (size third),15,1.0282,0.1333,0.0215
-Myeloid,small cells (size third),15,1.0039,0.4667,0.1876
-Myeloid,white matter only,12,0.9674,0.75,0.0771
-Myeloid,grey matter only,11,1.0143,0.3636,0.7646
-Myeloid,WM 0–100 µm from grey matter,9,0.9955,0.5556,0.6523
-Myeloid,WM 100–400 µm from grey matter,6,0.9543,0.8333,0.0625
-Astrocyte,main: lesion-region zones,15,1.0202,0.4,0.1688
-Astrocyte,curated lesion niches vs physiological,22,1.0382,0.1364,0.0001
-Astrocyte,run5 only,11,0.9988,0.5455,0.7646
-Astrocyte,run6 only,4,1.0597,0.0,
-Astrocyte,segmented by interior stain (18S),15,1.0254,0.2667,0.0151
-Astrocyte,large cells (size third),15,1.003,0.4667,0.978
-Astrocyte,mid cells (size third),15,1.0195,0.3333,0.0353
-Astrocyte,small cells (size third),14,1.0281,0.3571,0.058
-Astrocyte,white matter only,14,0.9702,0.5714,0.4263
-Astrocyte,grey matter only,11,0.9822,0.6364,0.8311
-MOL only,main: lesion-region zones,15,1.0199,0.2,0.0151
-MOL only,curated lesion niches vs physiological,21,1.0257,0.0952,0.0
-MOL only,run5 only,11,1.0196,0.2727,0.123
-MOL only,run6 only,4,1.0399,0.0,
-MOL only,segmented by interior stain (18S),15,1.0208,0.1333,0.0067
-MOL only,large cells (size third),11,1.019,0.3636,0.1475
-MOL only,mid cells (size third),13,1.0285,0.1538,0.0017
-MOL only,small cells (size third),13,1.0204,0.3077,0.0574
-MOL only,white matter only,14,1.0067,0.3571,0.5016
-MOL only,grey matter only,12,1.0032,0.4167,0.791
+OPC,WM 100–400 µm from grey matter,8,0.9786,0.625,0.6406
+Myeloid,main: lesion-region zones,41,0.9904,0.5854,0.2411
+Myeloid,curated lesion niches vs physiological,64,0.9772,0.6719,0.001
+Myeloid,runs 5/6 only,15,1.0225,0.3333,0.1205
+Myeloid,runs 1-3 only,26,0.9819,0.7308,0.0102
+Myeloid,segmented by interior stain (18S),41,1.0173,0.3171,0.0122
+Myeloid,segmented by nucleus expansion of 5.0µm,7,0.8739,0.7143,0.2188
+Myeloid,large cells (size third),37,0.9773,0.6486,0.0033
+Myeloid,mid cells (size third),36,1.0188,0.25,0.0095
+Myeloid,small cells (size third),37,0.9995,0.5135,0.6653
+Myeloid,white matter only,34,0.9395,0.8235,0.0
+Myeloid,grey matter only,30,1.0001,0.5,0.8712
+Myeloid,WM 0–100 µm from grey matter,19,0.9674,0.6842,0.0204
+Myeloid,WM 100–400 µm from grey matter,20,0.9288,0.85,0.0
+Astrocyte,main: lesion-region zones,40,1.0215,0.35,0.0394
+Astrocyte,curated lesion niches vs physiological,63,1.0409,0.127,0.0
+Astrocyte,runs 5/6 only,15,1.0202,0.4,0.1688
+Astrocyte,runs 1-3 only,25,1.0228,0.32,0.1073
+Astrocyte,segmented by interior stain (18S),40,1.0349,0.225,0.0
+Astrocyte,segmented by nucleus expansion of 5.0µm,3,1.0355,0.3333,
+Astrocyte,large cells (size third),37,1.0085,0.4324,0.8231
+Astrocyte,mid cells (size third),39,1.027,0.3077,0.0005
+Astrocyte,small cells (size third),37,1.0243,0.2432,0.0008
+Astrocyte,white matter only,36,0.9918,0.5,0.2786
+Astrocyte,grey matter only,29,0.9998,0.5172,0.966
+MOL only,main: lesion-region zones,40,1.0169,0.275,0.0136
+MOL only,curated lesion niches vs physiological,61,1.0264,0.1803,0.0
+MOL only,runs 5/6 only,15,1.0199,0.2,0.0151
+MOL only,runs 1-3 only,25,1.0131,0.32,0.2304
+MOL only,segmented by interior stain (18S),40,1.017,0.275,0.0067
+MOL only,segmented by nucleus expansion of 5.0µm,1,0.8222,1.0,
+MOL only,large cells (size third),28,1.0022,0.5,0.8139
+MOL only,mid cells (size third),33,1.0166,0.3333,0.0178
+MOL only,small cells (size third),30,1.0126,0.4,0.0549
+MOL only,white matter only,31,1.0009,0.4839,0.5814
+MOL only,grey matter only,32,1.0154,0.3438,0.0521

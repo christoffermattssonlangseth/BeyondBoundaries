@@ -532,3 +532,15 @@ SEVERE (5: SEVERE16 ×3, SEVERE30 ×2, run 5).
 - Depth profile: deep lesion WM z ≈ 3–4.5 (mild) vs 1–1.5 (severe), healthy WM at the same depth ≈ 0–1 in both.
 - Galleries (same-image, deep lesion WM): mild brighter in 2 of 4 shared images, severe brighter in 1, similar in 1.
 - **Status: exploratory** — consistent direction, weakened by depth matching and partly shared by the channel calibrator.
+
+## 2026-10-14 — Notebook 23 on all five runs (runs 1–3 transcripts copied 2026-10-13)
+Runs 1–3 `transcripts.parquet` (36 files, 40.6 GB, sizes verified) relayed to the analysis Mac; compartments
+extracted for all 36 sections; notebook 23 re-run on 67 animals (cells < 20 µm from another piece excluded).
+- *Mbp* ÷ control myelin genes in lesion oligodendrocyte somata: ×0.90 (31/38); **runs 1–3 ×0.90 (19/23)** vs runs 5/6
+  ×0.91 — replicated. MOL only runs 1–3 ×0.91. NFOL exported *Mbp*: runs 1–3 ×0.98 (stays withdrawn).
+- Myeloid ÷ astrocyte myelin uptake in cores: ×0.88 (47/51); **runs 1–3 ×0.86 (29/31)** — replicated negative.
+  Grey-matter cores, neuron-derived RNA in myeloid vs astrocytes ×1.39 (40/41): lead (engulfment or spillover).
+- Nuclear retention: WM only ×0.99, GM only ×1.00–1.01 (withdrawal confirmed).
+- WM between-cell RNA at matched distance from grey matter: neuron-derived ×0.36–0.64 within 150 µm, ATP1A1 ×0.83–0.87
+  within 75 µm, astrocyte RNA ×1.14–1.50 everywhere, myelin RNA ×0.80–0.92 beyond 75 µm only — replicated.
+- Clinical correlations (|ρ| 0.3–0.47) use pooled or unmatched per-animal values with run/arm confounding: not interpreted.

@@ -17,8 +17,8 @@
 # # 23 — Where RNA sits in and around cells in EAE lesions
 #
 # Cell-by-gene tables throw away *where* in the cell each transcript was. With the stain-based outlines and the nuclei
-# we can ask what cells are doing with their RNA in lesions. Four questions, all runs 5/6 (25 animals, transcripts are
-# only available there):
+# we can ask what cells are doing with their RNA in lesions. Four questions, all five runs (67 animals; transcripts
+# for runs 1–3 were copied on 2026-10-13; findings are checked in runs 5/6 and runs 1–3 separately):
 #
 # 1. **Do oligodendrocytes in lesions still send myelin RNA out to their sheaths?** *Mbp* mRNA is transported out of
 #    the cell body into the processes and translated where myelin is made; its sister myelin genes (*Mag*, *Mog*,
@@ -86,7 +86,8 @@ MYELIN = ["mbp", "myelin_ctrl", "cnp"]
 
 # %%
 a = ad.read_h5ad(ROOT / "data" / "RRMAP2_all_runs.h5ad", backed="r")
-obs = a.obs[a.obs.run_id.isin(["run5", "run6"])][
+RUNS = sorted({p.name.split("_")[0] for p in SUB.glob("run*_points.parquet")})  # runs with extracted transcripts
+obs = a.obs[a.obs.run_id.isin(RUNS)][
     ["sample_name", "meta_sample_id", "sample_id", "stage", "model", "Anno_L1_curated", "Curated_niche_state",
      "Global_anatomical_region", "x_centroid", "y_centroid", "cell_area", "nucleus_area", "segmentation_method",
      "run_id"]].copy()
@@ -107,6 +108,17 @@ obs["wm"] = obs.Global_anatomical_region.isin(WM)
 obs["zone_cur"] = np.select([obs.Curated_niche_state.str.startswith("Lesion"), obs.Curated_niche_state == "Physiological"],
                             ["core", "healthy"], default="other")
 obs["seg"] = obs.segmentation_method.str.replace("Segmented by ", "", regex=False)
+obs["runset"] = np.where(obs.run_id.isin(["run5", "run6"]), "runs 5/6", "runs 1-3")
+# pieces touch in runs 1-3: drop cells < 20 µm from another tissue piece (their halo mixes two animals)
+other = pd.Series(np.inf, index=obs.index)
+for _, g in obs.groupby("sample_id"):
+    xy, pcs = g[["x_centroid", "y_centroid"]].to_numpy(), g.meta_sample_id.to_numpy()
+    for p_ in np.unique(pcs):
+        m_ = pcs == p_
+        if not m_.all():
+            other[g.index[m_]] = cKDTree(xy[~m_]).query(xy[m_])[0]
+obs = obs[other >= 20]
+print(RUNS, f"{len(obs):,} cells,", obs.sample_name.nunique(), "animals")
 ARM = obs.drop_duplicates("sample_name").set_index("sample_name").arm
 clin = pd.read_csv(ROOT / "data" / "clinical" / "animal_course_metrics.csv", index_col=0)
 print(obs.zone.value_counts().to_string())
@@ -137,6 +149,10 @@ for sid in sorted(obs.sample_id.unique()):
     for k, ix in sidx.items():
         d[f"{k}_cell"], d[f"{k}_nuc"] = tot[:, ix].sum(1).A1, nuc[:, ix].sum(1).A1
     d["halo_area"], d["halo_all"] = z["halo_area_um2"], z["halo_all"]
+    # keep cells still in obs (cells < 20 µm from another piece were dropped above)
+    m_ = pd.Index(names).isin(obs.index)
+    names, tot, nuc, d = names[m_], tot[m_], nuc[m_], d[m_]
+    n = len(names)
     p = pd.read_parquet(SUB / f"{sid}_points.parquet", columns=["gene", "in_cell", "cell", "depth_um", "near_cell",
                                                                   "dist_um"])
     p["set"] = p.gene.astype(str).map(gene2set)
@@ -222,7 +238,7 @@ def robust(d, vfn, label):
     """The same core-vs-healthy contrast under each confound check. vfn(cells, by) -> value per (animal, zone)."""
     z = ("sample_name", "zone")
     checks = [("main: lesion-region zones", d, z), ("curated lesion niches vs physiological", d, ("sample_name", "zone_cur"))]
-    checks += [(f"{r} only", d[d.run_id == r], z) for r in ["run5", "run6"]]
+    checks += [(f"{r} only", d[d.runset == r], z) for r in ["runs 5/6", "runs 1-3"]]
     checks += [(f"segmented by {m}", s, z) for m, s in d.groupby("seg") if len(s) > 2000]
     checks += [(f"{k} cells (size third)", s, z) for k, s in d.groupby("size_third")]
     rg = d.Global_anatomical_region
@@ -276,7 +292,7 @@ def fmt(t):
 # %%
 # image helpers: crops with outlines, nuclei and transcripts; random galleries
 cfg = data.load_config()
-cfg["runs"] = {k: v for k, v in cfg["runs"].items() if k in ("run5", "run6")}
+cfg["runs"] = {k: v for k, v in cfg["runs"].items() if k in RUNS}
 bundles = find_bundles(cfg)
 
 
@@ -299,6 +315,12 @@ def cell_labels(sid):
 
 def show_crop(ax, row, w_um, layers, cell_hl=None, hl_color="#f1c40f", title=""):
     if row.sample_id not in _BUN:
+        if len(_BUN) >= 6:  # keep few sections open (4 image files + masks each)
+            for b_ in _BUN.values():
+                if b_._planes:
+                    for p_ in b_._planes.values():
+                        p_.close()
+            _BUN.clear()
         _BUN[row.sample_id] = XeniumBundle(bundles[row.sample_id])
     b = _BUN[row.sample_id]
     px = b.pixel_size
@@ -498,8 +520,8 @@ for st_ in ["MOL", "NFOL"]:
 # transcripts inside an outline (red) and outside (cyan), control myelin genes (yellow dots).
 
 # %%
-cnt = ol[ol.zone == "core"].groupby("meta_sample_id").size()
-pc = cnt.idxmax()
+cnt = ol[ol.zone.isin(["core", "healthy"])].groupby(["meta_sample_id", "zone"]).size().unstack(fill_value=0)
+pc = cnt.min(1).idxmax()  # piece with the most of both healthy and core WM oligodendrocytes
 g = ol[ol.meta_sample_id == pc]
 rng = np.random.default_rng(0)
 picks = [("healthy WM", g[g.zone == "healthy"]), ("lesion core WM", g[g.zone == "core"])]
@@ -945,8 +967,8 @@ q4p.to_csv(OUT / "q4_pieces_lesion_vs_local_healthy.csv", index=False)
 q4, an = q4_summary(q4p, "main: curated lesion niches vs physiological WM within 150 µm")
 checks = [q4]
 checks.append(q4_summary(q4_pieces(w4, "zone", 400), "lesion-region core vs healthy WM within 400 µm")[0])
-for r_ in ["run5", "run6"]:
-    checks.append(q4_summary(q4_pieces(w4[w4.run_id == r_]), f"{r_} only")[0])
+for r_ in ["runs 5/6", "runs 1-3"]:
+    checks.append(q4_summary(q4_pieces(w4[w4.runset == r_]), f"{r_} only")[0])
 r4 = pd.concat(checks)
 r4.round(4).to_csv(OUT / "q4_summary_and_robustness.csv", index=False)
 print(f"{len(q4p)} pieces, {q4p.animal.nunique()} animals")
@@ -1095,50 +1117,41 @@ plotting.save_fig(fig, "course", OUT, SRC)
 
 # %% [markdown]
 # ## Findings
-# Runs 5/6 (25 animals; 15–20 with lesion cores per readout). Each claim was repeated under: the other lesion
-# definition, each run alone, each segmentation method, each cell-size third, MOL only, and (white matter) the same
-# distance band from grey matter. Strength labels follow those checks.
+# All five runs (67 animals; 38–53 with lesion cores per readout). Each claim was repeated under: the other lesion
+# definition, **runs 5/6 and runs 1–3 separately** (runs 1–3 were added after the claims were made, so they are an
+# independent replication), each segmentation method, each cell-size third, white and grey matter separately, MOL
+# only and (white matter) the same distance band from grey matter.
 #
-# > **Check — RNA sits where cell biology says it should (strong).** In healthy tissue only 22 % of *Mbp* lies inside
-# > cell outlines (it is shipped out into myelin), against ~75 % for its sister myelin genes and the oligodendrocyte
-# > soma genes; *Neat1* is the most nuclear; *Gfap* RNA lies mostly in astrocyte processes. The method sees real
-# > subcellular biology.
+# > **Check — RNA sits where cell biology says it should (strong).** In healthy tissue ~20 % of *Mbp* lies inside
+# > cell outlines (transported into myelin), against ~73 % for its sister myelin genes; *Neat1* is the most nuclear;
+# > *Gfap* RNA lies mostly in astrocyte processes.
 # >
-# > **1. Oligodendrocytes in lesions keep less *Mbp* in the cell body relative to their other myelin genes (modest,
-# > consistent).** ×0.91 (12/15 animals lower, p = 0.007); ×0.88 in mature oligodendrocytes alone (13/14); also with
-# > curated lesions (×0.94), in every size third, and at the same distance from grey matter (×0.92–0.94, weaker p).
-# > There is **no sign of a transport block**: *Mbp* does not pile up in the soma or the nucleus. The data fit a
-# > relative down-shift of *Mbp* (less made, or relatively more sent out), not a jam. *Withdrawn:* the earlier
-# > "newly formed oligodendrocytes have less exported *Mbp* around them" disappears with the curated lesion definition
-# > (×0.99, p = 0.13).
+# > **1. Oligodendrocytes in lesions keep less *Mbp* in the cell body relative to their other myelin genes
+# > (replicated, modest).** ×0.90 (31/38 animals lower, p < 0.001); runs 5/6 ×0.91 (12/15), **runs 1–3 ×0.90 (19/23)**;
+# > MOL only ×0.89 (runs 1–3 ×0.91); curated lesions ×0.94; every size third; strongest within 100 µm of grey matter
+# > (×0.86) and weaker deeper (×0.95, p = 0.02). No pile-up in soma or nucleus: a relative down-shift of *Mbp*, not a
+# > transport block. *Withdrawn:* NFOL "less exported *Mbp*" (runs 1–3 ×0.98; curated ×1.09).
 # >
-# > **2. No RNA trace of engulfed myelin in macrophages/microglia (robust negative).** In lesion cores myeloid cells
-# > carry *less* myelin RNA inside relative to around them than astrocytes do (×0.88, 18/20 animals; both runs, both
-# > lesion definitions, every size third; in white matter alone ×0.91, in grey matter alone equal, ×0.99);
-# > *Cd68*-high myeloid cells carry less than *Cd68*-low ones, also per
-# > transcript (×0.60), although they are bigger; what myelin RNA they contain sits at the rim like spillover. Engulfed
-# > mRNA is probably degraded too fast to be seen; phagocytosis has to be read from the cells' own programs.
-# > *Lead, not a finding:* in **grey-matter** lesion cores, myeloid cells hold more neuron-derived RNA relative to
-# > around them than astrocytes (×1.35, 16/16 animals). Engulfed neuronal material and spillover from neurons that
-# > microglia touch would both give this; it needs the depth test restricted to grey matter before any claim.
+# > **2. No RNA trace of engulfed myelin in macrophages/microglia (replicated negative).** Lesion-core myeloid cells
+# > carry less myelin RNA relative to around them than astrocytes: ×0.88 (47/51), runs 1–3 ×0.86 (29/31); *Cd68*-high
+# > cells less than *Cd68*-low ones (core ×0.77). *Lead:* in grey-matter lesion cores myeloid cells hold more
+# > neuron-derived RNA than astrocytes (×1.39, 40/41 animals; runs 5/6 ×1.35, 16/16). Engulfed neuronal material and
+# > spillover from neurons that microglia touch would both give this; the depth test in grey matter is the next step.
 # >
-# > **3. Nuclear retention in lesions: withdrawn (Simpson's paradox).** The pooled +3 % for oligodendrocytes and OPC
-# > vanished within white matter (×1.00) and within grey matter (×1.00) separately; it came from mixing regions
-# > (healthy WM cells have more nuclear RNA than GM cells, and lesion cores hold more WM cells). The gene-level screen
-# > pools regions in the same way and is not interpreted.
+# > **3. Nuclear retention: withdrawn (Simpson's paradox), confirmed on all runs.** Pooled ×1.02–1.03 for
+# > oligodendrocytes and OPC; within white matter ×0.99, within grey matter ×1.00–1.01.
 # >
-# > **4. The space between cells in white-matter lesions, compared at the same distance from grey matter
-# > (consistent).** *Astrocyte RNA* (*Gfap*, *Aqp4*, …) between cells is **higher everywhere** (×1.14–1.50; gliosis).
-# > *Neuron-derived RNA* (neurofilaments, *Stmn2*, *Gap43*), which in healthy WM comes mainly from the adjacent grey
-# > matter, is **lower within ~150 µm of grey matter** (×0.38–0.64, nearly all animals), together with ATP1A1
-# > (×0.83–0.89 within 75 µm; notebook 20, section 9). *Myelin RNA* is not lower near grey matter but ~10 % lower
-# > deeper in the white matter (×0.86–0.92 beyond 75 µm). The first, unmatched comparison (axonal RNA ×0.17) was mostly
-# > anatomy: lesions lie further from grey matter, and neuronal RNA falls ~20-fold over the first 200 µm.
+# > **4. The space between cells in white-matter lesions, at matched distance from grey matter (replicated).**
+# > Neuron-derived RNA ×0.36–0.64 within 150 µm of grey matter (nearly every animal, 43–46 per band); ATP1A1
+# > ×0.83–0.87 within 75 µm and ~1 beyond (notebook 20, section 9); astrocyte RNA up at every distance (×1.14–1.50);
+# > myelin RNA unchanged near grey matter and ×0.80–0.92 deeper. Unmatched comparisons (neuron-derived ×0.18) are
+# > mostly anatomy.
 # >
-# > **5. Disease course.** None of the readouts follows clinical score or first-attack peak (all p > 0.05, 15–20
-# > animals).
+# > **5. Disease course: not interpreted.** With all runs several per-animal readouts correlate with clinical score
+# > (|ρ| 0.3–0.47), but the per-animal values used here are pooled over white and grey matter or not matched for
+# > distance to grey matter, and run and arm are confounded with score; they need distance-matched, run-adjusted
+# > values before any claim.
 # >
-# > **Overall.** The subcellular view adds two solid points (the myelin-RNA localisation biology itself, and a modest
-# > lesion shift in *Mbp* handling by oligodendrocytes), one robust negative (no engulfed-RNA trace), and, with the
-# > anatomy control, a coherent picture of the grey/white border in lesions: less neuronal RNA *and* less ATP1A1
-# > neuropil there, with gliosis RNA up throughout. The nuclear-retention signal did not survive.
+# > **Overall.** Two subcellular findings replicate in independent runs: the *Mbp* shift in lesion oligodendrocytes
+# > and the absence of engulfed-myelin RNA in myeloid cells. At the grey/white border, lesions have less neuronal RNA
+# > and less ATP1A1 neuropil; gliosis RNA is up throughout. Nuclear retention did not survive.
