@@ -1,0 +1,68 @@
+animal,stage,group,run,arm,border_ratio,border_bands,deep_ratio,deep_bands
+C_CFA_1,MOG CFA,,run1,chronic,,0,,0
+C_CFA_2,MOG CFA,,run1,chronic,,0,,0
+C_CFA_3,MOG CFA,,run1,chronic,,0,,0
+C_CFA_4,CFA,,run5,chronic,,0,,0
+C_CFA_6,CFA,,run5,chronic,,0,,0
+C_L_1,MILD30,chronic late,run1,chronic,1.016,1,1.05,3
+C_L_2,MILD30,chronic late,run1,chronic,0.422,3,0.465,2
+C_L_3,MILD30,chronic late,run1,chronic,1.008,3,2.557,1
+C_L_4,MILD30,chronic late,run1,chronic,0.607,3,0.649,3
+C_L_5,MILD30,chronic late,run1,chronic,1.078,3,1.12,4
+C_M16_1,MILD16,chronic late,run5,chronic,0.654,3,0.79,2
+C_M16_2,MILD16,chronic late,run5,chronic,0.972,3,1.293,2
+C_M16_3,MILD16,chronic late,run5,chronic,0.818,2,1.026,3
+C_NS_1,NONSYMPTOM,,run1,chronic,,0,,0
+C_NS_2,NONSYMPTOM,,run1,chronic,,0,1.249,1
+C_NS_3,NONSYMPTOM,,run1,chronic,,0,0.628,2
+C_NS_4,NONSYMPTOM,,run5,chronic,,0,,0
+C_NS_5,NONSYMPTOM,,run5,chronic,,0,,0
+C_OS1_1,OS1,active,run1,chronic,0.83,3,1.414,3
+C_OS1_2,OS1,active,run1,chronic,1.108,3,1.948,3
+C_OS1_3,OS1,active,run1,chronic,0.613,3,0.465,3
+C_OS1_4,OS1,active,run1,chronic,0.825,3,0.969,3
+C_OS1_5,OS1,active,run5,chronic,1.107,3,0.761,3
+C_P1_1,PEAK1,active,run1,chronic,,0,,0
+C_P1_2,PEAK1,active,run1,chronic,0.439,2,,0
+C_P1_3,PEAK1,active,run1,chronic,0.722,3,,0
+C_P1_4,PEAK1,active,run5,chronic,,0,,0
+C_P1_5,PEAK1,active,run5,chronic,0.644,1,,0
+C_P1_6,PEAK1,active,run5,chronic,0.686,2,,0
+C_S16_1,SEVERE16,chronic late,run5,chronic,0.926,3,,0
+C_S16_2,SEVERE16,chronic late,run5,chronic,1.045,3,1.567,2
+C_S16_3,SEVERE16,chronic late,run5,chronic,0.629,3,,0
+C_S30_1,SEVERE30,chronic late,run5,chronic,0.777,3,0.786,1
+C_S30_2,SEVERE30,chronic late,run5,chronic,1.047,3,1.435,1
+RR_CFA_1,PLP CFA,,run2,RR,,0,0.905,2
+RR_CFA_2,PLP CFA,,run2,RR,,0,0.957,1
+RR_CFA_3,PLP CFA,,run3,RR,,0,0.98,2
+RR_MP_1,MONOPHASIC,recovery,run2,RR,0.754,3,0.924,3
+RR_MP_2,MONOPHASIC,recovery,run2,RR,0.869,3,0.902,1
+RR_MP_3,MONOPHASIC,recovery,run3,RR,0.882,3,1.315,3
+RR_MP_4,MONOPHASIC,recovery,run3,RR,0.973,3,0.998,3
+RR_OS1_1,ONSET1,active,run2,RR,1.17,3,0.907,3
+RR_OS1_2,ONSET1,active,run3,RR,0.825,3,0.994,4
+RR_OS2_1,ONSET2,active,run2,RR,0.964,3,1.064,4
+RR_OS2_2,ONSET2,active,run3,RR,1.158,3,1.145,4
+RR_P1_1,PEAK1,active,run2,RR,,0,,0
+RR_P1_2,PEAK1,active,run3,RR,,0,,0
+RR_P1_3,PEAK1,active,run3,RR,0.616,2,,0
+RR_P1_5,PEAK1,active,run6,RR,,0,,0
+RR_P2M_1,PEAK2_MILD,active,run2,RR,0.692,3,0.868,1
+RR_P2M_2,PEAK2_MILD,active,run2,RR,0.834,3,,0
+RR_P2_3,PEAK2,active,run3,RR,0.82,3,,0
+RR_P2_4,PEAK2,active,run6,RR,,0,,0
+RR_P3_1,PEAK3,active,run2,RR,0.775,3,1.066,2
+RR_P3_2,PEAK3,active,run3,RR,1.405,2,,0
+RR_P3_3,PEAK3,active,run3,RR,0.455,3,,0
+RR_P3_4,PEAK3,active,run5,RR,0.815,3,0.998,2
+RR_P3_5,PEAK3,active,run6,RR,0.903,3,1.593,2
+RR_R1_1,REMISSION1,recovery,run2,RR,0.726,3,,0
+RR_R1_2,REMISSION1,recovery,run2,RR,0.781,3,0.998,2
+RR_R1_3,REMISSION1,recovery,run3,RR,0.78,3,0.828,1
+RR_R1_4,REMISSION1,recovery,run6,RR,0.849,3,1.16,1
+RR_R1_6,REMISSION1,recovery,run5,RR,0.8,3,0.925,4
+RR_R2LONG_1,REMISSION2_LONG,recovery,run3,RR,0.801,3,1.041,3
+RR_R2_3,REMISSION2,recovery,run6,RR,0.888,3,1.339,3
+RR_R2_4,REMISSION2,recovery,run6,RR,0.941,3,0.988,2
+RR_R2_5,REMISSION2,recovery,run5,RR,0.834,3,1.099,3

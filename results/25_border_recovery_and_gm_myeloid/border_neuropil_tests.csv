@@ -1,0 +1,13 @@
+readout,group,animals,ratio,p_vs_1
+border_ratio,active,22,0.8224,0.0015
+border_ratio,recovery,13,0.8338,0.0002
+border_ratio,chronic late,13,0.9257,0.0574
+border_ratio,active vs recovery,35,0.9863,0.5967
+border_ratio,active vs chronic late,35,0.8885,0.8779
+border_ratio,recovery vs chronic late,26,0.9008,0.5727
+deep_ratio,active,13,0.9977,0.8394
+deep_ratio,recovery,12,0.998,0.791
+deep_ratio,chronic late,11,1.0498,0.6377
+deep_ratio,active vs recovery,25,0.9997,0.9783
+deep_ratio,active vs chronic late,24,0.9504,0.9538
+deep_ratio,recovery vs chronic late,23,0.9507,0.8294

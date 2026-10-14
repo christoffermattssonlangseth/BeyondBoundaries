@@ -1,0 +1,9 @@
+sample,contrast,channel,n,difference,p
+S07-256,plasma vs T/B,bnd,162 vs 1335,-0.2734,0.0
+S07-256,plasma vs T/B,dapi,162 vs 1335,-0.3153,0.003
+S07-256,microglia vs macrophage,bnd,1773 vs 6960,-0.0176,0.002
+S07-256,microglia vs macrophage,dapi,1773 vs 6960,0.047,0.0072
+S13-019,plasma vs T/B,bnd,1712 vs 2839,-0.3819,0.0
+S13-019,plasma vs T/B,dapi,1712 vs 2839,0.0815,0.0195
+S13-019,microglia vs macrophage,bnd,9447 vs 2572,-0.1162,0.0
+S13-019,microglia vs macrophage,dapi,9447 vs 2572,0.249,0.0

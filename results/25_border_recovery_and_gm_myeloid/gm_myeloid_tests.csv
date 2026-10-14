@@ -1,0 +1,15 @@
+zone,test,animals,ratio,share_above,p
+core,uptake: myeloid ÷ astrocyte,41,1.3478,0.9756,0.0
+core,depth index: myeloid ÷ astrocyte,41,1.0436,0.6341,0.1444
+core,myeloid uptake: touching ÷ distant from a neuron,35,1.2511,0.8286,0.0
+core,astrocyte uptake: touching ÷ distant,32,1.3412,0.9688,0.0
+core,distant cells only: myeloid ÷ astrocyte,41,1.3479,0.9024,0.0
+core,depth_myeloid (median level),41,0.8869,,
+core,depth_astro (median level),41,0.8474,,
+healthy,uptake: myeloid ÷ astrocyte,54,1.1383,0.8519,0.0
+healthy,depth index: myeloid ÷ astrocyte,54,0.8938,0.2037,0.0
+healthy,myeloid uptake: touching ÷ distant from a neuron,50,1.1751,0.84,0.0
+healthy,astrocyte uptake: touching ÷ distant,53,1.175,0.9245,0.0
+healthy,distant cells only: myeloid ÷ astrocyte,52,1.1118,0.7115,0.0005
+healthy,depth_myeloid (median level),54,0.7495,,
+healthy,depth_astro (median level),54,0.8417,,

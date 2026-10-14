@@ -17,6 +17,10 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
 | **Astrocyte reactive RNA without vimentin protein in active disease**, consistent with RNA preceding protein (stages from different animals) (*Vim* not on the panel) | protein vs RNA ρ 0.46–0.58 per run; "RNA-only" astrocytes enriched in active disease in both run sets | the clearest protein-vs-RNA insight |
 | **Images alone map lesions and cell types on unseen runs** | lesion AUROC 0.85–0.91, cell type 0.42–0.47 (chance 0.07), leave-one-run-out over 5 runs | QC and annotation cross-check; redundant with RNA for biology |
 
+**Human MS spinal cord (one run, 4 sections):** CD45 **is** detectable on lymphocytes there (boundary-channel-specific
+at matched size, tracks *PTPRC*, outlines perivascular cuffs), and the αSMA/vimentin channel follows *VIM* RNA
+(ρ 0.69–0.98), validating the vimentin readout. Neuropil loss is inconclusive in human.
+
 ## What is weak or partial
 
 - **Lesion vimentin and outcome:** low at peak, fills lesion interiors, tends to be higher in animals that do well
@@ -27,7 +31,7 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
 
 ## What does not work, or was withdrawn after controls
 
-- **CD45** is undetectable in mouse spinal cord; the boundary channel reports ATP1A1 only.
+- **CD45** is undetectable in mouse spinal cord (the boundary channel reports ATP1A1 only); in human it works.
 - **No hidden cell states:** ~85 % of image variance isn't explained by RNA, but it is mostly a local optical/staining field.
 - **Images don't improve lesion identity or severity prediction** over the transcriptome.
 - **Withdrawn:** nuclear RNA retention in lesion oligodendrocytes (white/grey-matter mix; notebook 23); T cells orienting 18S towards vessels (bleed from bright neighbours + outline geometry); a vimentin
@@ -48,8 +52,6 @@ Mouse EAE spinal cord, RRMAP2 runs 1–6: 54 images, 67 animals, 1.38 M cells. S
   αSMA, GFAP; a mouse-reactive CD45). The most informative sections: MILD16 vs SEVERE16 (they share images) and
   MONOPHASIC vs REMISSION1.
 - **Future panels:** add *Vim*, *Acta2*, *Gfap*, *Atp1a1* as custom genes.
-- **Worth writing up as methods:** control-referenced lesion definitions; lesion regions instead of linked cells;
-  brightness-matched and nucleus-relative controls for polarity.
 
 ## The bigger contribution may be the disease biology (transcriptome-led, all five runs)
 
@@ -58,6 +60,4 @@ infiltrate → fibrotic, demyelinated and glial-reactive tissue. Chronic severit
 lesions that stayed active. Relapse can't be predicted clinically; B cells accumulate after the first attack in
 meningeal aggregates (fewer in never-relapsing animals), and relapses are mostly new lesions.
 
-**For discussion:** (1) the paper's framing, disease biology or kit evaluation; (2) whether the slides are available
-for post-Xenium immunofluorescence; (3) which open threads to close first (B cells and relapse with more REMISSION1-stage
-animals; vimentin with separate antibodies).
+**For discussion:** the paper's framing; slides for post-Xenium immunofluorescence; which open threads to close first.

@@ -1,0 +1,7 @@
+sample,zone,myeloid,astrocytes,uptake_myeloid,uptake_astrocyte,myeloid_over_astrocyte
+S07-256,demyelinated,6380,6056,0.843,0.775,1.089
+S07-256,myelinated,2868,3072,0.84,0.797,1.053
+S13-019,demyelinated,2830,2170,1.398,1.038,1.347
+S13-019,myelinated,8398,5898,0.942,0.876,1.075
+Balo-2,demyelinated,1891,569,0.885,0.643,1.376
+Balo-2,myelinated,1576,572,1.052,0.803,1.31

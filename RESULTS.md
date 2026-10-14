@@ -544,3 +544,18 @@ extracted for all 36 sections; notebook 23 re-run on 67 animals (cells < 20 µm 
 - WM between-cell RNA at matched distance from grey matter: neuron-derived ×0.36–0.64 within 150 µm, ATP1A1 ×0.83–0.87
   within 75 µm, astrocyte RNA ×1.14–1.50 everywhere, myelin RNA ×0.80–0.92 beyond 75 µm only — replicated.
 - Clinical correlations (|ρ| 0.3–0.47) use pooled or unmatched per-animal values with run/arm confounding: not interpreted.
+
+## 2026-10-15 — Border neuropil over the course; grey-matter myeloid neuronal RNA (`notebooks/25_border_recovery_and_gm_myeloid.ipynb`)
+- **Border ATP1A1 loss persists:** lesion ÷ healthy WM within 0–75 µm of grey matter at matched distance — active ×0.82
+  (22 animals, p = 0.002), recovery ×0.83 (13/13 below 1, p < 0.001), chronic late ×0.93 (p = 0.06); groups do not
+  differ (p ≥ 0.57); deep WM ×1.00–1.05 in every group. Replaces the unmatched "neuropil returns in recovery"
+  (notebooks 11/12).
+- **GM myeloid neuronal RNA:** cores ×1.35 vs astrocytes (40/41; healthy GM ×1.14); touching a neuron raises it in
+  both cell types (myeloid ×1.25, astrocytes ×1.34) but the myeloid excess remains in cells ≥ 25 µm from any neuron
+  (×1.35, 37/41); not deeper inside than own RNA (depth ×1.04, p = 0.14). Unresolved: neurite contact or small
+  recent uptake.
+
+## 2026-10-15 — Human h05: CD45 by immune subtype
+- Size-matched boundary-channel excess T +0.75/+0.81 > B +0.45/+0.54 ≈ plasma +0.46/+0.38, same order as *PTPRC* RNA;
+  plasma vs T/B −0.27/−0.38 (DAPI opposite in S13-019, same direction in S07-256); microglia vs macrophages −0.02/−0.12
+  with DAPI opposite. Supports CD45 specificity, moderately.

@@ -269,6 +269,23 @@ or RNA astrocyte reactivity (reactive − homeostatic gene z, lesion astrocytes)
 (≥ 20 astrocytes of that state); within-image pairs (all pairs of post-peak animals sharing a Xenium image with different
 scores; sign test over animal pairs).
 
+### 13d. Human MS / Baló validation (`human/`, notebooks h01–h04)
+
+Four sections from one Xenium run (2026-01-15; same segmentation kit, XOA 4.0.1; human 5K panel hAtlas v1.1 + 100
+custom genes): MS spinal cord S07-256 and S13-019 (Netherlands Brain Bank) and Baló's concentric sclerosis Balo-1
+and Balo-2. Raw data stay on the analysis Mac (`/Volumes/moldiassd/human_MS_Balo/`); no per-cell data in git. Cell
+types: Leiden 1.5 clusters labelled from marker sets plus manual labels from each cluster's top genes
+(`human/scripts/01_label_clusters.py`); two low-quality clusters (median 104–132 transcripts) excluded. Image
+features: the mouse extractor with `human/config.yaml`. CD45: boundary-channel membrane contrast = log(rim mean ÷
+2 µm ring mean); compared with other cell types, with each immune cell's nearest non-immune neighbour (≤ 30 µm), at
+matched cell size (section-wise area deciles) with DAPI and 18S as geometry controls, and against *PTPRC* RNA within
+immune cells; CD45-bright = contrast above the 95th percentile of the section's oligodendrocytes. Stain vs gene:
+cell-type medians of channel z against cell-type mean RNA per 1,000 transcripts (*ATP1A1*, *PTPRC*, *CDH1*, *VIM*).
+Lesion maps: 25 µm bins of myelin RNA share (*MBP*, *MOBP*, *MOG*, *MAG*, *OPALIN* ÷ all transcripts), grey matter
+from neuron share, meninges/roots from fibroblast + Schwann share, subpial rim = first 100 µm. Neuropil: demyelinated
+vs myelinated white-matter cells within 300 µm at the same distance from grey matter (± 25 µm). Cuffs: lymphocytes
+within 20 µm of a vessel cell vs other cells. One donor per section: descriptive, no tests across patients.
+
 ### 14. Software and statistics
 
 Python 3.12.14; numpy 2.2.6, pandas 2.2.3, scipy 1.15.2, scikit-learn 1.7.2, anndata 0.12.19, scanpy 1.11.5,
@@ -458,8 +475,9 @@ are descriptive [11].
 Within the same lesion state, from peak (19 animals) to recovery (13), neuropil trends back towards normal (S1 0.79 →
 1.03; S5 0.88 → 0.99, p = 0.02) while vimentin rises (glial S0/S3 tissue vimentin p = 0.009/0.005; best q = 0.13).
 Lesions that persist into recovery look repaired in neuropil but scarred in vimentin [11]. (This readout pools WM and
-GM; WM lesions alone stay below 1 [13]. Not yet checked for distance to grey matter, which notebook 20, section 9
-showed drives most of the WM neuropil contrast; treat the neuropil half of this pattern as unconfirmed.)
+GM; WM lesions alone stay below 1 [13]. **Superseded (notebook 25):** matched for distance to grey matter, the border ATP1A1 loss does *not*
+recover: active ×0.82, recovery ×0.83 (13/13 animals below 1), chronic late ×0.93; deep white matter ×1.0 throughout.
+The neuropil half of this pattern was a white/grey-matter and position mix.)
 
 ---
 
@@ -480,6 +498,33 @@ showed drives most of the WM neuropil contrast; treat the neuropil half of this 
 - *Withdrawn*: nuclear RNA retention in lesion oligodendrocytes/OPC (+3 % pooled; ×1.00 within WM and within GM:
   Simpson's paradox from region mix); "newly formed oligodendrocytes export less *Mbp*" (not robust to the lesion
   definition). No readout tracks clinical score.
+
+### J. Human MS / Baló validation (human/ h01–h04)
+
+- *CD45 is detectable in human MS lymphocytes, unlike in mouse*: highest boundary-channel membrane contrast of any cell
+  type (0.61–0.75 vs ≈ 0 for glia), brighter than the nearest non-immune neighbour in 67–71 % of pairs, brighter at
+  matched cell size in 10/10 size deciles (+0.57 to +0.64) while DAPI (−0.25 to −0.48) and 18S (≈ 0) are not, and
+  rising with *PTPRC* RNA within lymphocytes (ρ +0.13, +0.19; *ATP1A1* control ≈ 0). Dense perivascular cuffs show a
+  honeycomb of CD45 membrane rings. Myeloid cells weaker (CD45-low microglia). Baló: too few lymphocytes to separate
+  CD45 from geometry.
+- *The αSMA/vimentin channel follows VIM RNA* across cell types in every section (ρ 0.69–0.98): the channel reports
+  vimentin. The boundary channel does not follow *ATP1A1* RNA (protein in neuropil, away from the soma) and E-cadherin
+  is not detected.
+- *Lesions from the RNA*: myelin RNA share resolves grey matter, myelinated and demyelinated white matter (a broad
+  subpial band in S07-256). Lymphocytes, 49–77 % CD45-bright, gather in demyelinated white matter (S13-019 602/mm² vs
+  55 in myelinated) and meninges, 2–5× enriched within 20 µm of vessels.
+- *Neuropil loss: inconclusive.* Demyelinated white matter lies far from grey matter (median 975–1,482 µm vs 375–551
+  for myelinated), the mouse confound again; matched at the zone boundary ×0.97 and ×0.76 with halves disagreeing.
+- *Baló*: an active lesion edge (SPP1+ myeloid cells 3,240/mm² in demyelinated vs 417 in myelinated tissue), no
+  concentric rings (also absent on H&E). ~6 % of each Baló section is out of focus (bubbles or lifting; no transcripts
+  or cells; tissue intact on H&E) and is excluded; the MS sections' no-transcript gaps are real spaces.
+- *Lesion areas (h04)*: S13-019 lesions are lymphocyte-rich (38 → 134 → 305 per 1,000 cells from myelinated white
+  matter to lesion edge to core) and phagocytically quiet (*CD68*/*GPNMB*/*SPP1*/*APOC1* RNA in myeloid cells 4–9 vs
+  33 per 1,000); S07-256 milder; Balo-2 macrophage-driven (myeloid 3× denser, phagocytic, few lymphocytes).
+- *Mouse RNA-localisation findings in human (h04)*: most *MBP* outside cell bodies (18–35 % inside) replicates; less
+  *MBP* relative to control myelin genes in lesion oligodendrocytes is mixed (S07-256 ×0.91, Balo-2 ×0.89, S13-019
+  ×1.18, consistent across distance-to-grey-matter bands); "myeloid cells hold less myelin RNA than astrocytes" does
+  not replicate (human ×1.05–1.38 everywhere).
 
 ## Limitations
 

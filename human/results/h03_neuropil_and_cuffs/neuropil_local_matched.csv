@@ -1,0 +1,27 @@
+sample,part,channel,cells,median_ratio,share_below_1,q25,q75
+S07-256,whole section,ATP1A1 (boundary channel),823,0.968,0.514,0.546,1.498
+S07-256,0–75 µm from grey matter,ATP1A1 (boundary channel),90,1.011,0.478,,
+S07-256,75–200 µm from grey matter,ATP1A1 (boundary channel),203,1.261,0.33,,
+S07-256,> 200 µm from grey matter,ATP1A1 (boundary channel),530,0.847,0.591,,
+S07-256,whole section,DAPI (control),823,1.434,0.326,0.863,2.484
+S07-256,0–75 µm from grey matter,DAPI (control),90,1.203,0.367,,
+S07-256,75–200 µm from grey matter,DAPI (control),202,1.421,0.342,,
+S07-256,> 200 µm from grey matter,DAPI (control),531,1.474,0.313,,
+S07-256,upper half,ATP1A1 (boundary channel),274,1.203,0.361,0.778,2.215
+S07-256,upper half,DAPI (control),273,1.421,0.3,0.91,2.259
+S07-256,lower half,ATP1A1 (boundary channel),383,0.924,0.559,0.479,1.371
+S07-256,lower half,DAPI (control),383,1.363,0.371,0.789,2.292
+S07-256,UNMATCHED: all myelinated WM of the section,ATP1A1 (boundary channel),23694,1.424,,,
+S13-019,whole section,ATP1A1 (boundary channel),1252,0.76,0.669,0.47,1.184
+S13-019,0–75 µm from grey matter,ATP1A1 (boundary channel),41,0.952,0.537,,
+S13-019,75–200 µm from grey matter,ATP1A1 (boundary channel),75,0.718,0.747,,
+S13-019,> 200 µm from grey matter,ATP1A1 (boundary channel),1136,0.766,0.668,,
+S13-019,whole section,DAPI (control),1248,1.305,0.364,0.804,2.963
+S13-019,0–75 µm from grey matter,DAPI (control),41,1.067,0.488,,
+S13-019,75–200 µm from grey matter,DAPI (control),75,1.17,0.413,,
+S13-019,> 200 µm from grey matter,DAPI (control),1132,1.325,0.356,,
+S13-019,upper half,ATP1A1 (boundary channel),894,0.706,0.717,0.403,1.066
+S13-019,upper half,DAPI (control),890,1.546,0.311,0.87,4.017
+S13-019,lower half,ATP1A1 (boundary channel),254,1.005,0.492,0.682,1.46
+S13-019,lower half,DAPI (control),254,1.038,0.445,0.765,1.506
+S13-019,UNMATCHED: all myelinated WM of the section,ATP1A1 (boundary channel),12552,0.866,,,
