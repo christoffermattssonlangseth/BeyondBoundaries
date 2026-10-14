@@ -37,6 +37,26 @@ MARKERS = {
     "Ependymal": ["FOXJ1", "CFAP43", "DNAH9", "RSPH1"],
     "Schwann": ["MPZ", "PMP22", "PRX", "NCMAP"],
 }
+# Manual labels for leiden_1.5 clusters the marker scores get wrong or call "mixed", decided from each cluster's top
+# genes (mean log-expression in cluster minus rest; checked 2026-10-14). The fibroblast collagen genes are not on the
+# panel, so PDGFRA alone cannot separate fibroblasts from OPCs.
+MANUAL = {
+    "20": "Fibroblast",            # VIM, TNXB, PI16, FMOD, CXCL12, LTBP2, C4A/B (meningeal / perivascular)
+    "21": "Fibroblast",            # VIM, TNXB, NBL1, COL18A1, FMOD, LTBP2, CXCL12
+    "22": "OPC",                   # PTPRZ1, TNR, BCAN, SOX10, PDGFRA, OLIG2, CSPG4
+    "28": "OPC",                   # PTPRZ1, BCAN, TNR, OLIG1/2, SOX8 (Balo sections)
+    "13": "Lymphocyte (T/B/plasma)",  # CXCR4, CD3E, CD2, CD8A, CD79A, MS4A1, XBP1, MZB1
+    "7": "Myeloid (SPP1+ activated)",  # SPP1, FTL, APOC1, CCL4, CD74 (Balo lesions)
+    "12": "Myeloid",               # CSF1R, CD163, LYZ, CD14
+    "19": "Myeloid",               # CSF1R, CD163, LYZ, CD14, CD68
+    "24": "Myeloid",               # CD163, MRC1, LYZ, CD14, CD68, F13A1 (macrophage)
+    "1": "Myeloid",                # P2RY12, CX3CR1, TMEM119, CSF1R (microglia)
+    "14": "Astrocyte (reactive)",  # GFAP, SERPINA3, CD44, C4A/B, APOE
+    "25": "Perivascular (mixed)",  # COL4A1, CLDN5, CD163, CXCL12, ADAMTS1
+    "27": "Neuron (with oligodendrocyte signal)",  # SNAP25, SYP, SLC17A7 + CNP, OPALIN (Balo only)
+    "9": "low quality",            # median 104 transcripts; MT-CO1, MCL1, NR4A1, CDKN1A (stress)
+    "11": "low quality",           # median 132 transcripts; MT-CO1/2 with GFAP + MBP + CD74 (mixed)
+}
 
 
 def main():
@@ -64,7 +84,12 @@ def main():
     best, second = S.idxmax(1), S.apply(lambda r: r.nlargest(2).index[1], axis=1)
     gap = S.max(1) - S.apply(lambda r: r.nlargest(2).iloc[1], axis=1)
     lab = pd.Series(np.where(gap >= args.margin, best, "mixed: " + best + "/" + second), index=S.index)
-    S["label"], S["margin"], S["cells"] = lab, gap, cl.value_counts().reindex(S.index)
+    S["marker_call"] = lab
+    if args.leiden == "leiden_1.5":
+        lab = lab.rename(index=str).copy()
+        for c, v in MANUAL.items():
+            lab[c] = v
+    S["label"], S["margin"], S["cells"] = lab.reindex(S.index), gap, cl.value_counts().reindex(S.index)
     S = S.sort_values("label")
     S.round(3).to_csv(out_fig / "cluster_scores.csv")
     print(S[["label", "margin", "cells"]].to_string())
